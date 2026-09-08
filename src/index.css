@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #000000;
+  --color-card: #0F0F0F;
+  --color-accent-dark: #1B1B1D;
+  --color-secondary: #2A2A2C;
+  --color-border: #26272D;
+  --color-primary: #2FE92B;
+  --color-orange: #FF9821;
+  --color-orange-sub: #F57733;
+  --color-orange-dark: #FF5102;
+  --color-text-main: #FFFFFF;
+  --color-text-sec: #BBCBB2;
+  --color-text-muted: rgba(255, 255, 255, 0.45);
+  --radius: 0.25rem;
+}
+
+body {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", sans-serif;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* Vinyl rotation animation */
+@keyframes vinyl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-vinyl-spin {
+  animation: vinyl-spin 22s linear infinite;
+}
+
+.animate-vinyl-spin-fast {
+  animation: vinyl-spin 12s linear infinite;
+}
+
+/* Vinyl concentric grooves effect */
+.vinyl-grooves {
+  background: radial-gradient(
+    circle at center,
+    transparent 28%,
+    rgba(255, 255, 255, 0.02) 28.5%,
+    transparent 29%,
+    rgba(255, 255, 255, 0.04) 34%,
+    transparent 34.5%,
+    rgba(255, 255, 255, 0.03) 42%,
+    transparent 42.5%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 50.5%,
+    rgba(255, 255, 255, 0.03) 58%,
+    transparent 58.5%,
+    rgba(255, 255, 255, 0.05) 67%,
+    transparent 67.5%,
+    rgba(255, 255, 255, 0.03) 76%,
+    transparent 76.5%,
+    rgba(255, 255, 255, 0.05) 86%,
+    transparent 86.5%,
+    rgba(255, 255, 255, 0.02) 95%,
+    transparent 96%
+  );
+}
+
+/* Vinyl light reflection sheen (butterfly reflection / luster) */
+.vinyl-reflection {
+  background: conic-gradient(
+    from 35deg at 50% 50%,
+    rgba(255, 255, 255, 0.08) 0deg,
+    rgba(255, 255, 255, 0.01) 35deg,
+    transparent 70deg,
+    rgba(255, 255, 255, 0.08) 180deg,
+    rgba(255, 255, 255, 0.01) 215deg,
+    transparent 250deg,
+    rgba(255, 255, 255, 0.08) 360deg
+  );
+}
+
+/* Subtle ambient vinyl glow */
+.vinyl-ambient-glow {
+  box-shadow: 0 0 32px rgba(47, 233, 43, 0.12);
+}
+
+/* Smooth hidden scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tonearm Keyframes & Natural Damped Animations */
+@keyframes needle-vibrate {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(0.35px, -0.25px);
+  }
+  40% {
+    transform: translate(-0.25px, 0.3px);
+  }
+  60% {
+    transform: translate(0.3px, 0.15px);
+  }
+  80% {
+    transform: translate(-0.2px, -0.2px);
+  }
+}
+
+.animate-needle-vibrate {
+  animation: needle-vibrate 0.14s linear infinite;
+}
+
+@keyframes tonearm-groove-vibrate {
+  0%, 100% {
+    transform: rotate(var(--tonearm-angle, 15deg));
+  }
+  35% {
+    transform: rotate(calc(var(--tonearm-angle, 15deg) + 0.1deg));
+  }
+  75% {
+    transform: rotate(calc(var(--tonearm-angle, 15deg) - 0.08deg));
+  }
+}
+
+@keyframes stylus-glow-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 3px #2FE92B);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px #2FE92B) drop-shadow(0 0 12px rgba(47, 233, 43, 0.7));
+  }
+}
+
+.animate-stylus-glow {
+  animation: stylus-glow-pulse 2s ease-in-out infinite;
+}
+

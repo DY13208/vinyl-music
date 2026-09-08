@@ -1,0 +1,6 @@
+{
+  "name": "VINYL - 黑胶收藏与播放",
+  "description": "高质感 iOS / Android 黑胶唱片收藏、展示与播放应用，以实体黑胶文化与触觉交互为核心。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
