@@ -14,6 +14,8 @@ export interface LyricLine {
   translation?: string; // localized / Chinese translation
 }
 
+export type VinylVariant = 'black' | 'colored' | 'clear' | 'translucent' | 'marble' | 'splatter' | 'split' | 'liquid' | 'picture';
+
 export interface Album {
   id: string;
   title: string;
@@ -37,6 +39,8 @@ export interface Album {
   isWishlist?: boolean;
   condition?: string; // e.g. "Mint (M)", "Near Mint (NM)"
   waxColor?: string; // e.g. "经典纯黑", "炫彩泼墨", "发烧透明"
+  vinylVariant?: VinylVariant;
+  vinylColors?: string[];
   addedAt?: string;
   barcode?: string;
 }

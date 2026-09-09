@@ -27,6 +27,361 @@ body {
   overflow-x: hidden;
 }
 
+/* Home: a restrained, single-purpose vinyl browsing surface. */
+.home-gallery {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 68px minmax(0, 1fr) 142px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #070706;
+  color: #fff;
+}
+
+.home-gallery__room { position: absolute; z-index: -1; inset: -3px; overflow: hidden; pointer-events: none; background: #080706 url('/assets/vinyl/home-room-bg.webp') center 44% / cover no-repeat; filter: blur(1.35px) brightness(.78) contrast(.84) saturate(.82); transform: scale(1.012); }
+.home-gallery__room::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.18) 0 55%, rgba(0,0,0,.3) 66%, #050505 82%, #000 100%); }
+.home-gallery__room::after { content: ""; position: absolute; inset: 13% 5% 31%; background: radial-gradient(circle at 53% 51%, color-mix(in srgb, var(--album-ambient) 72%, transparent) 0, transparent 64%); opacity: .1; }
+
+.home-gallery__header {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 15px 20px 0;
+}
+
+.home-gallery__search {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #26272d;
+  border-radius: 50%;
+  background: rgba(22, 21, 20, .84);
+  color: #fff;
+  transition: transform 180ms cubic-bezier(.22, 1, .36, 1), border-color 180ms ease, background-color 180ms ease;
+}
+
+.home-gallery__search svg { width: 20px; height: 20px; }
+.home-gallery__search:hover { border-color: #45464d; background: #151515; }
+.home-gallery__search:active { transform: scale(.94); }
+.home-gallery__search:focus-visible,
+.vinyl-carousel__item:focus-visible { outline: 2px solid #2fe92b; outline-offset: 3px; }
+
+.home-gallery__stage { position: relative; z-index: 2; min-height: 0; display: grid; place-items: center; transform: translateY(-7%); }
+.home-gallery__stage::before { content: ""; position: absolute; z-index: 0; left: -8%; right: -8%; top: calc(50% + 145px); height: 158px; border-top: 1px solid rgba(221, 170, 124, .6); background: url('/assets/vinyl/shelf-dark-wood.webp') center top / auto 165px repeat-x; filter: brightness(.8) saturate(.68); box-shadow: inset 0 11px 19px rgba(230, 164, 108, .16), 0 -8px 24px rgba(0, 0, 0, .72); transform: perspective(520px) rotateX(8deg); transform-origin: top; -webkit-mask-image: linear-gradient(to bottom, #000 0 42%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0 42%, transparent 100%); }
+.home-gallery__stage::after { content: ""; position: absolute; z-index: 1; left: 12%; right: 8%; top: calc(50% + 133px); height: 38px; border-radius: 50%; background: rgba(0, 0, 0, .75); filter: blur(10px); }
+
+.vinyl-carousel {
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  perspective: 1100px;
+  touch-action: pan-y;
+}
+
+.vinyl-carousel__track { position: absolute; inset: 0; cursor: grab; }
+.vinyl-carousel__track:active { cursor: grabbing; }
+.vinyl-carousel__item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 340px;
+  height: 300px;
+  margin: -150px 0 0 -170px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  transform-style: preserve-3d;
+  -webkit-tap-highlight-color: transparent;
+}
+.vinyl-carousel__edge-preview { pointer-events: none; filter: brightness(.7) blur(.35px); transform-style: preserve-3d; }
+.vinyl-carousel__edge-preview.is-left { z-index: 4; clip-path: inset(0 55px 0 0); }
+.vinyl-carousel__edge-preview.is-right { z-index: 4; clip-path: inset(0 0 0 55px); }
+
+.vinyl-object {
+  --sleeve-size: clamp(252px, 73vw, 292px);
+  --disc-size: clamp(264px, 76vw, 304px);
+  position: relative;
+  width: 340px;
+  height: 326px;
+  margin: 0 auto;
+}
+
+.vinyl-object__disc,
+.vinyl-object__sleeve { position: absolute; top: 50%; left: 50%; }
+.vinyl-object__disc {
+  z-index: 0;
+  transform: translate(calc(-50% + 58px), -50%);
+  filter: brightness(1.08) drop-shadow(10px 22px 24px rgba(0, 0, 0, .82)) drop-shadow(0 0 15px rgba(234, 161, 98, .2));
+}
+.vinyl-object__sleeve {
+  z-index: 1;
+  transform: translate(calc(-50% - 20px), -50%);
+  filter: brightness(1.06) drop-shadow(10px 18px 18px rgba(0, 0, 0, .7)) drop-shadow(0 0 6px rgba(255, 195, 139, .26));
+}
+
+.home-gallery__caption {
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  margin-top: -140px;
+  padding: 0 24px 20px;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,.88) 44%, #000 100%);
+  text-align: center;
+}
+.home-gallery__caption h1 {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -.018em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-gallery__caption p {
+  margin: 8px 0 0;
+  color: #bbcbb2;
+  font-size: 14px;
+  font-weight: 450;
+  line-height: 1.35;
+}
+.vinyl-label--minimal { justify-content: center; }
+.vinyl-surface,
+.vinyl-texture-base { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
+.vinyl-surface { overflow: hidden; background: #0a0a0c; }
+.vinyl-texture-base { z-index: 2; object-fit: contain; opacity: .72; mix-blend-mode: screen; }
+.vinyl-surface--colored { background: var(--vinyl-a); }
+.vinyl-surface--clear { background: color-mix(in srgb, var(--vinyl-a) 30%, transparent); opacity: .62; box-shadow: inset 0 0 22px rgba(255,255,255,.25); }
+.vinyl-texture-base--clear { opacity: .38; }
+.vinyl-surface--translucent { background: color-mix(in srgb, var(--vinyl-a) 72%, transparent); opacity: .84; box-shadow: inset 0 0 24px rgba(255,255,255,.16); }
+.vinyl-texture-base--translucent { opacity: .5; }
+.vinyl-surface--marble { background: repeating-radial-gradient(ellipse at 31% 42%, var(--vinyl-a) 0 7%, var(--vinyl-b) 9% 12%, var(--vinyl-c) 15% 22%); filter: contrast(.78) saturate(.68); }
+.vinyl-surface--splatter { background-color: var(--vinyl-a); background-image: radial-gradient(circle at 27% 21%, var(--vinyl-b) 0 2%, transparent 2.4%), radial-gradient(circle at 68% 33%, var(--vinyl-c) 0 3%, transparent 3.5%), radial-gradient(circle at 39% 72%, var(--vinyl-b) 0 4%, transparent 4.5%), radial-gradient(circle at 76% 74%, var(--vinyl-c) 0 2%, transparent 2.6%), radial-gradient(circle at 18% 56%, var(--vinyl-c) 0 2.7%, transparent 3.2%); }
+.vinyl-surface--split { background: linear-gradient(90deg, var(--vinyl-a) 0 49.5%, var(--vinyl-b) 50.5% 100%); }
+.vinyl-surface--liquid { background: radial-gradient(ellipse at 68% 28%, var(--vinyl-b) 0 18%, transparent 19%), radial-gradient(ellipse at 35% 70%, var(--vinyl-c) 0 26%, transparent 27%), var(--vinyl-a); filter: saturate(.72); }
+.vinyl-surface--picture { background: var(--picture-url) center / cover no-repeat; filter: brightness(.7) saturate(.7); }
+.vinyl-texture-base--picture { opacity: .46; }
+
+@media (max-height: 670px) {
+  .home-gallery { grid-template-rows: 66px minmax(0, 1fr) 130px; }
+  .vinyl-carousel { min-height: 270px; }
+  .vinyl-object { transform: scale(.9); }
+  .home-gallery__caption { padding-bottom: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-gallery *, .home-gallery *::before, .home-gallery *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Collection: ThreeUI-inspired WebGL shelf, adapted from the package's real BookshelfScene. */
+.collection-room {
+  width: 100%;
+  min-height: 1250px;
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  background: #080604;
+  color: #fff;
+}
+.collection-room__header {
+  position: relative;
+  z-index: 4;
+  min-height: 188px;
+  padding: 18px 20px 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid #4a2b1b;
+  background: #0b0a09 url('/assets/vinyl/collection-header-bg.webp') center center / cover no-repeat;
+}
+.collection-room__header::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .24); pointer-events: none; }
+.collection-room__title { position: relative; z-index: 2; padding-bottom: 16px; text-align: center; }
+.collection-room__title h1 { margin: 0; font-family: "Songti SC", "STSong", serif; font-size: 32px; font-weight: 680; letter-spacing: .01em; }
+.collection-room__title p { margin: 9px 0 0; color: #9b9189; font-size: 13px; letter-spacing: .06em; }
+.collection-room__actions { position: absolute; z-index: 3; top: 18px; right: 18px; display: flex; gap: 8px; }
+.collection-room__actions button,
+.collection-sheet__heading button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #26272d;
+  border-radius: 50%;
+  background: #0f0f0f;
+  color: #fff;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.collection-room__actions button svg,
+.collection-sheet__heading button svg { width: 19px; height: 19px; }
+.collection-room__actions button:active { transform: scale(.94); }
+.collection-room__actions button.is-active { color: #2fe92b; border-color: #375038; }
+.collection-room__actions button:focus-visible,
+.collection-room__search input:focus-visible,
+.collection-sheet button:focus-visible { outline: 2px solid #2fe92b; outline-offset: 2px; }
+
+.collection-room__search {
+  position: relative;
+  z-index: 5;
+  height: 48px;
+  margin: 8px 20px 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #26272d;
+}
+
+.collection-room__filters {
+  position: relative;
+  z-index: 4;
+  min-height: 68px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid #3f2518;
+  background: #0d0c0a;
+  box-shadow: inset 0 -8px 22px rgba(0, 0, 0, .55);
+}
+.collection-room__filters > div { min-width: 0; flex: 1; display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+.collection-room__filters > div::-webkit-scrollbar { display: none; }
+.collection-room__filters button { flex: 0 0 auto; min-height: 38px; padding: 0 13px; border: 1px solid transparent; border-radius: 22px; background: transparent; color: #9b9692; font-size: 13px; }
+.collection-room__filters button.is-selected { border-color: #268c3b; background: #102418; color: #fff; }
+.collection-room__filters .collection-room__sort { min-height: 40px; padding: 0 11px; display: flex; align-items: center; gap: 6px; border-color: #26272d; background: #111; color: #fff; }
+.collection-room__sort svg { width: 15px; }
+.collection-room__sort span { white-space: nowrap; font-size: 11px; }
+.collection-room__search > svg { width: 17px; color: #8a8a92; }
+.collection-room__search input {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  padding: 0 12px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+}
+.collection-room__search input::placeholder { color: #8a8a92; opacity: 1; }
+.collection-room__search button { border: 0; background: transparent; color: #bbcbb2; font-size: 12px; }
+
+.collection-room__shelf { position: relative; flex: none; height: 690px; overflow: hidden; border-bottom: 1px solid #3c2317; background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat; box-shadow: inset 0 15px 32px rgba(255, 159, 86, .06); }
+.threeui-vinyl-shelf { position: absolute; inset: 0; animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both; }
+.threeui-vinyl-shelf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 18%, rgba(255, 175, 106, .13), transparent 28%);
+}
+.threeui-vinyl-shelf canvas { position: relative; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.threeui-vinyl-shelf canvas:active { cursor: grabbing; }
+
+.collection-room__focus {
+  position: absolute;
+  z-index: 3;
+  left: 24px;
+  right: 24px;
+  bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 280ms cubic-bezier(.22, 1, .36, 1);
+  text-align: center;
+  text-shadow: 0 2px 16px #000;
+}
+.collection-room__focus.is-visible { opacity: 1; transform: translateY(0); }
+.collection-room__focus strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
+.collection-room__focus span { margin-top: 3px; color: #bbcbb2; font-size: 12px; }
+.collection-room__focus small { margin-top: 8px; color: #8a8a92; font-size: 10px; }
+.collection-room__pages { position: absolute; z-index: 3; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
+.collection-room__pages button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; background: #26272d; }
+.collection-room__pages button[aria-current="true"] { background: #2fe92b; }
+.collection-room__empty { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; color: #bbcbb2; font-size: 14px; }
+.collection-room__empty button { padding: 10px 14px; border: 1px solid #26272d; border-radius: 5px; background: #0f0f0f; color: #fff; }
+
+.collection-room__labels {
+  position: absolute;
+  z-index: 2;
+  inset: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, 1fr);
+  column-gap: 24px;
+  pointer-events: none;
+  animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.collection-room__labels > div { min-width: 0; align-self: end; padding: 0 4px 26px; text-shadow: 0 2px 9px #000; }
+.collection-room__labels strong,
+.collection-room__labels span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collection-room__labels strong { color: #ead1ba; font-size: 12px; font-weight: 600; }
+.collection-room__labels span { margin-top: 4px; color: #aaa19a; font-size: 10px; }
+
+@keyframes shelf-content-in { from { opacity: .15; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+
+.collection-sheet-backdrop {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, .68);
+}
+.collection-sheet {
+  width: min(100%, 448px);
+  padding: 8px 20px max(22px, env(safe-area-inset-bottom));
+  border: 1px solid #26272d;
+  border-bottom: 0;
+  border-radius: 18px 18px 0 0;
+  background: #0f0f0f;
+  box-shadow: 0 -20px 54px rgba(0, 0, 0, .65);
+}
+.collection-sheet__handle { width: 34px; height: 4px; margin: 0 auto 12px; border-radius: 2px; background: #3a3b40; }
+.collection-sheet__heading { display: flex; align-items: center; justify-content: space-between; }
+.collection-sheet__heading h2 { margin: 0; font-size: 18px; }
+.collection-sheet__heading button { width: 36px; height: 36px; }
+.collection-sheet fieldset { margin: 20px 0 0; padding: 0; border: 0; }
+.collection-sheet legend { margin-bottom: 10px; color: #8a8a92; font-size: 12px; }
+.collection-sheet__options { display: flex; flex-wrap: wrap; gap: 8px; }
+.collection-sheet__options button { min-width: 58px; padding: 9px 13px; border: 1px solid #26272d; border-radius: 5px; background: #151517; color: #bbcbb2; font-size: 13px; }
+.collection-sheet__options button.is-selected { border-color: #465847; color: #2fe92b; }
+.collection-sheet__sort { display: flex; flex-direction: column; }
+.collection-sheet__sort button { min-height: 46px; padding: 0 2px; display: flex; align-items: center; justify-content: space-between; border: 0; border-bottom: 1px solid #26272d; background: transparent; color: #bbcbb2; text-align: left; }
+.collection-sheet__sort button i { width: 16px; height: 16px; border: 1px solid #505158; border-radius: 50%; }
+.collection-sheet__sort button.is-selected { color: #fff; }
+.collection-sheet__sort button.is-selected i { border: 5px solid #2fe92b; }
+.collection-sheet__done { width: 100%; min-height: 46px; margin-top: 22px; border: 0; border-radius: 5px; background: #2fe92b; color: #061006; font-weight: 700; }
+
+@media (max-height: 690px) {
+  .collection-room__focus { bottom: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-room *, .collection-room *::before, .collection-room *::after { transition-duration: .01ms !important; }
+}
+
 /* Vinyl rotation animation */
 @keyframes vinyl-spin {
   from {

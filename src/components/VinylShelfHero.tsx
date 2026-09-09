@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { animate, motion, MotionValue, PanInfo, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { Album } from '../types';
 import { VinylCarouselItem } from './VinylCarouselItem';
 import { audioEngine } from '../services/audioEngine';
@@ -7,187 +8,173 @@ interface VinylShelfHeroProps {
   albums: Album[];
   currentIndex: number;
   onSelectIndex: (index: number) => void;
-  isPlaying: boolean;
   onOpenAlbumDetail?: (album: Album) => void;
 }
 
-export const VinylShelfHero: React.FC<VinylShelfHeroProps> = ({
-  albums,
-  currentIndex,
-  onSelectIndex,
-  isPlaying,
-  onOpenAlbumDetail,
-}) => {
-  const [dragOffset, setDragOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const startXRef = useRef(0);
-  const currentDragRef = useRef(0);
-  const lastXRef = useRef(0);
-  const velocityRef = useRef(0);
-  const lastTimeRef = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+const ITEM_SPACING = 250;
+const SPRING = { type: 'spring' as const, stiffness: 155, damping: 25, mass: 0.95 };
+const modulo = (value: number, length: number) => ((value % length) + length) % length;
 
-  // Drag start handler
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    setIsDragging(true);
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    startXRef.current = clientX;
-    lastXRef.current = clientX;
-    lastTimeRef.current = Date.now();
-    velocityRef.current = 0;
-    currentDragRef.current = 0;
+const CarouselRecord: React.FC<{
+  album: Album;
+  occurrence: number;
+  trackX: MotionValue<number>;
+  active: boolean;
+  reduceMotion: boolean | null;
+  dragging: React.MutableRefObject<boolean>;
+  onActivate: () => void;
+}> = ({ album, occurrence, trackX, active, reduceMotion, dragging, onActivate }) => {
+  const distance = useTransform(trackX, (value) => occurrence + value / ITEM_SPACING);
+  const scale = useTransform(distance, (value) => 1 - Math.min(1, Math.abs(value)) * 0.13);
+  const opacity = useTransform(distance, (value) => 1 - Math.min(1, Math.abs(value)) * 0.55);
+  const rotateY = useTransform(distance, (value) => Math.max(-7, Math.min(7, value * -6.5)));
+  const zIndex = useTransform(distance, (value) => Math.abs(value) < 0.5 ? 5 : Math.abs(value) < 1.5 ? 2 : 1);
+  const filter = useTransform(distance, (value) => {
+    const amount = Math.min(1, Math.abs(value));
+    return `brightness(${1 - amount * 0.24}) blur(${amount * 0.45}px)`;
+  });
+
+  return (
+    <motion.button
+      type="button"
+      className="vinyl-carousel__item"
+      style={{
+        x: occurrence * ITEM_SPACING,
+        zIndex: reduceMotion ? (active ? 5 : 1) : zIndex,
+        scale: reduceMotion ? (active ? 1 : .87) : scale,
+        opacity: reduceMotion ? (active ? 1 : .45) : opacity,
+        rotateY: reduceMotion ? 0 : rotateY,
+        filter: reduceMotion ? 'none' : filter,
+      }}
+      onClick={() => { if (!dragging.current) onActivate(); }}
+      aria-label={active ? `打开专辑：${album.title}` : `切换到专辑：${album.title}`}
+      aria-current={active ? 'true' : undefined}
+    >
+      <VinylCarouselItem album={album} />
+    </motion.button>
+  );
+};
+
+const EdgePreview: React.FC<{ album: Album; occurrence: number; side: -1 | 1; trackX: MotionValue<number> }> = ({ album, occurrence, side, trackX }) => {
+  const distance = useTransform(trackX, (value) => occurrence + value / ITEM_SPACING);
+  const opacity = useTransform(distance, (value) => {
+    const amount = Math.abs(value);
+    return Math.max(0, Math.min(.5, ((amount - .68) / .32) * .5));
+  });
+  return (
+    <motion.div
+      className={`vinyl-carousel__item vinyl-carousel__edge-preview is-${side < 0 ? 'left' : 'right'}`}
+      style={{ x: occurrence * ITEM_SPACING, opacity }}
+      aria-hidden="true"
+    >
+      <VinylCarouselItem album={album} />
+    </motion.div>
+  );
+};
+
+export const VinylShelfHero: React.FC<VinylShelfHeroProps> = ({ albums, currentIndex, onSelectIndex, onOpenAlbumDetail }) => {
+  const [virtualIndex, setVirtualIndex] = useState(currentIndex);
+  const virtualIndexRef = useRef(currentIndex);
+  const trackX = useMotionValue(-currentIndex * ITEM_SPACING);
+  const dragging = useRef(false);
+  const transitionSequence = useRef(0);
+  const animationRef = useRef<{ stop: () => void } | null>(null);
+  const reduceMotion = useReducedMotion();
+
+  const settleTo = async (targetVirtualIndex: number) => {
+    const sequence = ++transitionSequence.current;
+    animationRef.current?.stop();
+    const controls = animate(trackX, -targetVirtualIndex * ITEM_SPACING, reduceMotion ? { duration: 0 } : SPRING);
+    animationRef.current = controls;
+    try {
+      await controls.finished;
+    } catch {
+      return;
+    }
+    if (sequence !== transitionSequence.current) return;
+
+    const changed = targetVirtualIndex !== virtualIndexRef.current;
+    virtualIndexRef.current = targetVirtualIndex;
+    setVirtualIndex(targetVirtualIndex);
+    onSelectIndex(modulo(targetVirtualIndex, albums.length));
+    animationRef.current = null;
+    if (changed) audioEngine.triggerHaptic('light');
   };
 
-  // Drag move with resistance
-  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDragging) return;
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const now = Date.now();
-    const dt = Math.max(1, now - lastTimeRef.current);
-    const dx = clientX - lastXRef.current;
-
-    velocityRef.current = dx / dt;
-    lastXRef.current = clientX;
-    lastTimeRef.current = now;
-
-    const delta = clientX - startXRef.current;
-
-    // Damping resistance at left and right boundaries
-    let resistedDelta = delta;
-    if ((currentIndex === 0 && delta > 0) || (currentIndex === albums.length - 1 && delta < 0)) {
-      resistedDelta = delta * 0.22;
-    }
-
-    currentDragRef.current = resistedDelta;
-    setDragOffset(resistedDelta);
-  };
-
-  // Drag end with inertia, spring snap, and haptic feedback
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    const delta = currentDragRef.current;
-    const velocity = velocityRef.current;
-    const distanceThreshold = 46;
-    const velocityThreshold = 0.28;
-
-    if (
-      (delta < -distanceThreshold || velocity < -velocityThreshold) &&
-      currentIndex < albums.length - 1
-    ) {
-      onSelectIndex(currentIndex + 1);
-      audioEngine.triggerHaptic('light');
-    } else if (
-      (delta > distanceThreshold || velocity > velocityThreshold) &&
-      currentIndex > 0
-    ) {
-      onSelectIndex(currentIndex - 1);
-      audioEngine.triggerHaptic('light');
-    }
-
-    setDragOffset(0);
-    currentDragRef.current = 0;
-    velocityRef.current = 0;
-  }, [isDragging, currentIndex, albums.length, onSelectIndex]);
-
-  // Keyboard left/right navigation
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' && currentIndex > 0) {
-        onSelectIndex(currentIndex - 1);
-        audioEngine.triggerHaptic('light');
-      } else if (e.key === 'ArrowRight' && currentIndex < albums.length - 1) {
-        onSelectIndex(currentIndex + 1);
-        audioEngine.triggerHaptic('light');
-      }
+    if (!albums.length) return;
+    if (modulo(virtualIndexRef.current, albums.length) === currentIndex) return;
+    transitionSequence.current += 1;
+    animationRef.current?.stop();
+    virtualIndexRef.current = currentIndex;
+    setVirtualIndex(currentIndex);
+    trackX.set(-currentIndex * ITEM_SPACING);
+  }, [albums.length, currentIndex, trackX]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const step = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+      if (step && albums.length > 1) void settleTo(virtualIndexRef.current + step);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, albums.length, onSelectIndex]);
+  });
 
-  // Optimal spacing: 252px allows ~16%-19% neighbor visibility on standard 390px viewport
-  const itemSpacing = 252;
+  useEffect(() => () => {
+    transitionSequence.current += 1;
+    animationRef.current?.stop();
+  }, []);
+
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    window.setTimeout(() => { dragging.current = false; }, 0);
+    const projected = info.offset.x + Math.max(-700, Math.min(700, info.velocity.x)) * 0.11;
+    const direction = projected < -62 ? 1 : projected > 62 ? -1 : 0;
+    void settleTo(virtualIndexRef.current + direction);
+  };
+
+  if (!albums.length) return null;
+  const occurrences = [-2, -1, 0, 1, 2].map((offset) => virtualIndex + offset);
+  const restingX = -virtualIndex * ITEM_SPACING;
 
   return (
-    <div
-      ref={containerRef}
-      id="vinyl-shelf-hero"
-      className="relative w-full h-[270px] flex items-center justify-center select-none overflow-hidden touch-pan-y"
-      style={{
-        perspective: '1100px',
-        perspectiveOrigin: '50% 50%',
-      }}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleTouchStart}
-      onMouseMove={handleTouchMove}
-      onMouseUp={handleTouchEnd}
-      onMouseLeave={handleTouchEnd}
-    >
-      {albums.map((album, index) => {
-        const offset = index - currentIndex;
-        // Render current item and up to 2 items on left and right
-        if (Math.abs(offset) > 2) return null;
-
-        const currentX = offset * itemSpacing + dragOffset;
-        const normDist = Math.abs(currentX) / itemSpacing;
-
-        // Scale: 1 at center, drops to ~0.85 when 1 unit away
-        const scale = Math.max(0.84, 1 - Math.min(0.15, normDist * 0.15));
-
-        // Opacity: 1 at center, drops to ~0.44 when 1 unit away
-        const opacity = Math.max(0.38, 1 - Math.min(0.56, normDist * 0.56));
-
-        // translateY: 0 at center, drops 5px down for neighbors
-        const translateY = Math.min(6, normDist * 6);
-
-        // rotateY: ±8deg for shelf perspective
-        const continuousProgress = offset - dragOffset / itemSpacing;
-        const rotateY = Math.max(-9, Math.min(9, -continuousProgress * 8));
-
-        // Blur: 0 at center, ~2.5px for neighbors
-        const blurAmount = Math.min(3, normDist * 2.5);
-
-        // zIndex: highest at center
-        const zIndex = Math.max(10, Math.round(30 - normDist * 10));
-
-        const isCenter = offset === 0;
-
-        return (
-          <div
-            key={album.id}
-            id={`vinyl-shelf-item-${album.id}`}
-            onClick={() => {
-              if (!isCenter && !isDragging) {
-                onSelectIndex(index);
-                audioEngine.triggerHaptic('light');
-              } else if (isCenter && !isDragging && onOpenAlbumDetail) {
-                onOpenAlbumDetail(album);
-              }
-            }}
-            className="absolute flex items-center justify-center cursor-pointer will-change-transform"
-            style={{
-              transform: `translateX(${currentX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
-              opacity,
-              zIndex,
-              filter: blurAmount > 0.4 ? `blur(${blurAmount}px)` : 'none',
-              transition: isDragging
-                ? 'none'
-                : 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease, filter 0.35s ease',
-            }}
-          >
-            <VinylCarouselItem
+    <div className="vinyl-carousel" aria-label="左右滑动浏览唱片">
+      <motion.div
+        className="vinyl-carousel__track"
+        style={{ x: trackX }}
+        drag="x"
+        dragConstraints={{ left: restingX, right: restingX }}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => {
+          transitionSequence.current += 1;
+          animationRef.current?.stop();
+          animationRef.current = null;
+          dragging.current = true;
+        }}
+        onDragEnd={handleDragEnd}
+      >
+        {([-1, 1] as const).map((offset) => {
+          const occurrence = virtualIndex + offset;
+          const album = albums[modulo(occurrence, albums.length)];
+          return <EdgePreview key={`edge:${album.id}:${occurrence}`} album={album} occurrence={occurrence} side={offset} trackX={trackX} />;
+        })}
+        {occurrences.map((occurrence) => {
+          const album = albums[modulo(occurrence, albums.length)];
+          const active = occurrence === virtualIndex;
+          return (
+            <CarouselRecord
+              key={`${album.id}:${occurrence}`}
               album={album}
-              isPlaying={isPlaying}
-              isCenter={isCenter}
-              discSize={256}
-              sleeveSize={196}
+              occurrence={occurrence}
+              trackX={trackX}
+              active={active}
+              reduceMotion={reduceMotion}
+              dragging={dragging}
+              onActivate={() => active ? onOpenAlbumDetail?.(album) : void settleTo(occurrence)}
             />
-          </div>
-        );
-      })}
+          );
+        })}
+      </motion.div>
     </div>
   );
 };

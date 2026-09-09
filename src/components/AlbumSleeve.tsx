@@ -4,7 +4,7 @@ interface AlbumSleeveProps {
   coverUrl: string;
   title: string;
   artist?: string;
-  size?: number; // Size in px, default ~192px
+  size?: number | string;
   className?: string;
 }
 

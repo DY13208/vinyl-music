@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import {
   Album,
   Track,
@@ -13,7 +13,6 @@ import { audioEngine } from './services/audioEngine';
 import { HomeView } from './views/HomeView';
 import { PlayerView } from './views/PlayerView';
 import { AlbumDetailView } from './views/AlbumDetailView';
-import { CollectionView } from './views/CollectionView';
 import { DiscoverView } from './views/DiscoverView';
 import { SearchView } from './views/SearchView';
 import { ArtistView } from './views/ArtistView';
@@ -26,6 +25,8 @@ import { DesignBoardView } from './views/DesignBoardView';
 import { MiniPlayer } from './components/MiniPlayer';
 import { BottomNav } from './components/BottomNav';
 
+const CollectionView = lazy(() => import('./views/CollectionView').then((module) => ({ default: module.CollectionView })));
+
 export default function App() {
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
@@ -37,7 +38,12 @@ export default function App() {
       const saved = localStorage.getItem('vinyl_user_collection');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((album: Album) => {
+            const catalogAlbum = ALBUMS.find((item) => item.id === album.id);
+            return album.vinylVariant || !catalogAlbum ? album : { ...album, vinylVariant: catalogAlbum.vinylVariant, vinylColors: catalogAlbum.vinylColors };
+          });
+        }
       }
     } catch (e) {
       console.error('Failed to load saved collection', e);
@@ -282,31 +288,15 @@ export default function App() {
               albums={albums}
               carouselIndex={carouselIndex}
               onSelectCarouselIndex={setCarouselIndex}
-              isPlaying={isPlaying && currentPlayingAlbum?.id === albums[carouselIndex]?.id}
-              currentTrackTitle={currentTrack?.title}
-              progressPercent={
-                currentPlayingAlbum?.id === albums[carouselIndex]?.id ? progressPercent : 0
-              }
-              onTogglePlayAlbum={handleTogglePlay}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSearch={() => setCurrentScreen('search')}
-              onToggleFavorite={handleToggleFavorite}
-              favorites={favorites}
-              onNextTrack={handleNextTrack}
-              onSeek={handleSeek}
             />
           )}
 
           {currentScreen === 'collection' && (
-            <CollectionView
-              albums={albums}
-              onOpenAlbumDetail={handleOpenAlbumDetail}
-              onOpenSearch={() => setCurrentScreen('search')}
-              onPlayAlbum={handleTogglePlay}
-              onAddAlbum={handleAddAlbum}
-              onImportMultiple={handleImportMultiple}
-              onRemoveAlbum={handleRemoveAlbum}
-            />
+            <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开收藏柜" />}>
+              <CollectionView albums={albums} onOpenAlbumDetail={handleOpenAlbumDetail} />
+            </Suspense>
           )}
 
           {currentScreen === 'discover' && (
@@ -403,7 +393,7 @@ export default function App() {
             className="w-full flex-shrink-0 bg-[#000000] z-40 border-t border-[#26272D]/70 shadow-[0_-10px_25px_rgba(0,0,0,0.85)]"
           >
             {/* Mini Player: Shown on non-home screens when audio is active */}
-            {currentPlayingAlbum && currentTrack && currentScreen !== 'home' && (
+            {currentPlayingAlbum && currentTrack && currentScreen !== 'home' && currentScreen !== 'collection' && (
               <MiniPlayer
                 currentAlbum={currentPlayingAlbum}
                 currentTrack={currentTrack}

@@ -34,6 +34,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '47:23',
     description: '披头士四位成员在 Abbey Road 斑马线留下的绝响，B面长达16分钟的组曲堪称模拟录音时代的最高峰。',
     color: '#101B2B',
+    vinylVariant: 'clear',
+    vinylColors: ['#6f7d82', '#d8ddd9', '#252a2d'],
     isCollected: true,
     tracks: [
       { id: 'ar-1', number: 1, title: 'Come Together', duration: '4:20', durationSec: 260 },
@@ -59,6 +61,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '53:21',
     description: '预言了数字时代异化与科技焦虑的现代经典。Thom Yorke 飘渺的声线与 Jonny Greenwood 具爆炸力的吉他层叠交融。',
     color: '#101B2B',
+    vinylVariant: 'colored',
+    vinylColors: ['#7994a0', '#d2d9d7', '#26343a'],
     isCollected: true,
     tracks: [
       { id: 'rh-1', number: 1, title: 'Airbag', duration: '4:44', durationSec: 284 },
@@ -93,6 +97,7 @@ export const ALBUMS: Album[] = [
     totalDuration: '42:49',
     description: '二十世纪最具划时代意义的摇滚概念专辑之一。棱镜折射光谱的封面成为流行文化图腾，录音技术与立体声实验的巅峰之作。',
     color: '#0A2010',
+    vinylVariant: 'black',
     isCollected: true,
     tracks: [
       { id: 'pf-1', number: 1, title: 'Speak to Me', duration: '1:30', durationSec: 90 },
@@ -125,6 +130,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '42:39',
     description: '温暖而极度克制的有机声音工程。黑胶版低频饱满沉稳，Reckoner 与 Weird Fishes 的吉他律动被发烧友奉为黑胶调校神作。',
     color: '#280F08',
+    vinylVariant: 'splatter',
+    vinylColors: ['#b65a37', '#171719', '#ddd1bb'],
     isCollected: false,
     isWishlist: true,
     tracks: [
@@ -158,6 +165,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '74:24',
     description: '致敬70与80年代模拟录音技术的宏伟史诗。汇聚Giorgio Moroder、Nile Rodgers、Pharrell Williams等传奇音乐人。',
     color: '#2A1B0B',
+    vinylVariant: 'split',
+    vinylColors: ['#c3b59b', '#27282c', '#8b6941'],
     isCollected: true,
     tracks: [
       { id: 'dp-1', number: 1, title: 'Give Life Back to Music', duration: '4:34', durationSec: 274 },
@@ -193,6 +202,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '45:44',
     description: '爵士史上无可撼动的登峰之作。John Coltrane 与 Bill Evans 携手带来的静谧与自由调式即兴，唱片沟槽里流淌着午夜纽约的微醺。',
     color: '#081824',
+    vinylVariant: 'marble',
+    vinylColors: ['#31546a', '#a8b5b5', '#17232c'],
     isCollected: true,
     tracks: [
       { id: 'md-1', number: 1, title: 'So What', duration: '9:22', durationSec: 562 },
@@ -220,6 +231,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '33:02',
     description: '柯川写给宇宙与神的四重奏礼赞。次中音萨克斯如火焰般升腾，是精神探索与爵士乐理的最高凝聚。',
     color: '#1C1508',
+    vinylVariant: 'translucent',
+    vinylColors: ['#765b31', '#b99555', '#2b241b'],
     isCollected: true,
     tracks: [
       { id: 'jc-1', number: 1, title: 'Part 1: Acknowledgement', duration: '7:47', durationSec: 467 },
@@ -246,6 +259,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '39:43',
     description: '全球销量超过4000万张的传奇之作。细腻的情感张力与加州录音工程的典范。',
     color: '#281B0E',
+    vinylVariant: 'liquid',
+    vinylColors: ['#3d6b68', '#c5b69d', '#202a2b'],
     isCollected: true,
     tracks: [
       { id: 'fm-1', number: 1, title: 'Second Hand News', duration: '2:56', durationSec: 176 },
@@ -274,6 +289,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '40:15',
     description: '奠定华语乐坛新纪元的跨时代神作。《爱在西元前》《简单爱》《开不了口》，以模拟胶片感重新呈现周氏经典编曲。',
     color: '#280A0A',
+    vinylVariant: 'colored',
+    vinylColors: ['#7c2428', '#be5e55', '#311316'],
     isCollected: false,
     isWishlist: true,
     tracks: [
@@ -307,6 +324,8 @@ export const ALBUMS: Album[] = [
     totalDuration: '40:58',
     description: '青年独白与派对心碎的艺术画像。Jack Antonoff 操刀的模拟合成器质感在黑胶上尤为温润鲜活。',
     color: '#081830',
+    vinylVariant: 'picture',
+    vinylColors: ['#24385d', '#85708c', '#151a29'],
     isCollected: false,
     isWishlist: true,
     tracks: [
