@@ -125,7 +125,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
               isPlaying={isPlaying}
               size={250}
               onTogglePlay={onTogglePlay}
-              className="absolute right-0 top-0 z-40"
+              className="absolute right-0 top-0 z-20"
             />
           </div>
         </div>

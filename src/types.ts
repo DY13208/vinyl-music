@@ -7,6 +7,13 @@ export interface Track {
   composer?: string;
 }
 
+export interface LyricLine {
+  id: string;
+  time: number; // timestamp in seconds
+  text: string; // original line text
+  translation?: string; // localized / Chinese translation
+}
+
 export interface Album {
   id: string;
   title: string;
@@ -28,6 +35,10 @@ export interface Album {
   tracks: Track[];
   isCollected?: boolean;
   isWishlist?: boolean;
+  condition?: string; // e.g. "Mint (M)", "Near Mint (NM)"
+  waxColor?: string; // e.g. "经典纯黑", "炫彩泼墨", "发烧透明"
+  addedAt?: string;
+  barcode?: string;
 }
 
 export interface Artist {

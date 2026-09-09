@@ -31,16 +31,39 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
   const [activeTab, setActiveTab] = useState<MainTab>('home');
 
+  // User Vinyl Collection with LocalStorage Persistence
+  const [albums, setAlbums] = useState<Album[]>(() => {
+    try {
+      const saved = localStorage.getItem('vinyl_user_collection');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error('Failed to load saved collection', e);
+    }
+    return ALBUMS;
+  });
+
+  // Persist collection changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('vinyl_user_collection', JSON.stringify(albums));
+    } catch (e) {
+      console.error('Failed to save vinyl collection', e);
+    }
+  }, [albums]);
+
   // Carousel & Content State
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
-  const [selectedAlbum, setSelectedAlbum] = useState<Album>(ALBUMS[0]);
+  const [selectedAlbum, setSelectedAlbum] = useState<Album>(albums[0] || ALBUMS[0]);
   const [selectedArtist, setSelectedArtist] = useState<Artist>(ARTISTS[0]);
   const [favorites, setFavorites] = useState<string[]>([ALBUMS[0].id, ALBUMS[1].id]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>(WISHLIST);
 
   // Playback State
-  const [currentPlayingAlbum, setCurrentPlayingAlbum] = useState<Album | null>(ALBUMS[0]);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(ALBUMS[0].tracks[0]);
+  const [currentPlayingAlbum, setCurrentPlayingAlbum] = useState<Album | null>(albums[0] || ALBUMS[0]);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(albums[0]?.tracks[0] || ALBUMS[0].tracks[0]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(138); // 2:18 initial sample time
   const [progressPercent, setProgressPercent] = useState<number>(33.4);
@@ -172,17 +195,38 @@ export default function App() {
     setCurrentScreen('artist_detail');
   };
 
+  // Vinyl Collection CRUD handlers
+  const handleAddAlbum = (newAlbum: Album) => {
+    setAlbums((prev) => [newAlbum, ...prev]);
+    setFavorites((prev) => (prev.includes(newAlbum.id) ? prev : [newAlbum.id, ...prev]));
+  };
+
+  const handleImportMultiple = (newAlbums: Album[]) => {
+    setAlbums((prev) => {
+      const existingIds = new Set(prev.map((a) => a.id));
+      const existingTitles = new Set(prev.map((a) => a.title.toLowerCase().trim()));
+      const toAdd = newAlbums.filter(
+        (a) => !existingIds.has(a.id) && !existingTitles.has(a.title.toLowerCase().trim())
+      );
+      return [...toAdd, ...prev];
+    });
+  };
+
+  const handleRemoveAlbum = (albumId: string) => {
+    setAlbums((prev) => prev.filter((a) => a.id !== albumId));
+  };
+
   // Check if current view is Landscape
   if (currentScreen === 'landscape') {
     return (
       <LandscapeView
-        albums={ALBUMS}
+        albums={albums}
         currentIndex={carouselIndex}
         onSelectIndex={setCarouselIndex}
         isPlaying={isPlaying}
-        onTogglePlay={() => handleTogglePlay(ALBUMS[carouselIndex])}
+        onTogglePlay={() => handleTogglePlay(albums[carouselIndex])}
         onToggleFavorite={handleToggleFavorite}
-        isFavorite={favorites.includes(ALBUMS[carouselIndex]?.id)}
+        isFavorite={favorites.includes(albums[carouselIndex]?.id)}
         onExitLandscape={() => {
           setCurrentScreen('home');
         }}
@@ -235,35 +279,39 @@ export default function App() {
 
           {currentScreen === 'home' && (
             <HomeView
-              albums={ALBUMS}
+              albums={albums}
               carouselIndex={carouselIndex}
               onSelectCarouselIndex={setCarouselIndex}
-              isPlaying={isPlaying && currentPlayingAlbum?.id === ALBUMS[carouselIndex]?.id}
+              isPlaying={isPlaying && currentPlayingAlbum?.id === albums[carouselIndex]?.id}
               currentTrackTitle={currentTrack?.title}
+              progressPercent={
+                currentPlayingAlbum?.id === albums[carouselIndex]?.id ? progressPercent : 0
+              }
               onTogglePlayAlbum={handleTogglePlay}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSearch={() => setCurrentScreen('search')}
-              onOpenProfile={() => {
-                setActiveTab('profile');
-                setCurrentScreen('profile');
-              }}
-              onOpenArtist={handleOpenArtist}
               onToggleFavorite={handleToggleFavorite}
               favorites={favorites}
+              onNextTrack={handleNextTrack}
+              onSeek={handleSeek}
             />
           )}
 
           {currentScreen === 'collection' && (
             <CollectionView
-              albums={ALBUMS}
+              albums={albums}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSearch={() => setCurrentScreen('search')}
+              onPlayAlbum={handleTogglePlay}
+              onAddAlbum={handleAddAlbum}
+              onImportMultiple={handleImportMultiple}
+              onRemoveAlbum={handleRemoveAlbum}
             />
           )}
 
           {currentScreen === 'discover' && (
             <DiscoverView
-              albums={ALBUMS}
+              albums={albums}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSearch={() => setCurrentScreen('search')}
             />
@@ -271,7 +319,7 @@ export default function App() {
 
           {currentScreen === 'search' && (
             <SearchView
-              albums={ALBUMS}
+              albums={albums}
               onBack={() => setCurrentScreen(activeTab)}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenArtist={handleOpenArtist}
@@ -354,8 +402,8 @@ export default function App() {
             id="app-bottom-dock"
             className="w-full flex-shrink-0 bg-[#000000] z-40 border-t border-[#26272D]/70 shadow-[0_-10px_25px_rgba(0,0,0,0.85)]"
           >
-            {/* Mini Player */}
-            {currentPlayingAlbum && currentTrack && (
+            {/* Mini Player: Shown on non-home screens when audio is active */}
+            {currentPlayingAlbum && currentTrack && currentScreen !== 'home' && (
               <MiniPlayer
                 currentAlbum={currentPlayingAlbum}
                 currentTrack={currentTrack}

@@ -58,12 +58,12 @@ export const Tonearm: React.FC<TonearmProps> = ({
   }, [isPlaying]);
 
   // Angular Kinematics (Pivot center at 104, 44):
-  // Parked position on cradle stand: 0 degrees (vertical straight down along x = 104)
-  // Playing positions: Swings counter-clockwise (towards the left, over the record)
-  // Lead-in outer groove: -17.5 degrees | Lead-out inner groove: -27.5 degrees
+  // Parked position on cradle stand: 0 degrees (vertical straight down along x = 104 on right deck)
+  // Playing positions: Swings clockwise (+20.5° to +33.0°), smoothly extending left onto the vinyl record grooves
+  // Lead-in outer groove: +20.5 degrees | Lead-out inner groove: +33.0 degrees
   const restAngle = 0;
-  const leadInAngle = -17.5;
-  const leadOutAngle = -27.5;
+  const leadInAngle = 20.5;
+  const leadOutAngle = 33.0;
   const clampedProgress = Math.min(100, Math.max(0, progressPercent));
   const activeGrooveAngle =
     leadInAngle + (clampedProgress / 100) * (leadOutAngle - leadInAngle);
@@ -84,8 +84,8 @@ export const Tonearm: React.FC<TonearmProps> = ({
 
   return (
     <div
-      id="tonearm-assembly"
-      className={`select-none pointer-events-none ${className}`}
+      id="tonearm-component"
+      className={`absolute right-0 top-0 z-20 select-none pointer-events-none ${className}`}
       style={{
         width,
         height,

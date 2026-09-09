@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Album } from '../types';
-import { VinylDisc } from './VinylDisc';
+import { VinylCarouselItem } from './VinylCarouselItem';
 import { audioEngine } from '../services/audioEngine';
 
-interface VinylHeroCarouselProps {
+interface VinylShelfHeroProps {
   albums: Album[];
   currentIndex: number;
   onSelectIndex: (index: number) => void;
@@ -11,7 +11,7 @@ interface VinylHeroCarouselProps {
   onOpenAlbumDetail?: (album: Album) => void;
 }
 
-export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
+export const VinylShelfHero: React.FC<VinylShelfHeroProps> = ({
   albums,
   currentIndex,
   onSelectIndex,
@@ -52,30 +52,36 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
 
     const delta = clientX - startXRef.current;
 
-    // Damping resistance at edges
+    // Damping resistance at left and right boundaries
     let resistedDelta = delta;
     if ((currentIndex === 0 && delta > 0) || (currentIndex === albums.length - 1 && delta < 0)) {
-      resistedDelta = delta * 0.25;
+      resistedDelta = delta * 0.22;
     }
 
     currentDragRef.current = resistedDelta;
     setDragOffset(resistedDelta);
   };
 
-  // Drag end with inertia and snap
+  // Drag end with inertia, spring snap, and haptic feedback
   const handleTouchEnd = useCallback(() => {
     if (!isDragging) return;
     setIsDragging(false);
 
     const delta = currentDragRef.current;
     const velocity = velocityRef.current;
-    const threshold = 48; // Distance threshold for flipping record
-    const velocityThreshold = 0.32; // Velocity threshold for flick gesture
+    const distanceThreshold = 46;
+    const velocityThreshold = 0.28;
 
-    if ((delta < -threshold || velocity < -velocityThreshold) && currentIndex < albums.length - 1) {
+    if (
+      (delta < -distanceThreshold || velocity < -velocityThreshold) &&
+      currentIndex < albums.length - 1
+    ) {
       onSelectIndex(currentIndex + 1);
       audioEngine.triggerHaptic('light');
-    } else if ((delta > threshold || velocity > velocityThreshold) && currentIndex > 0) {
+    } else if (
+      (delta > distanceThreshold || velocity > velocityThreshold) &&
+      currentIndex > 0
+    ) {
       onSelectIndex(currentIndex - 1);
       audioEngine.triggerHaptic('light');
     }
@@ -85,7 +91,7 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
     velocityRef.current = 0;
   }, [isDragging, currentIndex, albums.length, onSelectIndex]);
 
-  // Desktop keyboard navigation
+  // Keyboard left/right navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' && currentIndex > 0) {
@@ -100,14 +106,18 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, albums.length, onSelectIndex]);
 
-  // Item spacing: 246px creates ~15%-18% visible edge on 375-390px mobile screens
-  const itemSpacing = 246;
+  // Optimal spacing: 252px allows ~16%-19% neighbor visibility on standard 390px viewport
+  const itemSpacing = 252;
 
   return (
     <div
       ref={containerRef}
-      id="vinyl-hero-carousel"
-      className="relative w-full h-[256px] flex items-center justify-center select-none overflow-hidden touch-pan-y"
+      id="vinyl-shelf-hero"
+      className="relative w-full h-[270px] flex items-center justify-center select-none overflow-hidden touch-pan-y"
+      style={{
+        perspective: '1100px',
+        perspectiveOrigin: '50% 50%',
+      }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -118,15 +128,28 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
     >
       {albums.map((album, index) => {
         const offset = index - currentIndex;
+        // Render current item and up to 2 items on left and right
         if (Math.abs(offset) > 2) return null;
 
         const currentX = offset * itemSpacing + dragOffset;
         const normDist = Math.abs(currentX) / itemSpacing;
 
-        // Scale: 1 at center, ~0.78 when 1 unit away
-        const scale = Math.max(0.78, 1 - Math.min(0.22, normDist * 0.22));
-        // Opacity: 1 at center, ~0.36 when 1 unit away
-        const opacity = Math.max(0.35, 1 - Math.min(0.65, normDist * 0.65));
+        // Scale: 1 at center, drops to ~0.85 when 1 unit away
+        const scale = Math.max(0.84, 1 - Math.min(0.15, normDist * 0.15));
+
+        // Opacity: 1 at center, drops to ~0.44 when 1 unit away
+        const opacity = Math.max(0.38, 1 - Math.min(0.56, normDist * 0.56));
+
+        // translateY: 0 at center, drops 5px down for neighbors
+        const translateY = Math.min(6, normDist * 6);
+
+        // rotateY: ±8deg for shelf perspective
+        const continuousProgress = offset - dragOffset / itemSpacing;
+        const rotateY = Math.max(-9, Math.min(9, -continuousProgress * 8));
+
+        // Blur: 0 at center, ~2.5px for neighbors
+        const blurAmount = Math.min(3, normDist * 2.5);
+
         // zIndex: highest at center
         const zIndex = Math.max(10, Math.round(30 - normDist * 10));
 
@@ -135,7 +158,7 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
         return (
           <div
             key={album.id}
-            id={`vinyl-carousel-item-${album.id}`}
+            id={`vinyl-shelf-item-${album.id}`}
             onClick={() => {
               if (!isCenter && !isDragging) {
                 onSelectIndex(index);
@@ -146,23 +169,21 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
             }}
             className="absolute flex items-center justify-center cursor-pointer will-change-transform"
             style={{
-              transform: `translateX(${currentX}px) scale(${scale})`,
+              transform: `translateX(${currentX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
               opacity,
               zIndex,
-              filter: normDist > 0.3 ? 'blur(0.6px)' : 'none',
+              filter: blurAmount > 0.4 ? `blur(${blurAmount}px)` : 'none',
               transition: isDragging
                 ? 'none'
-                : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.32s ease, filter 0.32s ease',
+                : 'transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease, filter 0.35s ease',
             }}
           >
-            {/* Pure Centered Vinyl Disc: Disc in back, square cover (45% diameter) in center */}
-            <VinylDisc
-              coverUrl={album.coverUrl}
-              albumTitle={album.title}
-              artistName={album.artist}
-              isPlaying={isCenter && isPlaying}
-              size={244}
-              showAmbientGlow={false}
+            <VinylCarouselItem
+              album={album}
+              isPlaying={isPlaying}
+              isCenter={isCenter}
+              discSize={256}
+              sleeveSize={196}
             />
           </div>
         );

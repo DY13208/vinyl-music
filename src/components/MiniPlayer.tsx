@@ -50,7 +50,7 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
               <img
                 src={currentAlbum.coverUrl}
                 alt={currentAlbum.title}
-                className="w-4 h-4 rounded-full object-cover border border-[#2FE92B]/50"
+                className="w-4 h-4 rounded-full object-cover border border-white/20"
               />
             </div>
           </div>
@@ -63,7 +63,7 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
             <p className="text-[11px] text-[#BBCBB2] truncate leading-tight mt-0.5 opacity-80 flex items-center gap-1.5">
               <span>{currentAlbum.artist}</span>
               <span className="w-1 h-1 rounded-full bg-[#2A2A2C]" />
-              <span className="font-mono text-[9px] text-[#2FE92B] flex items-center gap-0.5">
+              <span className="font-mono text-[9px] text-white/50 flex items-center gap-0.5">
                 <Disc className="w-2.5 h-2.5" />
                 {currentAlbum.rpm}
               </span>
@@ -85,13 +85,13 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({
               onTogglePlay();
               audioEngine.triggerHaptic('medium');
             }}
-            className="w-8 h-8 rounded-full bg-[#2FE92B] text-[#0F0F0F] flex items-center justify-center shadow-[0_0_8px_rgba(47,233,43,0.3)] hover:scale-105 active:scale-95 transition-transform"
+            className="w-8 h-8 rounded-full bg-[#1A1A20] hover:bg-[#22222A] border border-[#2B2B36] text-white flex items-center justify-center transition-colors active:scale-95"
             title={isPlaying ? '暂停' : '播放'}
           >
             {isPlaying ? (
-              <Pause className="w-4 h-4 fill-[#0F0F0F]" />
+              <Pause className="w-3.5 h-3.5 fill-[#2FE92B] text-[#2FE92B]" />
             ) : (
-              <Play className="w-4 h-4 fill-[#0F0F0F] ml-0.5" />
+              <Play className="w-3.5 h-3.5 fill-[#2FE92B] text-[#2FE92B] ml-0.5" />
             )}
           </button>
         </div>
