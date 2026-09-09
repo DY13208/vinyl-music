@@ -54,6 +54,11 @@ export interface Album {
   discs?: VinylRecord[];
   addedAt?: string;
   barcode?: string;
+  catalogNumber?: string;
+  country?: string;
+  pressingPlant?: string;
+  sleeveCondition?: string;
+  collectionTags?: string[];
 }
 
 export interface Artist {

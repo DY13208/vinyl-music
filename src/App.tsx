@@ -9,7 +9,8 @@ import {
   WishlistItem,
 } from './types';
 import { ALBUMS, ARTISTS, WISHLIST } from './data/mockData';
-import { audioEngine } from './services/audioEngine';
+import { audioEngine, PreviewTrack } from './services/audioEngine';
+import { loadServerCollection, removeAlbumFromServer, saveAlbumsToServer, saveAlbumToServer } from './services/collectionApi';
 import { HomeView } from './views/HomeView';
 import { PlayerView } from './views/PlayerView';
 import { AlbumDetailView } from './views/AlbumDetailView';
@@ -26,11 +27,13 @@ import { MiniPlayer } from './components/MiniPlayer';
 import { BottomNav } from './components/BottomNav';
 
 const CollectionView = lazy(() => import('./views/CollectionView').then((module) => ({ default: module.CollectionView })));
+const ImportVinylModal = lazy(() => import('./components/ImportVinylModal').then((module) => ({ default: module.ImportVinylModal })));
 
 export default function App() {
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
   const [activeTab, setActiveTab] = useState<MainTab>('home');
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   // User Vinyl Collection with LocalStorage Persistence
   const [albums, setAlbums] = useState<Album[]>(() => {
@@ -60,6 +63,18 @@ export default function App() {
     }
   }, [albums]);
 
+  useEffect(() => {
+    let active = true;
+    loadServerCollection().then((savedAlbums) => {
+      if (!active || !savedAlbums.length) return;
+      setAlbums((current) => {
+        const serverIds = new Set(savedAlbums.map(album => album.id));
+        return [...savedAlbums, ...current.filter(album => !serverIds.has(album.id))];
+      });
+    }).catch((error) => console.warn('Backend collection unavailable', error));
+    return () => { active = false; };
+  }, []);
+
   // Carousel & Content State
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
   const [selectedAlbum, setSelectedAlbum] = useState<Album>(albums[0] || ALBUMS[0]);
@@ -73,68 +88,90 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(138); // 2:18 initial sample time
   const [progressPercent, setProgressPercent] = useState<number>(33.4);
-  const playbackTimerRef = useRef<number | null>(null);
+  const [previewDurationSec, setPreviewDurationSec] = useState<number>(30);
+  const [previewMatch, setPreviewMatch] = useState<PreviewTrack | null>(null);
+  const [playbackMessage, setPlaybackMessage] = useState('');
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const previewRequestRef = useRef(0);
 
-  const durationSec = currentTrack?.durationSec || 413;
+  const durationSec = previewMatch ? previewDurationSec : (currentTrack?.durationSec || 30);
 
-  // Real-time playback timer simulation
-  useEffect(() => {
-    if (isPlaying) {
-      playbackTimerRef.current = window.setInterval(() => {
-        setCurrentTimeSec((prev) => {
-          if (prev >= durationSec) {
-            // Next track or loop
-            return 0;
-          }
-          const next = prev + 1;
-          setProgressPercent((next / durationSec) * 100);
-          return next;
-        });
-      }, 1000);
-    } else {
-      if (playbackTimerRef.current) {
-        clearInterval(playbackTimerRef.current);
-      }
-    }
-    return () => {
-      if (playbackTimerRef.current) {
-        clearInterval(playbackTimerRef.current);
-      }
-    };
-  }, [isPlaying, durationSec]);
-
-  // Audio Play / Pause control
-  const handleTogglePlay = (targetAlbum?: Album) => {
-    const alb = targetAlbum || currentPlayingAlbum || ALBUMS[0];
-    if (currentPlayingAlbum?.id !== alb.id) {
-      setCurrentPlayingAlbum(alb);
-      setCurrentTrack(alb.tracks[0]);
-      setCurrentTimeSec(0);
-      setProgressPercent(0);
-      setIsPlaying(true);
-      audioEngine.playNeedleDrop();
-      audioEngine.startPlayback(ALBUMS.indexOf(alb) + 1);
-      return;
-    }
-
-    if (isPlaying) {
-      setIsPlaying(false);
-      audioEngine.stopPlayback();
-    } else {
-      setIsPlaying(true);
-      audioEngine.playNeedleDrop();
-      audioEngine.startPlayback(ALBUMS.indexOf(alb) + 1);
-    }
-  };
-
-  const handleSelectTrack = (album: Album, track: Track) => {
+  const startTrackPreview = async (album: Album, track: Track) => {
+    const requestId = ++previewRequestRef.current;
     setCurrentPlayingAlbum(album);
     setCurrentTrack(track);
     setCurrentTimeSec(0);
     setProgressPercent(0);
-    setIsPlaying(true);
+    setPreviewMatch(null);
+    setPlaybackMessage('正在查找官方试听…');
+    setIsPreviewLoading(true);
+    setIsPlaying(false);
     audioEngine.playNeedleDrop();
-    audioEngine.startPlayback(track.number);
+    try {
+      const match = await audioEngine.playTrackPreview(
+        { title: track.title, artist: album.artist, album: album.title },
+        {
+          onTimeUpdate: (time, duration) => {
+            if (previewRequestRef.current !== requestId) return;
+            setCurrentTimeSec(time);
+            setPreviewDurationSec(duration);
+            setProgressPercent(duration ? (time / duration) * 100 : 0);
+          },
+          onEnded: () => {
+            if (previewRequestRef.current !== requestId) return;
+            setIsPlaying(false);
+            setProgressPercent(100);
+          },
+          onError: (message) => {
+            if (previewRequestRef.current !== requestId) return;
+            setPlaybackMessage(message);
+            setIsPlaying(false);
+          },
+        },
+      );
+      if (previewRequestRef.current !== requestId) return;
+      setPreviewMatch(match);
+      setIsPreviewLoading(false);
+      if (match) {
+        setPlaybackMessage('试听音频由 iTunes 提供');
+        setIsPlaying(true);
+      } else {
+        setPlaybackMessage((message) =>
+          message === '正在查找官方试听…' ? '暂未找到这首歌的官方试听' : message,
+        );
+      }
+    } catch {
+      if (previewRequestRef.current !== requestId) return;
+      setIsPreviewLoading(false);
+      setIsPlaying(false);
+      setPlaybackMessage('暂时无法连接试听服务，请检查网络后重试');
+    }
+  };
+
+  // Audio Play / Pause control
+  const handleTogglePlay = (targetAlbum?: Album) => {
+    const alb = targetAlbum || currentPlayingAlbum || ALBUMS[0];
+    const track = currentPlayingAlbum?.id === alb.id && currentTrack ? currentTrack : alb.tracks[0];
+    if (!track || isPreviewLoading) return;
+
+    if (isPlaying) {
+      setIsPlaying(false);
+      audioEngine.pausePreview();
+    } else {
+      const query = { title: track.title, artist: alb.artist, album: alb.title };
+      if (currentPlayingAlbum?.id === alb.id && currentTrack?.id === track.id && audioEngine.hasPreview(query)) {
+        void audioEngine.resumePreview().then(resumed => {
+          setIsPlaying(resumed);
+          if (!resumed) setPlaybackMessage('浏览器阻止了音频播放，请再次点击播放');
+        });
+      } else {
+        void startTrackPreview(alb, track);
+      }
+    }
+  };
+
+  const handleSelectTrack = (album: Album, track: Track) => {
+    void startTrackPreview(album, track);
   };
 
   const handlePrevTrack = () => {
@@ -154,6 +191,7 @@ export default function App() {
   };
 
   const handleSeek = (percent: number) => {
+    audioEngine.seekPreview(percent);
     setProgressPercent(percent);
     setCurrentTimeSec(Math.floor((percent / 100) * durationSec));
   };
@@ -202,12 +240,14 @@ export default function App() {
   };
 
   // Vinyl Collection CRUD handlers
-  const handleAddAlbum = (newAlbum: Album) => {
+  const handleAddAlbum = async (newAlbum: Album) => {
+    await saveAlbumToServer(newAlbum);
     setAlbums((prev) => [newAlbum, ...prev]);
     setFavorites((prev) => (prev.includes(newAlbum.id) ? prev : [newAlbum.id, ...prev]));
   };
 
-  const handleImportMultiple = (newAlbums: Album[]) => {
+  const handleImportMultiple = async (newAlbums: Album[]) => {
+    await saveAlbumsToServer(newAlbums);
     setAlbums((prev) => {
       const existingIds = new Set(prev.map((a) => a.id));
       const existingTitles = new Set(prev.map((a) => a.title.toLowerCase().trim()));
@@ -220,6 +260,7 @@ export default function App() {
 
   const handleRemoveAlbum = (albumId: string) => {
     setAlbums((prev) => prev.filter((a) => a.id !== albumId));
+    void removeAlbumFromServer(albumId).catch((error) => console.warn('Backend delete unavailable', error));
   };
 
   // Check if current view is Landscape
@@ -295,7 +336,7 @@ export default function App() {
 
           {currentScreen === 'collection' && (
             <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开收藏柜" />}>
-              <CollectionView albums={albums} onOpenAlbumDetail={handleOpenAlbumDetail} />
+              <CollectionView albums={albums} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} />
             </Suspense>
           )}
 
@@ -382,6 +423,9 @@ export default function App() {
               onSeek={handleSeek}
               onClose={() => setCurrentScreen(activeTab)}
               onSelectTrack={(trk) => handleSelectTrack(currentPlayingAlbum, trk)}
+              previewMatch={previewMatch}
+              playbackMessage={playbackMessage}
+              isPreviewLoading={isPreviewLoading}
             />
           )}
         </div>
@@ -412,6 +456,18 @@ export default function App() {
               <div className="w-32 h-1 rounded-full bg-white/25" />
             </div>
           </div>
+        )}
+
+        {isImportOpen && (
+          <Suspense fallback={null}>
+            <ImportVinylModal
+              isOpen
+              onClose={() => setIsImportOpen(false)}
+              onAddAlbum={handleAddAlbum}
+              onImportMultiple={handleImportMultiple}
+              currentAlbums={albums}
+            />
+          </Suspense>
         )}
       </div>
     </div>

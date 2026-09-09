@@ -21,6 +21,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { audioEngine } from '../services/audioEngine';
+import type { PreviewTrack } from '../services/audioEngine';
 
 interface PlayerViewProps {
   album: Album;
@@ -35,6 +36,9 @@ interface PlayerViewProps {
   onSeek: (percent: number) => void;
   onClose: () => void;
   onSelectTrack: (track: Track) => void;
+  previewMatch: PreviewTrack | null;
+  playbackMessage: string;
+  isPreviewLoading: boolean;
 }
 
 export const PlayerView: React.FC<PlayerViewProps> = ({
@@ -50,6 +54,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onSeek,
   onClose,
   onSelectTrack,
+  previewMatch,
+  playbackMessage,
+  isPreviewLoading,
 }) => {
   const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
@@ -137,6 +144,16 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           <h2 title={currentTrack.title}>{currentTrack.title}</h2>
           <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
           <small>{album.rpm}{face ? ` · Side ${face.side} · ${position}` : ''}</small>
+          {(playbackMessage || previewMatch) && (
+            <div className="full-player__source" aria-live="polite" aria-busy={isPreviewLoading}>
+              <span>{playbackMessage}</span>
+              {previewMatch && (
+                <a href={previewMatch.storeUrl} target="_blank" rel="noreferrer">
+                  在 Apple Music 查看
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {viewMode === 'lyrics' && (
@@ -230,7 +247,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
               audioEngine.triggerHaptic('medium');
             }}
             className="full-player__play"
-            title={isPlaying ? '暂停' : '播放'}
+            title={isPreviewLoading ? '正在加载试听' : isPlaying ? '暂停' : '播放'}
+            aria-label={isPreviewLoading ? '正在加载试听' : isPlaying ? '暂停' : '播放'}
+            disabled={isPreviewLoading}
           >
             {isPlaying ? (
               <Pause className="w-5 h-5 fill-[#2FE92B] text-[#2FE92B]" />

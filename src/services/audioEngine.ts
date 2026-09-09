@@ -6,6 +6,70 @@ class VinylAudioEngine {
   private crackleGain: GainNode | null = null;
   private isPlayingMusic = false;
   private currentFreqs: number[] = [196, 246.94, 293.66, 392]; // G major 7 warm chord
+  private previewAudio: HTMLAudioElement | null = null;
+  private previewKey: string | null = null;
+  private previewCache = new Map<string, PreviewTrack | null>();
+
+  public async playTrackPreview(
+    query: { title: string; artist: string; album: string },
+    listeners: PreviewListeners,
+  ): Promise<PreviewTrack | null> {
+    const key = `${query.artist}::${query.album}::${query.title}`.toLocaleLowerCase();
+    const match = this.previewCache.has(key) ? this.previewCache.get(key)! : await this.findPreview(query);
+    this.previewCache.set(key, match);
+    if (!match) return null;
+
+    this.stopPlayback();
+    const audio = new Audio(match.previewUrl);
+    audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous';
+    audio.addEventListener('timeupdate', () => listeners.onTimeUpdate(audio.currentTime, audio.duration || 30));
+    audio.addEventListener('durationchange', () => listeners.onTimeUpdate(audio.currentTime, audio.duration || 30));
+    audio.addEventListener('ended', listeners.onEnded);
+    audio.addEventListener('error', () => listeners.onError('试听音频加载失败，请稍后重试'));
+    this.previewAudio = audio;
+    this.previewKey = key;
+    try {
+      await audio.play();
+      return match;
+    } catch {
+      listeners.onError('浏览器阻止了音频播放，请再次点击播放');
+      return null;
+    }
+  }
+
+  public hasPreview(query: { title: string; artist: string; album: string }) {
+    return this.previewKey === `${query.artist}::${query.album}::${query.title}`.toLocaleLowerCase() && !!this.previewAudio;
+  }
+
+  public async resumePreview() {
+    if (!this.previewAudio) return false;
+    try { await this.previewAudio.play(); return true; } catch { return false; }
+  }
+
+  public pausePreview() { this.previewAudio?.pause(); }
+
+  public seekPreview(percent: number) {
+    if (!this.previewAudio || !Number.isFinite(this.previewAudio.duration)) return;
+    this.previewAudio.currentTime = Math.max(0, Math.min(1, percent / 100)) * this.previewAudio.duration;
+  }
+
+  private async findPreview(query: { title: string; artist: string; album: string }): Promise<PreviewTrack | null> {
+    const term = encodeURIComponent(`${query.title} ${query.artist}`);
+    const response = await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&country=US&limit=10`);
+    if (!response.ok) throw new Error(`iTunes Search ${response.status}`);
+    const payload = await response.json() as { results?: ItunesTrack[] };
+    const normalize = (value = '') => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+    const targetTitle = normalize(query.title);
+    const targetArtist = normalize(query.artist);
+    const targetAlbum = normalize(query.album);
+    const candidates = (payload.results ?? []).filter(item => item.previewUrl);
+    const best = candidates.sort((a, b) => {
+      const score = (item: ItunesTrack) => (normalize(item.trackName) === targetTitle ? 6 : normalize(item.trackName).includes(targetTitle) ? 3 : 0) + (normalize(item.artistName) === targetArtist ? 4 : 0) + (normalize(item.collectionName).includes(targetAlbum) ? 2 : 0);
+      return score(b) - score(a);
+    })[0];
+    return best ? { previewUrl: best.previewUrl, storeUrl: best.trackViewUrl, trackName: best.trackName, artistName: best.artistName, collectionName: best.collectionName } : null;
+  }
 
   private initContext() {
     if (!this.ctx) {
@@ -134,6 +198,13 @@ class VinylAudioEngine {
   // Stop playback gracefully
   public stopPlayback() {
     try {
+      if (this.previewAudio) {
+        this.previewAudio.pause();
+        this.previewAudio.removeAttribute('src');
+        this.previewAudio.load();
+        this.previewAudio = null;
+        this.previewKey = null;
+      }
       if (this.ctx && this.masterGain) {
         const now = this.ctx.currentTime;
         this.masterGain.gain.linearRampToValueAtTime(0.001, now + 0.6);
@@ -203,3 +274,7 @@ class VinylAudioEngine {
 }
 
 export const audioEngine = new VinylAudioEngine();
+
+interface ItunesTrack { trackName: string; artistName: string; collectionName: string; previewUrl: string; trackViewUrl: string; }
+export interface PreviewTrack { previewUrl: string; storeUrl: string; trackName: string; artistName: string; collectionName: string; }
+interface PreviewListeners { onTimeUpdate: (currentTime: number, duration: number) => void; onEnded: () => void; onError: (message: string) => void; }

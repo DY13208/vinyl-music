@@ -23,13 +23,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ albums, carouselIndex, onSel
       </header>
       <section className="home-gallery__stage" aria-roledescription="carousel">
         <VinylShelfHero albums={albums} currentIndex={carouselIndex} onSelectIndex={onSelectCarouselIndex} onOpenAlbumDetail={onOpenAlbumDetail} />
+        {currentAlbum && (
+          <div className="home-gallery__caption" aria-live="polite">
+            <h1>{currentAlbum.title}</h1>
+            <p>{currentAlbum.artist}</p>
+          </div>
+        )}
       </section>
-      {currentAlbum && (
-        <section className="home-gallery__caption" aria-live="polite">
-          <h1>{currentAlbum.title}</h1>
-          <p>{currentAlbum.artist}</p>
-        </section>
-      )}
     </main>
   );
 };

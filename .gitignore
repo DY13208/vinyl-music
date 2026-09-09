@@ -1,6 +1,8 @@
 node_modules/
 build/
 dist/
+data/vinyl-collection.json
+data/vinyl-collection.json.tmp
 coverage/
 .DS_Store
 *.log

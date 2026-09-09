@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowDownUp, MoreHorizontal, Search, X } from 'lucide-react';
+import { ArrowDownUp, MoreHorizontal, Plus, Search, X } from 'lucide-react';
 import { Album } from '../types';
 import { ThreeUIVinylShelf } from '../components/ThreeUIVinylShelf';
 import { audioEngine } from '../services/audioEngine';
@@ -7,6 +7,7 @@ import { audioEngine } from '../services/audioEngine';
 interface CollectionViewProps {
   albums: Album[];
   onOpenAlbumDetail: (album: Album) => void;
+  onAddVinyl: () => void;
 }
 
 type Genre = '全部' | '摇滚' | '流行' | '爵士' | '电子' | '古典' | '其他';
@@ -19,7 +20,7 @@ const genreMatches = (album: Album, genre: Genre) => {
   return album.genre.includes(genre);
 };
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAlbumDetail }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAlbumDetail, onAddVinyl }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -66,8 +67,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
       )}
 
       <nav className="collection-room__filters" aria-label="收藏分类">
-        <div>{genres.map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div>
-        <button type="button" className="collection-room__sort" onClick={() => setSheetOpen(true)}><ArrowDownUp /><span>{sort === 'recent' ? '最近收藏' : sort === 'artist' ? '艺术家' : '发行年份'}</span></button>
+        <div className="collection-room__categories">{genres.map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div>
+        <div className="collection-room__toolbar-actions">
+          <button type="button" className="collection-room__add" onClick={onAddVinyl} aria-label="新增唱片"><Plus /><span className="collection-room__add-label"><span>新增唱片</span><span>新增</span></span></button>
+          <button type="button" className="collection-room__sort" onClick={() => setSheetOpen(true)}><ArrowDownUp /><span>{sort === 'recent' ? '最近收藏' : sort === 'artist' ? '艺术家' : '发行年份'}</span></button>
+        </div>
       </nav>
 
       <section className="collection-room__shelf" aria-label="3D 黑胶收藏柜">

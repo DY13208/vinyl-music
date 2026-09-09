@@ -1,4 +1,4 @@
-.album-archive { --archive-ink: #f3f0ea; width: 100%; min-height: 100%; padding-bottom: 110px; color: var(--archive-ink); background: #131211; container-type: inline-size; }
+.album-archive { --archive-ink: #f3f0ea; flex: 0 0 auto; width: 100%; min-height: 100%; padding-bottom: 110px; color: var(--archive-ink); background: #131211; container-type: inline-size; }
 .archive-nav { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: #171614; }
 .archive-nav button { width: 40px; height: 40px; display: grid; place-items: center; color: #d5d0c8; background: none; border: 0; }
 .archive-nav > span { font-size: 12px; color: #aaa49a; }
@@ -23,7 +23,7 @@
 .archive-actions .archive-actions__play { width: 162px; gap: 10px; background: #2fe92b; color: #11200e; font-size: 13px; font-weight: 700; }
 .archive-actions button[aria-pressed=true] { color: #2fe92b; }
 .archive-actions__play:hover { filter: brightness(1.08); }
-.archive-tracks { margin: 0 auto; padding: 0 23px; max-width: 680px; }
+.archive-tracks { margin: 8px auto 0; padding: 14px 23px 0; max-width: 680px; border-top: 1px solid #2a2825; }
 .archive-discs { display: flex; justify-content: center; gap: 18px; padding: 4px 0 14px; }
 .archive-discs button { min-height: 36px; padding: 0 14px; border: 1px solid #35312a; color: #aaa49a; font: 11px ui-monospace, monospace; border-radius: 3px; }
 .archive-discs button[aria-pressed=true] { color: #eee8df; border-color: #888072; }

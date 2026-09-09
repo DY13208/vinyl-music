@@ -72,13 +72,15 @@ cp .env.example .env
 
 ### 开发模式
 
-启动本地开发服务器（端口 3000）：
+启动前端与收藏后端（前端端口 3000，API 端口 3001）：
 
 ```bash
 npm run dev
 ```
 
 访问 [http://localhost:3000](http://localhost:3000)
+
+新增唱片会持久化到后端的 `data/vinyl-collection.json`。扫码功能需要通过 HTTPS 或 localhost 打开并允许摄像头权限；识别到 EAN / UPC 后，会通过 MusicBrainz 与 Cover Art Archive 补全发行资料。
 
 ### 构建生产版本
 
