@@ -1,0 +1,62 @@
+.album-archive { --archive-ink: #f3f0ea; width: 100%; min-height: 100%; padding-bottom: 110px; color: var(--archive-ink); background: #131211; container-type: inline-size; }
+.archive-nav { height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 22px; background: #171614; }
+.archive-nav button { width: 40px; height: 40px; display: grid; place-items: center; color: #d5d0c8; background: none; border: 0; }
+.archive-nav > span { font-size: 12px; color: #aaa49a; }
+.archive-nav .archive-nav__format { font: 10px ui-monospace, monospace; width: 40px; text-align: right; }
+.archive-display { height: 270px; position: relative; overflow: hidden; isolation: isolate; background: #211d18 url('/assets/vinyl/collection-header-bg.webp') center 48% / cover; }
+.archive-display::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #19140aa3, #14120f60 60%, #17150e70); z-index: -1; }
+.archive-display__table { position: absolute; inset: 88% 0 0; background: #33281e url('/assets/vinyl/shelf-dark-wood.webp') center / 100% auto; box-shadow: 0 -1px 0 #eac08c40, inset 0 5px 20px #0006; }
+.archive-object { --archive-sleeve: 218px; --archive-disc: 212px; position: relative; width: 310px; height: 264px; margin: 0 auto; }
+.archive-object__disc { position: absolute; top: 23px; right: 0; z-index: 1; }
+.archive-object__sleeve { position: absolute; top: 20px; left: 0; z-index: 2; transform: rotate(-3deg); box-shadow: 7px 10px 9px #0008; -webkit-box-reflect: below 5px linear-gradient(transparent 85%, #ffffff0e); }
+.archive-object__sleeve > div { border-radius: 2px; }
+.archive-object__sleeve::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: url('/assets/vinyl-textures/paper-grain.webp') center / 180px; mix-blend-mode: soft-light; opacity: .23; }
+.archive-display__caption { position: absolute; bottom: 10px; left: 25px; right: 25px; display: flex; justify-content: space-between; font: 9px ui-monospace, monospace; letter-spacing: .1em; color: #c7bba9; }
+.archive-info { position: relative; padding: 15px 22px 17px; text-align: center; }
+.archive-info h1 { margin: 0 auto; max-width: 30ch; font-family: 'Songti SC', STSong, Georgia, serif; font-size: 27px; font-weight: 600; line-height: 1.23; text-wrap: balance; }
+.archive-info__artist { margin: 5px 0 0; font-size: 14px; color: #d3c8b8; }
+.archive-info__summary { margin: 8px 0 0; font-size: 11px; line-height: 1.6; color: #aca79f; text-wrap: balance; }
+.archive-info__edition { margin: 8px auto 0; font-size: 10px; line-height: 1.5; color: #ada69a; }
+.archive-info__label { margin: 3px 0 0; color: #a7a097; font-size: 10px; }
+.archive-actions { display: flex; align-items: center; justify-content: center; gap: 13px; margin-top: 14px; }
+.archive-actions button { display: flex; align-items: center; justify-content: center; width: 44px; height: 50px; border: 0; border-radius: 5px; background: none; color: #bdb6ac; cursor: pointer; }
+.archive-actions .archive-actions__play { width: 162px; gap: 10px; background: #2fe92b; color: #11200e; font-size: 13px; font-weight: 700; }
+.archive-actions button[aria-pressed=true] { color: #2fe92b; }
+.archive-actions__play:hover { filter: brightness(1.08); }
+.archive-tracks { margin: 0 auto; padding: 0 23px; max-width: 680px; }
+.archive-discs { display: flex; justify-content: center; gap: 18px; padding: 4px 0 14px; }
+.archive-discs button { min-height: 36px; padding: 0 14px; border: 1px solid #35312a; color: #aaa49a; font: 11px ui-monospace, monospace; border-radius: 3px; }
+.archive-discs button[aria-pressed=true] { color: #eee8df; border-color: #888072; }
+.archive-sides { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(var(--side-count, 2), minmax(0, 1fr)); height: 56px; padding: 3px; border: 1px solid #26272d; border-radius: 999px; background: #0d0d0f; }
+.archive-sides__indicator { position: absolute; z-index: -1; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / var(--side-count, 2)); border: 1px solid #2fe92b; border-radius: 999px; background: #101212; transform: translateX(calc(var(--active-side, 0) * 100%)); transition: transform 250ms ease-out; pointer-events: none; }
+.archive-sides button { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 5px; border-radius: 999px; background: none; border: 0; color: #8a8a92; font: 12px ui-monospace, monospace; cursor: pointer; }
+.archive-sides button[aria-selected=true] { color: #2fe92b; }
+.vinyl-side-icon { display: block; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; filter: grayscale(1); opacity: .55; transition: filter 180ms ease-out, opacity 180ms ease-out, box-shadow 180ms ease-out; }
+.vinyl-side-icon.is-active { opacity: 1; filter: grayscale(0); box-shadow: 0 0 6px #2fe92b30; }
+.vinyl-side-icon .vinyl-disc { filter: none; }
+.vinyl-side-icon .vinyl-disc__label-title, .vinyl-side-icon .vinyl-disc__rpm, .vinyl-side-icon .vinyl-disc__artist { display: none; }
+.vinyl-side-icon .vinyl-disc__side { font-size: 5px; }
+.archive-side-panel { opacity: 1; transform: translateY(0); transition: opacity 180ms ease-out, transform 180ms ease-out; }
+.archive-side-panel[data-transition=out] { opacity: 0; transform: translateY(4px); transition-duration: 120ms; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .archive-side-panel, .archive-sides__indicator, .vinyl-side-icon { transition: none; } }
+.archive-tracks__heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 15px 0 8px; }
+.archive-tracks__heading p { margin: 0; font: 11px ui-monospace, monospace; color: #d0c8bc; }
+.archive-tracks__heading p span { color: #a7a098; font-size: 10px; }
+.archive-tracks__heading button { display: flex; align-items: center; gap: 5px; padding: 9px 0 9px 8px; background: none; border: none; font-size: 10px; color: #c3bbae; }
+.archive-tracklist { list-style: none; padding: 0; margin: 0; }
+.archive-track { display: flex; align-items: center; gap: 15px; width: 100%; min-height: 62px; padding: 10px 0; text-align: left; border: 0; border-bottom: 1px solid #ffffff0b; color: #e8e4de; background: none; cursor: pointer; }
+.archive-track:hover { background: #ffffff04; }
+.archive-track__number { width: 23px; flex-shrink: 0; color: #b3a791; font: 11px ui-monospace, monospace; }
+.archive-track__name { flex: 1; min-width: 0; }
+.archive-track__name strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 500; }
+.archive-track__name small { display: block; color: #a19b92; font-size: 10px; margin-top: 4px; }
+.archive-track__duration { display: flex; align-items: center; gap: 7px; color: #b5ada1; font: 10px ui-monospace, monospace; }
+.archive-track__duration i { width: 3px; height: 3px; border-radius: 50%; background: #2fe92b; }
+.archive-track.is-current .archive-track__name strong, .archive-track.is-current .archive-track__number { color: #2fe92b; }
+.archive-tracks__empty { color: #b7afa3; font-size: 12px; padding: 20px 0; }
+.archive-footnote { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 21px 0; color: #999287; font-size: 9px; line-height: 1.6; }
+.archive-footnote span:last-child { margin-left: auto; font-family: ui-monospace, monospace; }
+.album-archive button:focus-visible { outline: 2px solid #2fe92b; outline-offset: 3px; }
+.album-archive button:disabled { opacity: .45; cursor: default; }
+@container (max-width: 350px) { .archive-object { --archive-sleeve: 190px; --archive-disc: 186px; width: 274px; } .archive-display { height: 240px; } .archive-tracks { padding: 0 17px; } }
+@container (min-width: 700px) { .archive-display { height: 370px; } .archive-object { --archive-sleeve: 275px; --archive-disc: 268px; width: 389px; } .archive-info h1 { font-size: 34px; } }

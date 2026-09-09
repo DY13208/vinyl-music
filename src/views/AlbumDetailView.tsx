@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Album, Track } from '../types';
 import { VinylDisc } from '../components/VinylDisc';
-import { ChevronLeft, Play, Pause, Heart, BookmarkPlus, Share2, Disc } from 'lucide-react';
+import { VinylSideIcon } from '../components/VinylSideIcon';
+import { useVinylSideTransition } from '../hooks/useVinylSideTransition';
+import { AlbumSleeve } from '../components/AlbumSleeve';
+import { ChevronLeft, Play, Heart, BookmarkPlus, ArrowLeftRight } from 'lucide-react';
 import { audioEngine } from '../services/audioEngine';
+import { getVinylAppearance } from '../utils/vinylAppearance';
+import { albumForSide, durationOf, getAlbumDiscs } from '../utils/vinylSides';
+import './AlbumDetailView.css';
 
 interface AlbumDetailViewProps {
   album: Album;
@@ -17,244 +23,107 @@ interface AlbumDetailViewProps {
   onToggleWishlist?: (album: Album) => void;
 }
 
-export const AlbumDetailView: React.FC<AlbumDetailViewProps> = ({
-  album,
-  currentTrackId,
-  isPlayingAlbum = false,
-  isPlaying = false,
-  onBack,
-  onPlayAlbum,
-  onSelectTrack,
-  onToggleFavorite,
-  isFavorite,
-  onToggleWishlist,
+export const AlbumDetailView: React.FC<AlbumDetailViewProps> = ({ album, ...props }) =>
+  <AlbumArchive key={album.id} album={album} {...props} />;
+
+const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
+  album, currentTrackId, isPlayingAlbum = false, isPlaying = false,
+  onBack, onSelectTrack, onToggleFavorite, isFavorite, onToggleWishlist,
 }) => {
-  return (
-    <div
-      id="album-detail-view"
-      className="w-full min-h-screen bg-[#000000] text-white flex flex-col select-none pb-20 overflow-y-auto no-scrollbar"
-    >
-      {/* Subtle Ambient Glow Background */}
-      <div
-        className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full filter blur-[80px] pointer-events-none"
-        style={{ backgroundColor: album.color, opacity: 0.2 }}
-      />
+  const discs = useMemo(() => getAlbumDiscs(album), [album]);
+  const { selection, target, phase, selectSide } = useVinylSideTransition();
+  const sideButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const disc = discs[selection.disc] ?? discs[0];
+  const side = disc.sides[selection.side] ?? disc.sides[0];
+  const appearance = getVinylAppearance(album);
+  const allTracks = discs.flatMap(record => record.sides.flatMap(face => face.tracks));
+  const changeSide = (discIndex: number, sideIndex: number) => {
+    selectSide({ disc: discIndex, side: sideIndex });
+    audioEngine.triggerHaptic('light');
+  };
+  const play = (tracks: Track[]) => {
+    if (!tracks.length) return;
+    onSelectTrack(albumForSide(album, tracks), tracks[0]);
+    audioEngine.triggerHaptic('medium');
+  };
 
-      {/* Top Navigation */}
-      <header className="px-4 pt-3 pb-2 flex items-center justify-between z-20">
-        <button
-          id="album-detail-back"
-          type="button"
-          onClick={onBack}
-          className="w-8 h-8 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] text-white/80 hover:text-white flex items-center justify-center transition-colors"
-          title="返回"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-
-        <span className="text-[12px] font-mono tracking-widest text-white/40 uppercase">
-          ALBUM ARCHIVE
-        </span>
-
-        <button
-          type="button"
-          className="w-8 h-8 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] text-white/80 hover:text-white flex items-center justify-center transition-colors"
-          title="分享黑胶"
-        >
-          <Share2 className="w-4 h-4" />
-        </button>
-      </header>
-
-      {/* Album Header Visual: Cover + Exposed Vinyl Disc */}
-      <div className="w-full flex flex-col items-center pt-2 pb-5 px-6 z-20">
-        <div className="relative w-[280px] h-[220px] flex items-center justify-center">
-          {/* Vinyl Disc sliding out backwards */}
-          <div className="absolute right-2 z-10">
-            <VinylDisc
-              coverUrl={album.coverUrl}
-              albumTitle={album.title}
-              artistName={album.artist}
-              isPlaying={isPlayingAlbum && isPlaying}
-              size={180}
-              rpm={album.rpm}
-              showAmbientGlow={false}
-            />
-          </div>
-
-          {/* Front Sleeve Jacket */}
-          <div
-            className="absolute left-2 z-20 w-[180px] h-[180px] rounded-[4px] overflow-hidden bg-[#0F0F0F]"
-            style={{
-              border: '1px solid #26272D',
-              boxShadow: '-6px 10px 24px rgba(0,0,0,0.85)',
-            }}
-          >
-            <img
-              src={album.coverUrl}
-              alt={album.title}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-[2px] bg-black/80 border border-white/10 text-[8px] font-mono text-white/90">
-              {album.rpm}
-            </div>
-          </div>
+  return <main id="album-detail-view" className="album-archive" translate="no">
+    <header className="archive-nav">
+      <button id="album-detail-back" type="button" onClick={onBack} aria-label="返回"><ChevronLeft size={20} /></button>
+      <span>唱片档案</span><span className="archive-nav__format">{discs.length} LP</span>
+    </header>
+    <section className="archive-display" aria-label="封套与实体唱片">
+      <div className="archive-display__table" />
+      <div className="archive-object">
+        <div className="archive-object__disc">
+          <VinylDisc coverUrl={album.coverUrl} albumTitle={album.title} artistName={album.label}
+            size="var(--archive-disc)" type={appearance.variant} texture={appearance.texture}
+            labelColor={appearance.label?.color} labelImage={appearance.label?.image}
+            labelText={appearance.label?.text} side={side.side} rpm={album.rpm} transitionPhase={phase} />
         </div>
-
-        {/* Album Metadata Typography */}
-        <div className="text-center mt-3 max-w-sm">
-          <h1 className="text-[21px] font-bold text-white tracking-tight leading-snug">
-            {album.title}
-          </h1>
-          <p className="text-[14px] font-medium text-[#BBCBB2] mt-0.5">
-            {album.artist}
-          </p>
-          <p className="text-[11.5px] text-white/45 mt-1 font-mono tracking-wide">
-            {album.year} · {album.genre} · {album.trackCount} 首 · {album.totalDuration}
-          </p>
-
-          {/* Pressing and weight badge */}
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <span className="text-[10px] px-2 py-0.5 rounded-[3px] bg-[#1B1B1D] border border-[#26272D] text-[#BBCBB2]">
-              {album.weight}
-            </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-[3px] bg-[#1B1B1D] border border-[#26272D] text-white/50">
-              厂牌: {album.label}
-            </span>
-          </div>
-
-          {album.description && (
-            <p className="text-[11px] text-white/50 text-left mt-3 leading-relaxed line-clamp-3 bg-[#0F0F0F] p-2.5 rounded-[4px] border border-[#26272D]">
-              {album.description}
-            </p>
-          )}
-        </div>
-
-        {/* Action Buttons: Primary Play (#2FE92B) + Favorite + Wishlist */}
-        <div className="flex items-center gap-2.5 w-full max-w-sm mt-4">
-          <button
-            id="album-detail-play-btn"
-            type="button"
-            onClick={() => {
-              onPlayAlbum(album);
-              audioEngine.triggerHaptic('medium');
-            }}
-            className="flex-1 h-10 px-4 rounded-[6px] bg-[#2FE92B] hover:bg-[#28d124] text-[#0F0F0F] font-bold text-[14px] tracking-wide flex items-center justify-center gap-2 shadow-[0_2px_12px_rgba(47,233,43,0.3)] active:scale-98 transition-all"
-          >
-            {isPlayingAlbum && isPlaying ? (
-              <>
-                <Pause className="w-4 h-4 fill-[#0F0F0F]" />
-                <span>暂停播放</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-[#0F0F0F]" />
-                <span>播放整张</span>
-              </>
-            )}
-          </button>
-
-          <button
-            id="album-detail-fav-btn"
-            type="button"
-            onClick={() => {
-              onToggleFavorite(album.id);
-              audioEngine.triggerHaptic('light');
-            }}
-            className={`h-10 px-3 rounded-[6px] border flex items-center justify-center transition-colors ${
-              isFavorite
-                ? 'bg-[#1B1B1D] border-[#2FE92B]/50 text-[#2FE92B]'
-                : 'bg-[#0F0F0F] border-[#26272D] text-white/70 hover:text-white'
-            }`}
-            title="收藏"
-          >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-[#2FE92B]' : ''}`} />
-          </button>
-
-          <button
-            id="album-detail-wishlist-btn"
-            type="button"
-            onClick={() => {
-              if (onToggleWishlist) onToggleWishlist(album);
-              audioEngine.triggerHaptic('light');
-            }}
-            className="h-10 px-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] text-white/70 hover:text-white flex items-center justify-center transition-colors"
-            title="加入愿望单"
-          >
-            <BookmarkPlus className="w-4 h-4" />
-          </button>
+        <div className="archive-object__sleeve">
+          <AlbumSleeve coverUrl={album.coverUrl} title={album.title} size="var(--archive-sleeve)" />
         </div>
       </div>
+      <div className="archive-display__caption"><span>{album.rpm}</span><span>DISC {disc.disc} / SIDE {side.side}</span></div>
+    </section>
 
-      {/* Tracklist Header */}
-      <div className="w-full px-5 mt-2 z-20">
-        <div className="flex items-center justify-between pb-2 border-b border-[#26272D]">
-          <span className="text-[12px] font-bold text-white tracking-wide">
-            曲目列表 ({album.tracks.length})
-          </span>
-          <span className="text-[10px] font-mono text-white/40 flex items-center gap-1">
-            <Disc className="w-3 h-3 text-[#2FE92B]" />
-            Side A / B
-          </span>
+    <section className="archive-info" aria-labelledby="archive-title">
+      <h1 id="archive-title">{album.title}</h1>
+      <p className="archive-info__artist">{album.artist}</p>
+      <p className="archive-info__summary">{album.year} · {album.genre} · {album.trackCount} 首 · {album.totalDuration}</p>
+      <p className="archive-info__edition">{album.weight} · {album.edition}</p>
+      <p className="archive-info__label">{album.label}</p>
+      <div className="archive-actions">
+        <button id="album-detail-play-btn" className="archive-actions__play" type="button" disabled={!allTracks.length} onClick={() => play(allTracks)}><Play size={17} fill="currentColor" />播放整张</button>
+        <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消收藏' : '收藏'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); audioEngine.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>
+        {onToggleWishlist && <button id="album-detail-wishlist-btn" type="button" aria-label="切换愿望单标记" onClick={() => { onToggleWishlist(album); audioEngine.triggerHaptic('light'); }}><BookmarkPlus size={21} /></button>}
+      </div>
+    </section>
+
+    <section className="archive-tracks" aria-label="唱片分面曲目">
+      {discs.length > 1 && <div className="archive-discs" aria-label="选择唱片">{discs.map((record, index) =>
+        <button type="button" key={record.disc} aria-pressed={selection.disc === index} onClick={() => changeSide(index, 0)}>Disc {record.disc}</button>
+      )}</div>}
+      <div className="archive-sides" role="tablist" aria-label={`Disc ${disc.disc} 唱片面`}
+        style={{ '--side-count': disc.sides.length, '--active-side': target.disc === selection.disc ? target.side : 0 } as React.CSSProperties}>
+        <span className="archive-sides__indicator" aria-hidden="true" />
+        {disc.sides.map((face, index) => <button type="button" key={face.side} role="tab"
+          id={`side-tab-${disc.disc}-${face.side}`} aria-controls="archive-side-tracks"
+          aria-selected={face.side === side.side} tabIndex={face.side === side.side ? 0 : -1}
+          ref={node => { sideButtons.current[index] = node; }}
+          onClick={() => changeSide(selection.disc, index)} onKeyDown={event => {
+            let next = index;
+            if (event.key === 'ArrowRight') next = (index + 1) % disc.sides.length;
+            else if (event.key === 'ArrowLeft') next = (index - 1 + disc.sides.length) % disc.sides.length;
+            else if (event.key === 'Home') next = 0;
+            else if (event.key === 'End') next = disc.sides.length - 1;
+            else return;
+            event.preventDefault();
+            changeSide(selection.disc, next); sideButtons.current[next]?.focus();
+          }}><VinylSideIcon album={album} side={face.side} active={face.side === side.side} /><span>Side {face.side}</span></button>)}
+      </div>
+      <div className="archive-side-panel" id="archive-side-tracks" role="tabpanel" aria-labelledby={`side-tab-${disc.disc}-${side.side}`}
+        data-transition={phase} style={{ minHeight: Math.max(...disc.sides.map(face => face.tracks.length), 1) * 62 + 58 }}>
+        <div className="archive-tracks__heading">
+          <p aria-live="polite">Side {side.side}<span> · {side.tracks.length} 首 · {durationOf(side.tracks)}</span></p>
+          <button type="button" disabled={!side.tracks.length} onClick={() => play(side.tracks)} aria-label={`播放 Side ${side.side}`}><Play size={12} />播放此面</button>
         </div>
-
-        {/* Tracks List */}
-        <div className="mt-2 space-y-1">
-          {album.tracks.map((track) => {
-            const isCurrent = isPlayingAlbum && currentTrackId === track.id;
-            return (
-              <div
-                key={track.id}
-                id={`track-item-${track.id}`}
-                onClick={() => {
-                  onSelectTrack(album, track);
-                  audioEngine.triggerHaptic('light');
-                }}
-                className={`flex items-center justify-between p-3 rounded-[4px] cursor-pointer transition-colors ${
-                  isCurrent
-                    ? 'bg-[#1B1B1D] border-l-3 border-[#2FE92B]'
-                    : 'hover:bg-[#0F0F0F] text-white/90'
-                }`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <span
-                    className={`text-[12px] font-mono w-5 text-center ${
-                      isCurrent ? 'text-[#2FE92B] font-bold' : 'text-white/40'
-                    }`}
-                  >
-                    {String(track.number).padStart(2, '0')}
-                  </span>
-
-                  <div className="overflow-hidden">
-                    <p
-                      className={`text-[13.5px] truncate font-medium ${
-                        isCurrent ? 'text-[#2FE92B]' : 'text-white'
-                      }`}
-                    >
-                      {track.title}
-                    </p>
-                    <p className="text-[10.5px] text-[#BBCBB2] opacity-70 truncate">
-                      {album.artist}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pl-2">
-                  {isCurrent && isPlaying && (
-                    <div className="flex items-end gap-[2px] h-3">
-                      <span className="w-0.5 h-2 bg-[#2FE92B] animate-pulse" />
-                      <span className="w-0.5 h-3 bg-[#2FE92B] animate-bounce" />
-                      <span className="w-0.5 h-1.5 bg-[#2FE92B] animate-pulse" />
-                    </div>
-                  )}
-                  <span className="text-[11px] font-mono text-white/40">
-                    {track.duration}
-                  </span>
-                </div>
-              </div>
-            );
+        <ol className="archive-tracklist">
+          {side.tracks.map((track, index) => {
+            const current = isPlayingAlbum && currentTrackId === track.id;
+            return <li key={track.id}><button type="button" id={`track-item-${track.id}`} className={`archive-track ${current ? 'is-current' : ''}`}
+              aria-current={current ? 'true' : undefined}
+              onClick={() => { onSelectTrack(albumForSide(album, side.tracks), track); audioEngine.triggerHaptic('light'); }}>
+              <span className="archive-track__number">{side.side}{index + 1}</span>
+              <span className="archive-track__name"><strong>{track.title}</strong><small>{album.artist}</small></span>
+              <span className="archive-track__duration">{current && isPlaying && <i aria-label="正在播放" />}{track.duration}</span>
+            </button></li>;
           })}
-        </div>
+        </ol>
+        {!side.tracks.length && <p className="archive-tracks__empty">此面尚未录入曲目</p>}
       </div>
-    </div>
-  );
+      <footer className="archive-footnote"><ArrowLeftRight size={13} /><span>{album.discs ? '按压片版本分面' : '按已录入曲目分面，实际压片以封套为准'}</span><span>{album.matrixCode}</span></footer>
+    </section>
+  </main>;
 };

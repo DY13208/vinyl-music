@@ -1,7 +1,10 @@
 import React from 'react';
 import { Album, Track } from '../types';
-import { Play, Pause, Disc } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { audioEngine } from '../services/audioEngine';
+import { VinylDisc } from './VinylDisc';
+import { getVinylAppearance } from '../utils/vinylAppearance';
+import './MiniPlayer.css';
 
 interface MiniPlayerProps {
   currentAlbum: Album | null;
@@ -12,90 +15,33 @@ interface MiniPlayerProps {
   onOpenPlayer: () => void;
 }
 
-export const MiniPlayer: React.FC<MiniPlayerProps> = ({
-  currentAlbum,
-  currentTrack,
-  isPlaying,
-  progressPercent,
-  onTogglePlay,
-  onOpenPlayer,
-}) => {
+export const MiniPlayer: React.FC<MiniPlayerProps> = ({ currentAlbum, currentTrack, isPlaying, progressPercent, onTogglePlay, onOpenPlayer }) => {
   if (!currentAlbum) return null;
+  const appearance = getVinylAppearance(currentAlbum);
+  // Only explicit pressing data can identify a side in a playback-only track subset.
+  const face = currentAlbum.discs?.flatMap(disc => disc.sides).find(side => side.tracks.some(track => track.id === currentTrack?.id));
+  const position = face ? `${face.side}${face.tracks.findIndex(track => track.id === currentTrack?.id) + 1}` : undefined;
+  const progress = Number.isFinite(progressPercent) ? Math.min(100, Math.max(0, progressPercent)) : 0;
+  const title = currentTrack?.title || currentAlbum.title;
 
-  return (
-    <div
-      id="mini-player-bar"
-      onClick={onOpenPlayer}
-      className="w-full bg-[#0F0F0F] border-t border-[#26272D] relative cursor-pointer select-none transition-colors hover:bg-[#141416]"
-    >
-      {/* Top micro progress bar in #2FE92B */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#1B1B1D]">
-        <div
-          className="h-full bg-[#2FE92B] transition-all duration-300"
-          style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-        />
-      </div>
-
-      <div className="flex items-center justify-between px-3.5 py-2">
-        {/* Left: Spinning mini vinyl disc + album artwork */}
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center">
-            {/* Spinning mini vinyl */}
-            <div
-              className={`w-10 h-10 rounded-full bg-[#09090A] border border-white/10 overflow-hidden flex items-center justify-center ${
-                isPlaying ? 'animate-vinyl-spin' : ''
-              }`}
-            >
-              <div className="absolute inset-0 vinyl-grooves opacity-60" />
-              <img
-                src={currentAlbum.coverUrl}
-                alt={currentAlbum.title}
-                className="w-4 h-4 rounded-full object-cover border border-white/20"
-              />
-            </div>
-          </div>
-
-          {/* Track and Artist Title */}
-          <div className="overflow-hidden text-left">
-            <p className="text-[13px] font-bold text-white truncate leading-tight">
-              {currentTrack ? currentTrack.title : currentAlbum.title}
-            </p>
-            <p className="text-[11px] text-[#BBCBB2] truncate leading-tight mt-0.5 opacity-80 flex items-center gap-1.5">
-              <span>{currentAlbum.artist}</span>
-              <span className="w-1 h-1 rounded-full bg-[#2A2A2C]" />
-              <span className="font-mono text-[9px] text-white/50 flex items-center gap-0.5">
-                <Disc className="w-2.5 h-2.5" />
-                {currentAlbum.rpm}
-              </span>
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Tactile Play / Pause button */}
-        <div
-          className="flex items-center gap-2 pl-2"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <button
-            id="mini-player-play-btn"
-            type="button"
-            onClick={() => {
-              onTogglePlay();
-              audioEngine.triggerHaptic('medium');
-            }}
-            className="w-8 h-8 rounded-full bg-[#1A1A20] hover:bg-[#22222A] border border-[#2B2B36] text-white flex items-center justify-center transition-colors active:scale-95"
-            title={isPlaying ? '暂停' : '播放'}
-          >
-            {isPlaying ? (
-              <Pause className="w-3.5 h-3.5 fill-[#2FE92B] text-[#2FE92B]" />
-            ) : (
-              <Play className="w-3.5 h-3.5 fill-[#2FE92B] text-[#2FE92B] ml-0.5" />
-            )}
-          </button>
-        </div>
-      </div>
+  return <section id="mini-player-bar" className="mini-player" aria-label="唱片播放托盘" translate="no">
+    <div className="mini-player__progress" role="progressbar" aria-label="播放进度" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100}>
+      <span style={{ transform: `scaleX(${progress / 100})` }} />
     </div>
-  );
+    <button type="button" className="mini-player__open" aria-label={`打开全屏播放器：${title}`} onClick={onOpenPlayer} />
+    <div className="mini-player__vinyl" aria-hidden="true">
+      <VinylDisc coverUrl={currentAlbum.coverUrl} albumTitle={currentAlbum.title} artistName={currentAlbum.artist}
+        size={40} type={appearance.variant} texture={appearance.texture} labelImage={appearance.label?.image}
+        labelColor={appearance.label?.color} labelText={appearance.label?.text} side={face?.side || 'A'} rpm={currentAlbum.rpm} isPlaying={isPlaying} />
+    </div>
+    <div className="mini-player__info">
+      <p className="mini-player__title" title={title}>{title}</p>
+      <p className="mini-player__artist" title={currentAlbum.artist}>{currentAlbum.artist}</p>
+      <p className="mini-player__pressing">{position ? `${position} · ` : ''}{currentAlbum.rpm}</p>
+    </div>
+    <button id="mini-player-play-btn" type="button" className={`mini-player__toggle ${isPlaying ? 'is-playing' : ''}`}
+      aria-label={isPlaying ? '暂停' : '播放'} onClick={event => { event.stopPropagation(); onTogglePlay(); audioEngine.triggerHaptic('medium'); }}>
+      {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}
+    </button>
+  </section>;
 };

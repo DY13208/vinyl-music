@@ -157,23 +157,6 @@ body {
   font-weight: 450;
   line-height: 1.35;
 }
-.vinyl-label--minimal { justify-content: center; }
-.vinyl-surface,
-.vinyl-texture-base { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
-.vinyl-surface { overflow: hidden; background: #0a0a0c; }
-.vinyl-texture-base { z-index: 2; object-fit: contain; opacity: .72; mix-blend-mode: screen; }
-.vinyl-surface--colored { background: var(--vinyl-a); }
-.vinyl-surface--clear { background: color-mix(in srgb, var(--vinyl-a) 30%, transparent); opacity: .62; box-shadow: inset 0 0 22px rgba(255,255,255,.25); }
-.vinyl-texture-base--clear { opacity: .38; }
-.vinyl-surface--translucent { background: color-mix(in srgb, var(--vinyl-a) 72%, transparent); opacity: .84; box-shadow: inset 0 0 24px rgba(255,255,255,.16); }
-.vinyl-texture-base--translucent { opacity: .5; }
-.vinyl-surface--marble { background: repeating-radial-gradient(ellipse at 31% 42%, var(--vinyl-a) 0 7%, var(--vinyl-b) 9% 12%, var(--vinyl-c) 15% 22%); filter: contrast(.78) saturate(.68); }
-.vinyl-surface--splatter { background-color: var(--vinyl-a); background-image: radial-gradient(circle at 27% 21%, var(--vinyl-b) 0 2%, transparent 2.4%), radial-gradient(circle at 68% 33%, var(--vinyl-c) 0 3%, transparent 3.5%), radial-gradient(circle at 39% 72%, var(--vinyl-b) 0 4%, transparent 4.5%), radial-gradient(circle at 76% 74%, var(--vinyl-c) 0 2%, transparent 2.6%), radial-gradient(circle at 18% 56%, var(--vinyl-c) 0 2.7%, transparent 3.2%); }
-.vinyl-surface--split { background: linear-gradient(90deg, var(--vinyl-a) 0 49.5%, var(--vinyl-b) 50.5% 100%); }
-.vinyl-surface--liquid { background: radial-gradient(ellipse at 68% 28%, var(--vinyl-b) 0 18%, transparent 19%), radial-gradient(ellipse at 35% 70%, var(--vinyl-c) 0 26%, transparent 27%), var(--vinyl-a); filter: saturate(.72); }
-.vinyl-surface--picture { background: var(--picture-url) center / cover no-repeat; filter: brightness(.7) saturate(.7); }
-.vinyl-texture-base--picture { opacity: .46; }
-
 @media (max-height: 670px) {
   .home-gallery { grid-template-rows: 66px minmax(0, 1fr) 130px; }
   .vinyl-carousel { min-height: 270px; }
@@ -191,14 +174,15 @@ body {
 }
 
 /* Collection: ThreeUI-inspired WebGL shelf, adapted from the package's real BookshelfScene. */
-.collection-room {
+ .collection-room {
+  --bottom-nav-height: 58px;
   width: 100%;
-  min-height: 1250px;
-  height: auto;
-  min-height: 0;
+  min-width: 0;
+  min-height: 100dvh;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
   background: #080604;
   color: #fff;
 }
@@ -283,7 +267,7 @@ body {
 .collection-room__search input::placeholder { color: #8a8a92; opacity: 1; }
 .collection-room__search button { border: 0; background: transparent; color: #bbcbb2; font-size: 12px; }
 
-.collection-room__shelf { position: relative; flex: none; height: 690px; overflow: hidden; border-bottom: 1px solid #3c2317; background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat; box-shadow: inset 0 15px 32px rgba(255, 159, 86, .06); }
+.collection-room__shelf { position: relative; flex: none; height: auto; overflow: visible; border-bottom: 1px solid #3c2317; background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat; box-shadow: inset 0 15px 32px rgba(255, 159, 86, .06); }
 .threeui-vinyl-shelf { position: absolute; inset: 0; animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both; }
 .threeui-vinyl-shelf::before {
   content: "";
@@ -315,28 +299,14 @@ body {
 .collection-room__focus strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
 .collection-room__focus span { margin-top: 3px; color: #bbcbb2; font-size: 12px; }
 .collection-room__focus small { margin-top: 8px; color: #8a8a92; font-size: 10px; }
-.collection-room__pages { position: absolute; z-index: 3; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
-.collection-room__pages button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; background: #26272d; }
-.collection-room__pages button[aria-current="true"] { background: #2fe92b; }
-.collection-room__empty { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; color: #bbcbb2; font-size: 14px; }
+.collection-room__pages { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
+.collection-room__pages button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; background: none; }
+.collection-room__pages button::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #6b6b78; }
+.collection-room__pages button[aria-current="true"]::after { background: #2fe92b; }
+.collection-room__empty { min-height: 240px; display: grid; place-content: center; justify-items: center; gap: 14px; color: #bbcbb2; font-size: 14px; }
 .collection-room__empty button { padding: 10px 14px; border: 1px solid #26272d; border-radius: 5px; background: #0f0f0f; color: #fff; }
 
-.collection-room__labels {
-  position: absolute;
-  z-index: 2;
-  inset: 0 24px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(3, 1fr);
-  column-gap: 24px;
-  pointer-events: none;
-  animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both;
-}
-.collection-room__labels > div { min-width: 0; align-self: end; padding: 0 4px 26px; text-shadow: 0 2px 9px #000; }
-.collection-room__labels strong,
-.collection-room__labels span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.collection-room__labels strong { color: #ead1ba; font-size: 12px; font-weight: 600; }
-.collection-room__labels span { margin-top: 4px; color: #aaa19a; font-size: 10px; }
+
 
 @keyframes shelf-content-in { from { opacity: .15; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 

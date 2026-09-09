@@ -1,0 +1,18 @@
+.vinyl-disc { position: relative; flex-shrink: 0; aspect-ratio: 1; border-radius: 50%; user-select: none; container-type: inline-size; filter: drop-shadow(3px 9px 8px #0007); }
+.vinyl-disc__surface, .vinyl-disc__rotation { position: absolute; inset: 0; border-radius: 50%; }
+.vinyl-disc__rotation { animation: vinyl-record-turn 20s linear infinite paused; mask: url('/assets/vinyl-textures/disc-mask.svg') center / 100% 100%; }
+.vinyl-disc__rotation.is-rotating { animation-play-state: running; }
+.vinyl-disc__texture, .vinyl-disc__picture { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.vinyl-disc__picture { object-fit: cover; clip-path: circle(49%); }
+.vinyl-disc__label { position: absolute; inset: 34%; border-radius: 50%; overflow: hidden; color: #292722; text-align: center; font-family: Georgia, 'Songti SC', serif; box-shadow: inset 0 0 0 1px #0003; }
+.vinyl-disc__label-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.vinyl-disc__label-title { position: absolute; top: 12%; left: 12%; width: 76%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 2.6cqw; font-weight: 700; }
+.vinyl-disc__side { position: absolute; top: 35%; right: 17%; font-family: Arial, sans-serif; font-size: 5.4cqw; font-weight: 500; line-height: 1; }
+.vinyl-disc__rpm { position: absolute; bottom: 23%; left: 5%; width: 90%; font: 1.7cqw ui-monospace, monospace; }
+.vinyl-disc__artist { position: absolute; bottom: 12%; left: 15%; width: 70%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 1.8cqw; }
+.vinyl-disc__label { opacity: 1; transition: opacity 180ms ease-out; }
+.vinyl-disc[data-transition=out] .vinyl-disc__label { opacity: 0; transition-duration: 120ms; }
+.vinyl-disc__texture { transform: rotate(0deg); transition: transform 180ms ease-out; }
+.vinyl-disc[data-transition=out] .vinyl-disc__texture { transform: rotate(3deg); transition-duration: 120ms; }
+@keyframes vinyl-record-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .vinyl-disc__rotation { animation: none !important; } .vinyl-disc__label, .vinyl-disc__texture { transition: none !important; } }

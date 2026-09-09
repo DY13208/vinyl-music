@@ -42,7 +42,6 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
   };
   const pageCount = Math.max(1, Math.ceil(shelfAlbums.length / 6));
   const safePage = Math.min(page, pageCount - 1);
-  const visibleAlbums = shelfAlbums.slice(safePage * 6, safePage * 6 + 6);
 
   return (
     <main id="collection-view" className="collection-room">
@@ -75,12 +74,9 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
         {shelfAlbums.length ? (
           <>
             <ThreeUIVinylShelf key={`${genre}-${sort}-${query}-${safePage}`} items={shelfAlbums} page={safePage} onPageChange={setPage} onOpenAlbumDetail={onOpenAlbumDetail} />
-            <div key={`labels-${genre}-${sort}-${query}-${safePage}`} className="collection-room__labels" aria-hidden="true">
-              {visibleAlbums.map((album) => <div key={album.id}><strong>{album.title}</strong><span>{album.artist}</span></div>)}
-            </div>
             {pageCount > 1 && (
               <div className="collection-room__pages" aria-label={`收藏柜第 ${safePage + 1} 层，共 ${pageCount} 层`}>
-                {Array.from({ length: pageCount }, (_, index) => <button key={index} type="button" aria-label={`查看第 ${index + 1} 层`} aria-current={safePage === index ? 'true' : undefined} onClick={() => updateCollection(() => setPage(index))} />)}
+                {Array.from({ length: pageCount }, (_, index) => <button key={index} type="button" aria-label={`查看第 ${index + 1} 层`} aria-current={safePage === index ? 'true' : undefined} onClick={() => { setPage(index); audioEngine.triggerHaptic('light'); }} />)}
               </div>
             )}
           </>

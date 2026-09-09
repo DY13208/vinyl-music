@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Album, Track } from '../types';
-import { VinylDisc } from '../components/VinylDisc';
-import { Tonearm } from '../components/Tonearm';
+import { TurntableScene } from '../components/TurntableScene';
+import './PlayerView.css';
 import { LyricsView } from '../components/LyricsView';
 import {
   ChevronDown,
@@ -57,48 +57,34 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('all');
 
+  const face = album.discs?.flatMap(disc => disc.sides).find(side => side.tracks.some(track => track.id === currentTrack.id));
+  const position = face ? `${face.side}${face.tracks.findIndex(track => track.id === currentTrack.id) + 1}` : undefined;
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percent = Math.min(100, Math.max(0, (clickX / rect.width) * 100));
-    onSeek(percent);
-    audioEngine.triggerHaptic('light');
-  };
-
   return (
     <div
       id="player-view-container"
-      className="fixed inset-0 z-50 bg-[#060608] text-white flex flex-col justify-between select-none overflow-hidden"
+      className="full-player" translate="no"
     >
-      {/* Subtle Low-Opacity Ambient Color Wash (<10% opacity, no loud gradient) */}
-      <div
-        className="absolute top-16 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full filter blur-[90px] pointer-events-none transition-colors duration-1000"
-        style={{
-          backgroundColor: album.color || '#1A1A24',
-          opacity: 0.12,
-        }}
-      />
-
       {/* Top Bar - Minimalist Hardware Feel */}
-      <header className="px-5 pt-3.5 pb-2 flex items-center justify-between z-20">
+      <header className="full-player__header">
         <button
           id="player-close-btn"
           type="button"
           onClick={onClose}
-          className="w-8 h-8 rounded-[6px] bg-[#111115] border border-[#202026] text-white/70 hover:text-white flex items-center justify-center transition-colors"
+          className="full-player__quiet-button"
           title="收起播放器"
         >
           <ChevronDown className="w-5 h-5" />
         </button>
 
         {/* Dual Mode Switcher: 唱机 vs 全量同步歌词 */}
-        <div className="flex items-center p-0.5 rounded-[6px] bg-[#111115] border border-[#202026]">
+        <div className="full-player__modes">
           <button
             id="player-mode-turntable"
             type="button"
@@ -106,11 +92,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
               setViewMode('turntable');
               audioEngine.triggerHaptic('light');
             }}
-            className={`px-3 py-1 rounded-[4px] text-[11px] font-medium flex items-center gap-1.5 transition-all ${
-              viewMode === 'turntable'
-                ? 'bg-[#1C1C22] text-white'
-                : 'text-white/45 hover:text-white'
-            }`}
+            aria-pressed={viewMode === 'turntable'}
+            className={`full-player__mode ${viewMode === 'turntable' ? 'is-active' : ''}`}
           >
             <Disc className="w-3 h-3" />
             <span>唱机</span>
@@ -122,11 +105,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
               setViewMode('lyrics');
               audioEngine.triggerHaptic('light');
             }}
-            className={`px-3 py-1 rounded-[4px] text-[11px] font-medium flex items-center gap-1.5 transition-all ${
-              viewMode === 'lyrics'
-                ? 'bg-[#1C1C22] text-white'
-                : 'text-white/45 hover:text-white'
-            }`}
+            aria-pressed={viewMode === 'lyrics'}
+            className={`full-player__mode ${viewMode === 'lyrics' ? 'is-active' : ''}`}
           >
             <FileText className="w-3 h-3" />
             <span>歌词</span>
@@ -141,11 +121,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             setIsCrackleEnabled(!isCrackleEnabled);
             audioEngine.triggerHaptic('light');
           }}
-          className={`w-8 h-8 rounded-[6px] border flex items-center justify-center transition-colors ${
-            isCrackleEnabled
-              ? 'bg-[#18181E] border-[#2FE92B]/40 text-[#2FE92B]'
-              : 'bg-[#111115] border-[#202026] text-white/40'
-          }`}
+          className="full-player__quiet-button"
+          aria-pressed={isCrackleEnabled}
           title="实体唱针底噪模拟"
         >
           <Volume2 className="w-4 h-4" />
@@ -153,113 +130,16 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       </header>
 
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
-      {viewMode === 'turntable' ? (
-        <div className="relative flex-1 flex flex-col items-center justify-center my-auto px-2 animate-in fade-in duration-200">
-          {/* Turntable Plinth Deck Frame (occupies 80%-88% width of viewport) */}
-          <div
-            className="relative rounded-[16px] overflow-hidden"
-            style={{
-              background: 'linear-gradient(155deg, #131317 0%, #0B0B0E 70%, #060608 100%)',
-              border: '1.5px solid #202026',
-              boxShadow: '0 24px 60px rgba(0,0,0,0.95), inset 0 1px 2px rgba(255,255,255,0.05)',
-              width: 356,
-              height: 340,
-            }}
-          >
-            {/* Direct Drive Indicator Marking */}
-            <div className="absolute top-3.5 left-4 flex items-center gap-2 z-20">
-              <span className={`w-1.5 h-1.5 rounded-full ${isPlaying ? 'bg-[#2FE92B] animate-pulse' : 'bg-white/30'}`} />
-              <span className="text-[8.5px] font-mono tracking-widest text-white/45 uppercase">
-                DIRECT DRIVE · {album.rpm}
-              </span>
-
-              {/* Tonearm Status Badge */}
-              <div
-                onClick={() => {
-                  onTogglePlay();
-                  audioEngine.triggerHaptic('medium');
-                }}
-                className="ml-1 px-2 py-0.5 rounded-[3px] bg-[#141418] border border-[#22222A] hover:border-[#32323E] text-[8.5px] font-mono cursor-pointer transition-colors flex items-center gap-1"
-                title="点击起落唱针"
-              >
-                <span className={isPlaying ? 'text-white' : 'text-white/40'}>
-                  {isPlaying ? '唱针落盘' : '唱针待命'}
-                </span>
-              </div>
-            </div>
-
-            {/* Strobe Dot Ring / Platter Surface (Offset to left to accommodate precision tonearm) */}
-            <div
-              onClick={() => {
-                setViewMode('lyrics');
-                audioEngine.triggerHaptic('light');
-              }}
-              className="absolute left-3 top-[44px] rounded-full p-2 flex items-center justify-center z-10 cursor-pointer group"
-              title="点击唱片查看全量歌词"
-              style={{
-                background: 'radial-gradient(circle at center, #17171C 0%, #0C0C0F 75%, #050507 100%)',
-                border: '2px solid #222228',
-                boxShadow: '0 12px 36px rgba(0,0,0,0.95), inset 0 0 12px rgba(255,255,255,0.02)',
-                width: 256,
-                height: 256,
-              }}
-            >
-              {/* Realistic Vinyl Disc Hero */}
-              <VinylDisc
-                coverUrl={album.coverUrl}
-                albumTitle={album.title}
-                artistName={album.artist}
-                isPlaying={isPlaying}
-                size={242}
-                rpm={album.rpm}
-                showAmbientGlow={isPlaying}
-              />
-            </div>
-
-            {/* Precision Physical Tonearm */}
-            <Tonearm
-              isPlaying={isPlaying}
-              progressPercent={progressPercent}
-              size={295}
-              onTogglePlay={onTogglePlay}
-              className="absolute right-0 top-0 z-20"
-            />
-
-            {/* Bottom Deck Accents */}
-            <div className="absolute bottom-2.5 left-4 flex items-center gap-2 z-10 opacity-35">
-              <span className="text-[7.5px] font-mono text-white/60 tracking-wider">
-                QUARTZ SYNTHESIZER · SHVL 804
-              </span>
-            </div>
-          </div>
-
-          {/* Track Information */}
-          <div
-            onClick={() => {
-              setViewMode('lyrics');
-              audioEngine.triggerHaptic('light');
-            }}
-            className="text-center mt-4 px-6 max-w-sm z-20 cursor-pointer group"
-            title="点击查看全量歌词"
-          >
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded-[2px] bg-[#141418] border border-[#222228] text-white/70">
-                {album.rpm}
-              </span>
-              <span className="text-[9.5px] font-mono text-white/40">
-                {album.matrixCode}
-              </span>
-            </div>
-
-            <h2 className="text-[18px] font-bold text-white tracking-tight leading-snug line-clamp-1 group-hover:text-white transition-colors">
-              {currentTrack.title}
-            </h2>
-            <p className="text-[13px] font-medium text-[#BBCBB2] mt-0.5">
-              {album.artist} · {album.title}
-            </p>
-          </div>
+      <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
+        <TurntableScene album={album} side={face?.side} isPlaying={isPlaying} progressPercent={progressPercent}
+          onShowLyrics={() => { setViewMode('lyrics'); audioEngine.triggerHaptic('light'); }} />
+        <div className="full-player__info">
+          <h2 title={currentTrack.title}>{currentTrack.title}</h2>
+          <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
+          <small>{album.rpm}{face ? ` · Side ${face.side} · ${position}` : ''}</small>
         </div>
-      ) : (
+      </div>
+      {viewMode === 'lyrics' && (
         /* Full Synchronized Lyrics Viewport (Folia Major / QQ Music inspired) */
         <div className="relative flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden z-20 animate-in fade-in duration-200">
           <div className="flex items-center justify-between px-5 pt-2 pb-1 bg-black/40">
@@ -300,49 +180,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       )}
 
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
-      <div className="w-full px-6 pb-6 pt-2 space-y-4 z-20">
-        {/* Subtle Waveform Visualizer */}
-        <div className="flex items-center justify-center gap-[3px] h-3.5 px-4 opacity-70">
-          {Array.from({ length: 32 }).map((_, i) => {
-            const isBarActive = i < Math.floor((progressPercent / 100) * 32);
-            const height = isPlaying
-              ? Math.max(3, Math.sin((i + currentTimeSec * 4) * 0.4) * 10 + 3)
-              : 3;
-            return (
-              <span
-                key={i}
-                className="w-1 rounded-full transition-all duration-150"
-                style={{
-                  height: `${height}px`,
-                  backgroundColor: isBarActive ? '#2FE92B' : '#1C1C22',
-                }}
-              />
-            );
-          })}
-        </div>
-
-        {/* Progress Bar */}
-        <div className="space-y-1.5">
-          <div
-            id="player-progress-track"
-            onClick={handleProgressBarClick}
-            className="w-full h-1.5 rounded-full bg-[#1C1C22] relative cursor-pointer group flex items-center"
-          >
-            <div
-              className="h-full rounded-full bg-[#2FE92B] relative flex items-center justify-end transition-all"
-              style={{ width: `${Math.min(100, Math.max(0, progressPercent))}%` }}
-            >
-              <div className="w-3 h-3 rounded-full bg-white shadow-md -mr-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-[11px] font-mono text-white/40">
-            <span>{formatTime(currentTimeSec)}</span>
-            <span>-{formatTime(Math.max(0, durationSec - currentTimeSec))}</span>
-          </div>
+      <div className="full-player__controls">
+        <div className="full-player__progress">
+          <input id="player-progress-track" type="range" min="0" max="100" step="0.1" aria-label="播放进度"
+            value={Number.isFinite(progressPercent) ? Math.min(100, Math.max(0, progressPercent)) : 0}
+            style={{ '--played': `${Math.min(100, Math.max(0, progressPercent || 0))}%` } as React.CSSProperties}
+            onChange={event => onSeek(Number(event.target.value))} />
+          <div><span>{formatTime(currentTimeSec)}</span><span>-{formatTime(Math.max(0, durationSec - currentTimeSec))}</span></div>
         </div>
 
         {/* Transport Hardware Controls */}
-        <div className="flex items-center justify-between px-2">
+        <div className="full-player__transport">
           {/* Shuffle */}
           <button
             id="player-btn-shuffle"
@@ -381,13 +229,13 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
               onTogglePlay();
               audioEngine.triggerHaptic('medium');
             }}
-            className="w-13 h-13 rounded-full bg-[#18181E] hover:bg-[#202028] border border-[#2B2B36] hover:border-[#3A3A48] text-white flex items-center justify-center shadow-lg active:scale-95 transition-all group"
+            className="full-player__play"
             title={isPlaying ? '暂停' : '播放'}
           >
             {isPlaying ? (
               <Pause className="w-5 h-5 fill-[#2FE92B] text-[#2FE92B]" />
             ) : (
-              <Play className="w-5 h-5 fill-[#2FE92B] text-[#2FE92B] ml-0.5" />
+              <Play className="w-5 h-5 fill-white text-white ml-0.5" />
             )}
           </button>
 
@@ -423,7 +271,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         </div>
 
         {/* Bottom 4 Utility Tools */}
-        <div className="pt-2 border-t border-[#1C1C22] flex items-center justify-around text-white/60">
+        <div className="full-player__utilities">
           <button
             id="player-util-lyrics"
             type="button"

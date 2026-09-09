@@ -8,7 +8,7 @@ export const VinylCarouselItem: React.FC<{ album: Album }> = ({ album }) => {
   const appearance = getVinylAppearance(album);
   return <div className="vinyl-object">
     <div className="vinyl-object__disc" aria-hidden="true">
-      <VinylDisc coverUrl={album.coverUrl} albumTitle={album.title} artistName={album.artist} size="var(--disc-size)" useTextureAsset labelColor={appearance.colors[0]} vinylVariant={appearance.variant} vinylColors={appearance.colors} />
+      <VinylDisc coverUrl={album.coverUrl} albumTitle={album.title} artistName={album.artist} size="var(--disc-size)" type={appearance.variant} texture={appearance.texture} labelColor={appearance.label?.color} labelImage={appearance.label?.image} labelText={appearance.label?.text} rpm={album.rpm} />
     </div>
     <div className="vinyl-object__sleeve">
       <AlbumSleeve coverUrl={album.coverUrl} title={album.title} artist={album.artist} size="var(--sleeve-size)" />

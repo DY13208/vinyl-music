@@ -1,0 +1,36 @@
+.full-player { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; width: 100%; height: 100dvh; min-height: 0; overflow: auto; color: #fff; background: #0a0a0c; user-select: none; container-type: inline-size; }
+.full-player__header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; padding: max(10px, env(safe-area-inset-top)) 18px 4px; min-height: 56px; }
+.full-player__quiet-button { width: 36px; height: 36px; display: grid; place-items: center; background: none; border: 0; color: #a3a3aa; }
+.full-player__modes { display: flex; gap: 25px; }
+.full-player__mode { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 0 5px; border: 0; border-bottom: 1px solid transparent; background: none; color: #85858b; font-size: 12px; }
+.full-player__mode.is-active { color: #fff; border-bottom-color: #2fe92b; }
+.full-player__turntable { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.full-player__turntable[hidden] { display: none; }
+.turntable-scene { position: relative; flex: 1; width: 100%; min-height: 240px; max-height: 55dvh; overflow: hidden; background: #101012 url('/assets/turntable/metal-noise.webp') center / cover; }
+.turntable-stage { position: absolute; width: 100%; aspect-ratio: 1; top: 50%; transform: translateY(-50%); isolation: isolate; }
+.turntable-plinth { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to bottom, transparent, #000 10% 90%, transparent); }
+.turntable-record { position: absolute; left: 8%; top: 18%; width: clamp(200px, 68cqw, 520px); aspect-ratio: 1; padding: 0; border: 0; background: none; border-radius: 50%; cursor: pointer; z-index: 1; }
+.turntable-record .vinyl-disc { filter: drop-shadow(2px 5px 4px #0008); }
+.turntable-tonearm { position: absolute; left: 69%; top: 11.72%; width: 26%; height: 78%; object-fit: contain; transform-origin: 50% 21%; z-index: 2; pointer-events: none; filter: drop-shadow(3px 5px 2px #0009); transition: transform 650ms cubic-bezier(.4, 0, .2, 1); }
+.turntable-tonearm[data-phase=returning] { transition-duration: 600ms; filter: drop-shadow(5px 8px 3px #0008); }
+.turntable-tonearm[data-phase=tracking] { transition-duration: 1000ms; transition-timing-function: linear; }
+.full-player__info { flex-shrink: 0; min-width: 0; text-align: center; padding: 18px 24px 14px; }
+.full-player__info h2 { font-size: 22px; font-weight: 600; line-height: 1.3; color: #fff; margin: 0; }
+.full-player__info p { color: #bbcbb2; font-size: 13px; margin: 6px 0 0; line-height: 1.4; }
+.full-player__info small { display: block; margin-top: 9px; font: 10px/1.4 ui-monospace, monospace; color: #8c8c92; }
+.full-player__info h2, .full-player__info p, .full-player__info small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.full-player__controls { position: relative; flex-shrink: 0; z-index: 2; width: 100%; padding: 6px 26px max(16px, env(safe-area-inset-bottom)); }
+.full-player__progress input { display: block; appearance: none; width: 100%; height: 22px; margin: 0; background: transparent; cursor: pointer; }
+.full-player__progress input::-webkit-slider-runnable-track { height: 3px; border-radius: 2px; background: linear-gradient(to right, #2fe92b var(--played), #27272b var(--played)); }
+.full-player__progress input::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; margin-top: -3px; border: 0; border-radius: 50%; background: #eee; }
+.full-player__progress input::-moz-range-track { height: 3px; background: #27272b; }
+.full-player__progress input::-moz-range-progress { height: 3px; background: #2fe92b; }
+.full-player__progress input::-moz-range-thumb { width: 9px; height: 9px; border: 0; border-radius: 50%; background: #eee; }
+.full-player__progress > div { display: flex; justify-content: space-between; color: #939399; font: 10px/1.4 ui-monospace, monospace; }
+.full-player__transport { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 18px; }
+.full-player__play { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: #141416; border: 1px solid #26272d; }
+.full-player__utilities { display: flex; align-items: center; justify-content: space-around; padding-top: 12px; border-top: 1px solid #202023; color: #a0a0a5; }
+.full-player button { cursor: pointer; }
+.full-player button:focus-visible, .full-player input:focus-visible { outline: 2px solid #2fe92b; outline-offset: 4px; }
+@media (max-height: 650px) { .full-player__header { min-height: 48px; padding-top: 6px; } .full-player__info { padding: 10px 20px; } .full-player__info h2 { font-size: 20px; } .full-player__info small { margin-top: 5px; } .full-player__controls { padding: 0 22px 10px; } .full-player__transport { margin: 8px 0 10px; } .full-player__utilities { padding-top: 7px; } }
+@media (prefers-reduced-motion: reduce) { .turntable-tonearm { transition: none; } }

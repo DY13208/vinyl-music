@@ -24,7 +24,7 @@ const CarouselRecord: React.FC<{
   dragging: React.MutableRefObject<boolean>;
   onActivate: () => void;
 }> = ({ album, occurrence, trackX, active, reduceMotion, dragging, onActivate }) => {
-  const distance = useTransform(trackX, (value) => occurrence + value / ITEM_SPACING);
+  const distance = useTransform(trackX, (value: number) => occurrence + value / ITEM_SPACING);
   const scale = useTransform(distance, (value) => 1 - Math.min(1, Math.abs(value)) * 0.13);
   const opacity = useTransform(distance, (value) => 1 - Math.min(1, Math.abs(value)) * 0.55);
   const rotateY = useTransform(distance, (value) => Math.max(-7, Math.min(7, value * -6.5)));
@@ -56,7 +56,7 @@ const CarouselRecord: React.FC<{
 };
 
 const EdgePreview: React.FC<{ album: Album; occurrence: number; side: -1 | 1; trackX: MotionValue<number> }> = ({ album, occurrence, side, trackX }) => {
-  const distance = useTransform(trackX, (value) => occurrence + value / ITEM_SPACING);
+  const distance = useTransform(trackX, (value: number) => occurrence + value / ITEM_SPACING);
   const opacity = useTransform(distance, (value) => {
     const amount = Math.abs(value);
     return Math.max(0, Math.min(.5, ((amount - .68) / .32) * .5));

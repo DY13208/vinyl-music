@@ -1,0 +1,28 @@
+{
+  "source": "User supplied GPT generation, 2026-09-09",
+  "assets": [
+    "turntable-plinth.webp",
+    "tonearm.webp",
+    "metal-noise.webp"
+  ],
+  "format": "WebP",
+  "platter": {
+    "center": [
+      0.42,
+      0.52
+    ],
+    "diameter": 0.73
+  },
+  "tonearm": {
+    "imagePivot": [
+      0.5,
+      0.21
+    ],
+    "scenePivot": [
+      0.82,
+      0.281
+    ],
+    "sceneHeight": 0.78
+  },
+  "processing": "Original PNGs preserved in tmp/imagegen/turntable-originals; scaled photograph with small mirrored edge strips, no procedural hardware or groove drawing."
+}

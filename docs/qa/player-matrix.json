@@ -1,0 +1,352 @@
+[
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 568,
+      "height": 152.5,
+      "right": 320,
+      "width": 320,
+      "x": 0,
+      "y": 415.5
+    },
+    "disc": {
+      "bottom": 302.3359375,
+      "height": 217.59375,
+      "right": 243.1875,
+      "width": 217.59375,
+      "x": 25.59375,
+      "y": 84.7421875
+    },
+    "discRatio": 0.67998046875,
+    "info": {
+      "bottom": 415.5,
+      "height": 89.1953125,
+      "right": 320,
+      "width": 320,
+      "x": 0,
+      "y": 326.3046875
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 326.3046875,
+      "height": 278.3046875,
+      "right": 320,
+      "width": 320,
+      "x": 0,
+      "y": 48
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      320,
+      568
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 800,
+      "height": 183.5,
+      "right": 360,
+      "width": 360,
+      "x": 0,
+      "y": 616.5
+    },
+    "disc": {
+      "bottom": 411.9453125,
+      "height": 244.796875,
+      "right": 273.59375,
+      "width": 244.796875,
+      "x": 28.796875,
+      "y": 167.1484375
+    },
+    "discRatio": 0.6799913194444445,
+    "info": {
+      "bottom": 610.140625,
+      "height": 107.7890625,
+      "right": 360,
+      "width": 360,
+      "x": 0,
+      "y": 502.3515625
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 502.3515625,
+      "height": 440,
+      "right": 360,
+      "width": 360,
+      "x": 0,
+      "y": 62.3515625
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      360,
+      800
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 812,
+      "height": 183.5,
+      "right": 375,
+      "width": 375,
+      "x": 0,
+      "y": 628.5
+    },
+    "disc": {
+      "bottom": 423.3515625,
+      "height": 255,
+      "right": 285,
+      "width": 255,
+      "x": 30,
+      "y": 168.3515625
+    },
+    "discRatio": 0.68,
+    "info": {
+      "bottom": 619.4375,
+      "height": 107.7890625,
+      "right": 375,
+      "width": 375,
+      "x": 0,
+      "y": 511.6484375
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 511.6484375,
+      "height": 446.59375,
+      "right": 375,
+      "width": 375,
+      "x": 0,
+      "y": 65.0546875
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      375,
+      812
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 844,
+      "height": 183.5,
+      "right": 390,
+      "width": 390,
+      "x": 0,
+      "y": 660.5
+    },
+    "disc": {
+      "bottom": 444.7421875,
+      "height": 265.1953125,
+      "right": 296.390625,
+      "width": 265.1953125,
+      "x": 31.1953125,
+      "y": 179.546875
+    },
+    "discRatio": 0.6799879807692307,
+    "info": {
+      "bottom": 644.2421875,
+      "height": 107.7890625,
+      "right": 390,
+      "width": 390,
+      "x": 0,
+      "y": 536.453125
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 536.453125,
+      "height": 464.1953125,
+      "right": 390,
+      "width": 390,
+      "x": 0,
+      "y": 72.2578125
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 852,
+      "height": 183.5,
+      "right": 393,
+      "width": 393,
+      "x": 0,
+      "y": 668.5
+    },
+    "disc": {
+      "bottom": 449.8203125,
+      "height": 267.234375,
+      "right": 298.671875,
+      "width": 267.234375,
+      "x": 31.4375,
+      "y": 182.5859375
+    },
+    "discRatio": 0.6799856870229007,
+    "info": {
+      "bottom": 650.4375,
+      "height": 107.7890625,
+      "right": 393,
+      "width": 393,
+      "x": 0,
+      "y": 542.6484375
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 542.6484375,
+      "height": 468.59375,
+      "right": 393,
+      "width": 393,
+      "x": 0,
+      "y": 74.0546875
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      393,
+      852
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 915,
+      "height": 183.5,
+      "right": 412,
+      "width": 412,
+      "x": 0,
+      "y": 731.5
+    },
+    "disc": {
+      "bottom": 488.1640625,
+      "height": 280.15625,
+      "right": 313.109375,
+      "width": 280.15625,
+      "x": 32.953125,
+      "y": 208.0078125
+    },
+    "discRatio": 0.6799908980582524,
+    "info": {
+      "bottom": 699.265625,
+      "height": 107.7890625,
+      "right": 412,
+      "width": 412,
+      "x": 0,
+      "y": 591.4765625
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 591.4765625,
+      "height": 503.25,
+      "right": 412,
+      "width": 412,
+      "x": 0,
+      "y": 88.2265625
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      412,
+      915
+    ]
+  },
+  {
+    "allControlsVisible": true,
+    "armAngle": "23.145985401459853",
+    "armPhase": "tracking",
+    "controls": {
+      "bottom": 932,
+      "height": 183.5,
+      "right": 430,
+      "width": 430,
+      "x": 0,
+      "y": 748.5
+    },
+    "disc": {
+      "bottom": 503.1484375,
+      "height": 292.3984375,
+      "right": 326.796875,
+      "width": 292.3984375,
+      "x": 34.3984375,
+      "y": 210.75
+    },
+    "discRatio": 0.6799963662790698,
+    "info": {
+      "bottom": 712.4375,
+      "height": 107.7890625,
+      "right": 430,
+      "width": 430,
+      "x": 0,
+      "y": 604.6484375
+    },
+    "infoFits": true,
+    "loaded": true,
+    "noHorizontalOverflow": true,
+    "noOverlap": true,
+    "playSize": 56,
+    "scene": {
+      "bottom": 604.6484375,
+      "height": 512.59375,
+      "right": 430,
+      "width": 430,
+      "x": 0,
+      "y": 92.0546875
+    },
+    "sceneBorder": "0px",
+    "sceneRadius": "0px",
+    "texture": "/assets/vinyl-textures/split-01.webp",
+    "viewport": [
+      430,
+      932
+    ]
+  }
+]

@@ -16,6 +16,11 @@ export interface LyricLine {
 
 export type VinylVariant = 'black' | 'colored' | 'clear' | 'translucent' | 'marble' | 'splatter' | 'split' | 'liquid' | 'picture';
 
+export type VinylType = VinylVariant | 'marbled' | 'red' | 'blue' | 'green' | 'orange' | 'white';
+export interface VinylSide { side: string; tracks: Track[]; }
+export interface VinylRecord { disc: number; sides: VinylSide[]; }
+export interface VinylLabel { image?: string; color?: string; text?: string; }
+
 export interface Album {
   id: string;
   title: string;
@@ -41,6 +46,12 @@ export interface Album {
   waxColor?: string; // e.g. "经典纯黑", "炫彩泼墨", "发烧透明"
   vinylVariant?: VinylVariant;
   vinylColors?: string[];
+  vinylType?: VinylType;
+  vinylTexture?: string;
+  vinylColor?: string;
+  vinylSecondaryColor?: string;
+  vinylLabel?: VinylLabel;
+  discs?: VinylRecord[];
   addedAt?: string;
   barcode?: string;
 }
