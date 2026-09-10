@@ -9,9 +9,11 @@ import { playerThemeRegistry } from '../features/player/themes/playerThemeRegist
 import type { PlayerThemePreference } from '../features/player/themes/usePlayerTheme';
 import type { RepeatMode } from '../features/player/themes/PlayerTheme';
 import './PlayerView.css';
+import '../features/player/themes/themes/crescent/crescentPlayer.css';
 import { LyricsView } from '../components/LyricsView';
 import {
   ChevronDown,
+  Heart,
   Palette,
   Play,
   Volume2,
@@ -22,6 +24,9 @@ import {
   Sparkles,
   Disc,
   Maximize2,
+  MoreHorizontal,
+  Shuffle,
+  Repeat,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
@@ -73,14 +78,14 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onImportLocalSource,
   localImportPending,
 }) => {
-  const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
+  const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'more' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
   const [isCrackleEnabled, setIsCrackleEnabled] = useState(true);
   const themeDialog = useRef<HTMLDialogElement>(null);
   return (
     <div
       id="player-view-container"
-      className="full-player" translate="no" data-player-theme={themePreference.themeId} data-player-view={viewMode} style={playerThemeRegistry[themePreference.themeId].tokens}
+      className="full-player" translate="no" data-player-theme={themePreference.themeId} data-player-view={viewMode} data-playing={isPlaying} style={playerThemeRegistry[themePreference.themeId].tokens}
     >
       {/* Top Bar - Minimalist Hardware Feel */}
       <header className="full-player__header">
@@ -93,6 +98,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         >
           <ChevronDown className="w-5 h-5" />
         </button>
+
+        {themePreference.themeId === 'crescent' ? <div className="crescent-header-track">
+          <div className="crescent-header-track__title">
+            <h2 title={currentTrack.title}>{currentTrack.title}</h2>
+            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
+          </div>
+          <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
+        </div> : <div className="full-player__brand" aria-hidden="true">
+          <strong>ORBIT</strong>
+          <span>轻触封面播放</span>
+        </div>}
 
         {/* Dual Mode Switcher: 唱机 vs 全量同步歌词 */}
         <div className="full-player__modes">
@@ -141,12 +157,13 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           <Volume2 className="w-4 h-4" />
         </button>
         </div>
+        <button type="button" className="full-player__more-button" aria-label="更多播放操作" aria-expanded={activeBottomModal !== 'none'} onClick={() => setActiveBottomModal(activeBottomModal === 'none' ? 'more' : 'none')}><MoreHorizontal size={21}/></button>
       </header>
 
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
         <PlayerThemeRenderer themeId={themePreference.themeId} album={album} currentTrack={currentTrack} queue={album.tracks} isPlaying={isPlaying} isPreviewLoading={isPreviewLoading} progressPercent={progressPercent} onSelectTrack={onSelectTrack} onTogglePlay={onTogglePlay} onShowLyrics={() => setViewMode('lyrics')} />
-        <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />
+        {themePreference.themeId !== 'crescent' && <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />}
       </div>
       {viewMode === 'lyrics' && (
         /* Full Synchronized Lyrics Viewport (Folia Major / QQ Music inspired) */
@@ -190,8 +207,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
       <div className="full-player__controls">
-        <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} />
-        <PlayerControls isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
+        <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} animated={themePreference.themeId === 'crescent'} />
+        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
 
         {/* Bottom 4 Utility Tools */}
         <div className="full-player__utilities">
@@ -265,6 +282,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         >
           <div className="flex items-center justify-between pb-3 border-b border-[#1E1E24]">
             <span className="text-[13px] font-bold text-white flex items-center gap-2">
+              {activeBottomModal === 'more' && '更多播放操作'}
               {activeBottomModal === 'lyrics' && '全量同步歌词 · Folia Major'}
               {activeBottomModal === 'queue' && `曲目清单 · ${album.title}`}
               {activeBottomModal === 'output' && '输出硬件'}
@@ -296,6 +314,26 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </div>
 
           <div className="overflow-y-auto no-scrollbar py-2 space-y-2 flex-1 min-h-0">
+            {activeBottomModal === 'more' && (
+              <div className="player-more">
+                <div className="player-more__source">
+                  <strong>当前音源</strong>
+                  <p>{playbackMessage || '尚未连接可播放音源'}</p>
+                  <div>
+                    {playbackSource?.metadata.storeUrl && <a href={playbackSource.metadata.storeUrl} target="_blank" rel="noreferrer">在 Apple Music 打开</a>}
+                    <button type="button" onClick={onImportLocalSource} disabled={isPreviewLoading}>{localImportPending ? '确认绑定本地音源' : '导入本地音源'}</button>
+                  </div>
+                </div>
+                <div className="player-more__actions">
+                  <button type="button" aria-pressed={isShuffle} onClick={() => onShuffleChange(!isShuffle)}><Shuffle/><span>随机播放</span></button>
+                  <button type="button" aria-pressed={repeatMode !== 'off'} onClick={() => onRepeatChange(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}><Repeat/><span>{repeatMode === 'one' ? '单曲循环' : repeatMode === 'all' ? '列表循环' : '循环关闭'}</span></button>
+                  <button type="button" onClick={() => { setViewMode('lyrics'); setActiveBottomModal('none'); }}><FileText/><span>歌词</span></button>
+                  <button type="button" onClick={() => setActiveBottomModal('queue')}><ListMusic/><span>曲目</span></button>
+                  <button type="button" onClick={() => setActiveBottomModal('output')}><Speaker/><span>唱放</span></button>
+                  <button type="button" onClick={() => setActiveBottomModal('quality')}><Sliders/><span>音效</span></button>
+                </div>
+              </div>
+            )}
             {activeBottomModal === 'lyrics' && (
               <div className="h-[380px] w-full flex flex-col">
                 <LyricsView

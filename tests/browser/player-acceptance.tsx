@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { PlayerView } from '../../src/views/PlayerView';
 import { ALBUMS } from '../../src/data/mockData';
 import { albumForSide } from '../../src/utils/vinylSides';
+import type { PlayerThemeId, RepeatMode } from '../../src/features/player/themes/PlayerTheme';
 import '../../src/index.css';
 
 function Acceptance() {
@@ -10,6 +11,10 @@ function Acceptance() {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [track, setTrack] = useState(0);
+  const [themeId,setTheme] = useState<PlayerThemeId>('classic');
+  const [favorite,setFavorite] = useState(false);
+  const [shuffle,setShuffle] = useState(false);
+  const [repeatMode,setRepeatMode] = useState<RepeatMode>('off');
   const [report, setReport] = useState('Ready');
   const stable = useRef<Element | null>(null);
   const history = useRef<{ angle: string | null; phase: string | null }[]>([]);
@@ -26,6 +31,8 @@ function Acceptance() {
     return () => observer.disconnect();
   }, []);
   return <><PlayerView album={album} currentTrack={album.tracks[track]} isPlaying={playing} progressPercent={progress}
+    themePreference={{themeId,setTheme,message:''}} favorite={favorite} onToggleFavorite={()=>setFavorite(value=>!value)} isShuffle={shuffle} onShuffleChange={setShuffle} repeatMode={repeatMode} onRepeatChange={setRepeatMode}
+    playbackSource={null} playbackMessage="本地界面验证" isPreviewLoading={false} onImportLocalSource={()=>{}} localImportPending={false}
     currentTimeSec={album.tracks[track].durationSec * progress / 100} durationSec={album.tracks[track].durationSec}
     onTogglePlay={() => setPlaying(p=>!p)} onNextTrack={()=>setTrack(t=>(t+1)%album.tracks.length)}
     onPrevTrack={()=>setTrack(t=>(t+album.tracks.length-1)%album.tracks.length)} onSeek={setProgress} onClose={()=>{}}

@@ -2,22 +2,27 @@ import type { Track } from '../../../../types';
 import type { OrbitThemeId } from '../PlayerTheme';
 export interface Point { x: number; y: number }
 export interface OrbitItem extends Point { track: Track; size: number; active: boolean }
-const points: Record<OrbitThemeId, Point[]> = {
-  crescent: [{x:78,y:40},{x:168,y:77},{x:231,y:133},{x:251,y:205},{x:228,y:277},{x:167,y:334},{x:78,y:367}],
-  halo: [{x:78,y:91},{x:168,y:59},{x:253,y:110},{x:273,y:208},{x:225,y:304},{x:124,y:333},{x:44,y:240}],
-  nocturne: [{x:43,y:340},{x:120,y:300},{x:189,y:254},{x:247,y:195},{x:192,y:129},{x:115,y:87},{x:42,y:50}],
-};
+// One coordinate system for the wheel, sleeves and pointer, at every viewport size.
+export const ORBIT_STAGE = { width: 400, height: 520, centerX: 0, centerY: 260, radius: 248, sleeveRadius: 207 };
+const orbitPoints: Point[] = [-70, -35, 0, 35, 70].map(degrees => {
+  const angle = degrees * Math.PI / 180;
+  return { x: ORBIT_STAGE.centerX + ORBIT_STAGE.sleeveRadius * Math.cos(angle), y: ORBIT_STAGE.centerY + ORBIT_STAGE.sleeveRadius * Math.sin(angle) };
+});
+const points: Record<OrbitThemeId, Point[]> = {crescent:orbitPoints,halo:orbitPoints,nocturne:orbitPoints};
 
 /** A bounded window of the real queue; never invent or duplicate tracks to fill a ring. */
 export function getOrbitItems(queue: Track[], currentTrack: Track, theme: OrbitThemeId): OrbitItem[] {
   const unique = queue.filter((track, index) => queue.findIndex(item => item.id === track.id) === index);
   if (!unique.some(track => track.id === currentTrack.id)) unique.push(currentTrack);
   const index = unique.findIndex(track => track.id === currentTrack.id);
-  const start = Math.max(0, Math.min(index - 3, unique.length - 7));
-  return unique.slice(start, start + 7).map((track, i, items) => {
-    // Stable slots inside each seven-track window let the pointer visibly follow selection.
-    const slot = items.length === 1 ? 3 : Math.round(i * 6 / (items.length - 1));
-    return { ...points[theme][slot], track, active: track.id === currentTrack.id, size: track.id === currentTrack.id ? 70 : 55 };
+  const offsets = [-2,-1,0,1,2];
+  return offsets.flatMap((offset, slot) => {
+    if (!unique.length) return [];
+    const track = unique[(index + offset + unique.length) % unique.length];
+    const closerDuplicate = offsets.some(other => (Math.abs(other) < Math.abs(offset) || (Math.abs(other) === Math.abs(offset) && other < offset))
+      && unique[(index + other + unique.length) % unique.length].id === track.id);
+    if (closerDuplicate) return [];
+    return [{ ...points[theme][slot], track, active: offset === 0, size: offset === 0 ? 72 : 54 }];
   });
 }
 

@@ -1,10 +1,15 @@
-.full-player { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; width: 100%; height: 100dvh; min-height: 0; overflow: auto; color: #fff; background: #101012 url('/assets/turntable/metal-noise.webp') center / cover fixed; user-select: none; container-type: inline-size; }
-.full-player__header { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; padding: max(10px, env(safe-area-inset-top)) 18px 4px; min-height: 56px; }
+.full-player { position:fixed; inset:0; z-index:50; display:flex; flex-direction:column; width:100%; height:100dvh; min-height:0; overflow:auto; color:#fff; background:#050606; user-select:none; container-type:inline-size; }
+.full-player__header { position:relative; z-index:2; display:flex; align-items:center; gap:10px; flex-shrink:0; padding:max(12px,env(safe-area-inset-top)) 18px 4px; min-height:74px; }
 .full-player__quiet-button { width: 36px; height: 36px; display: grid; place-items: center; background: none; border: 0; color: #a3a3aa; }
-.full-player__modes { display: flex; gap: 25px; }
-.full-player__mode { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 0 5px; border: 0; border-bottom: 1px solid transparent; background: none; color: #85858b; font-size: 12px; }
-.full-player__mode.is-active { color: #fff; border-bottom-color: #2fe92b; }
-.full-player__turntable { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+.full-player__brand { margin-right:auto; }
+.full-player__brand strong { display:block; color:#fff; font-size:13px; line-height:1; letter-spacing:.28em; }
+.full-player__brand span { display:block; margin-top:6px; color:#8f9692; font-size:10px; }
+.full-player__modes,.pt-header-actions { display:none; }
+.full-player__more-button { display:grid; place-items:center; flex:0 0 44px; width:44px; height:44px; border:0; border-radius:50%; color:#fff; background:#171918; }
+.full-player__mode { display:grid; place-items:center; width:42px; height:42px; padding:0; border:0; border-radius:50%; background:#151716; color:#8e9591; }
+.full-player__mode span { display:none; }
+.full-player__mode.is-active { color:#fff; background:#242725; }
+.full-player__turntable { position:relative; flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center; }
 .full-player__turntable[hidden] { display: none; }
 .turntable-scene { position: relative; flex: 1; width: 100%; min-height: 240px; max-height: 55dvh; overflow: hidden; background: transparent; }
 .turntable-stage { position: absolute; width: 100%; aspect-ratio: 1; top: 50%; transform: translateY(-50%); isolation: isolate; }
@@ -24,7 +29,7 @@
 .full-player__source a:hover { color: #fff; border-bottom-color: #2fe92b; }
 .full-player__source button { display: inline-flex; align-items: center; gap: 3px; min-height: 24px; padding: 2px 6px; border: 1px solid #34343a; border-radius: 4px; background: #171719; color: #9eae99; font: inherit; }
 .full-player__source button svg { width: 11px; height: 11px; }
-.full-player__controls { position: relative; flex-shrink: 0; z-index: 2; width: 100%; padding: 6px 26px max(16px, env(safe-area-inset-bottom)); }
+.full-player__controls { position:relative; flex-shrink:0; z-index:2; width:100%; padding:4px 26px calc(16px + env(safe-area-inset-bottom)); }
 .full-player__progress input { display: block; appearance: none; width: 100%; height: 22px; margin: 0; background: transparent; cursor: pointer; }
 .full-player__progress input::-webkit-slider-runnable-track { height: 3px; border-radius: 2px; background: linear-gradient(to right, #2fe92b var(--played), #27272b var(--played)); }
 .full-player__progress input::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; margin-top: -3px; border: 0; border-radius: 50%; background: #eee; }
@@ -35,7 +40,35 @@
 .full-player__transport { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 18px; }
 .full-player__play { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: #141416; border: 1px solid #26272d; }
 .full-player__play:disabled { cursor: wait; opacity: .58; }
-.full-player__utilities { display: flex; align-items: center; justify-content: space-around; padding-top: 12px; border-top: 1px solid #202023; color: #a0a0a5; }
+.full-player__utilities { display:flex; align-items:center; justify-content:space-around; padding-top:8px; border-top:1px solid #1b1e1c; color:#919794; }
+[data-player-view=turntable] .pt-track-info { position:relative; flex-shrink:0; padding-bottom:8px; background:none; }
+[data-player-view=turntable]:not([data-player-theme=classic]) .pt-track-info .full-player__source { display:none; }
+[data-player-view=turntable]:not([data-player-theme=classic]) .full-player__utilities { display:none; }
+[data-player-view=turntable]:not([data-player-theme=classic]) #player-btn-shuffle,[data-player-view=turntable]:not([data-player-theme=classic]) #player-btn-repeat { display:none; }
+.full-player[data-player-theme=classic] { background:#101012 url('/assets/turntable/metal-noise.webp') center / cover; }
+[data-player-theme=classic] .full-player__brand { display:none; }
+[data-player-theme=classic] .full-player__modes { display:flex; gap:16px; margin-right:auto; }
+[data-player-theme=classic] .full-player__mode { display:flex; gap:5px; width:auto; border-radius:0; border-bottom:1px solid transparent; background:none; font-size:12px; }
+[data-player-theme=classic] .full-player__mode span { display:inline; }
+[data-player-theme=classic] .pt-transport { justify-content:space-between; gap:8px; }
+[data-player-theme=classic] .pt-transport .full-player__play { width:56px; height:56px; border:1px solid #393b3b; background:#141416; color:#eee; box-shadow:none; }
+[data-player-theme=classic] .full-player__play span { width:auto; height:auto; color:inherit; background:none; box-shadow:none; }
+[data-player-theme=classic] .pt-progress input { background:none; filter:none; }
+[data-player-theme=classic] .pt-progress input::-webkit-slider-runnable-track { background:linear-gradient(to right,var(--player-accent) var(--played),#27272b var(--played)); }
+[data-player-theme=classic] .turntable-scene { container-type:size; min-height:210px; }
+[data-player-theme=classic] .turntable-stage { width:min(100%,55dvh); left:50%; transform:translate(-50%,-50%); }
+@supports (width:1cqh) { [data-player-theme=classic] .turntable-stage { width:min(100%,100cqh); } }
+[data-player-theme=classic] .turntable-record { width:68%; }
+.player-more { display:grid; gap:18px; padding:4px 0 10px; }
+.player-more__source { padding:14px; border:1px solid #292d2a; border-radius:12px; background:#141615; }
+.player-more__source strong { font-size:13px; color:#fff; }
+.player-more__source p { margin:5px 0 12px; color:#aab1ad; font-size:12px; line-height:1.45; }
+.player-more__source div { display:flex; flex-wrap:wrap; gap:8px; }
+.player-more__source a,.player-more__source button { min-height:40px; padding:0 12px; border:1px solid #333834; border-radius:8px; color:#e9eee9; background:#202320; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; }
+.player-more__actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.player-more__actions button { display:flex; min-width:0; min-height:76px; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:8px 4px; border:1px solid #252925; border-radius:12px; color:#aeb5b1; background:#141615; font-size:11px; }
+.player-more__actions button svg { width:19px; height:19px; }
+.player-more__actions button[aria-pressed=true] { color:#c7e9b3; border-color:#53664c; background:#1a2118; }
 .full-player button { cursor: pointer; }
 .full-player button:focus-visible, .full-player input:focus-visible { outline: 2px solid #2fe92b; outline-offset: 4px; }
 @media (max-height: 650px) { .full-player__header { min-height: 48px; padding-top: 6px; } .full-player__info { padding: 10px 20px; } .full-player__info h2 { font-size: 20px; } .full-player__info small { margin-top: 5px; } .full-player__controls { padding: 0 22px 10px; } .full-player__transport { margin: 8px 0 10px; } .full-player__utilities { padding-top: 7px; } }
