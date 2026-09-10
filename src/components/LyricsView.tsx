@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { LyricLine, Track, Album } from '../types';
 import { getLyricsForTrack } from '../data/lyricsData';
 import { Play, Languages, AlignLeft, AlignCenter, ArrowDown, Sparkles } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 export interface LyricsViewProps {
   currentTrack: Track;
@@ -97,7 +97,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
         behavior: 'smooth',
         block: 'center',
       });
-      audioEngine.triggerHaptic('light');
+      hapticsService.triggerHaptic('light');
     }
   };
 
@@ -105,7 +105,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
     const targetPercent = Math.min(100, Math.max(0, (line.time / Math.max(1, durationSec)) * 100));
     onSeek(targetPercent);
     setIsUserInteracting(false);
-    audioEngine.triggerHaptic('medium');
+    hapticsService.triggerHaptic('medium');
   };
 
   const formatTimestamp = (sec: number) => {
@@ -137,7 +137,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
             type="button"
             onClick={() => {
               setShowTranslation(!showTranslation);
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className={`px-2 py-1 rounded-[4px] text-[11px] font-medium flex items-center gap-1 transition-all ${
               showTranslation
@@ -155,7 +155,7 @@ export const LyricsView: React.FC<LyricsViewProps> = ({
             type="button"
             onClick={() => {
               setTextAlign(textAlign === 'left' ? 'center' : 'left');
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="p-1.5 rounded-[4px] bg-[#111113] border border-[#26272D] text-white/50 hover:text-white transition-colors"
             title={textAlign === 'left' ? '居中排版' : '靠左排版'}

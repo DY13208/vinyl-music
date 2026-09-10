@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Album } from '../types';
 import { Search, Sparkles, BookOpen, Disc, Play, ChevronRight, Compass } from 'lucide-react';
 import { EDITORIAL_STORIES } from '../data/mockData';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface DiscoverViewProps {
   albums: Album[];
@@ -65,7 +65,7 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
               type="button"
               onClick={() => {
                 setSelectedIssue(tab.id as any);
-                audioEngine.triggerHaptic('light');
+                hapticsService.triggerHaptic('light');
               }}
               className={`px-3 py-1 rounded-[4px] text-[11.5px] whitespace-nowrap transition-colors ${
                 isActive

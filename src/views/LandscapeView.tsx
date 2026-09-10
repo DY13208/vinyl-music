@@ -3,7 +3,7 @@ import { Album } from '../types';
 import { VinylDisc } from '../components/VinylDisc';
 import { Tonearm } from '../components/Tonearm';
 import { Play, Pause, Heart, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface LandscapeViewProps {
   albums: Album[];
@@ -65,7 +65,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
         <div
           onClick={() => {
             onSelectIndex((currentIndex - 1 + albums.length) % albums.length);
-            audioEngine.triggerHaptic('light');
+            hapticsService.triggerHaptic('light');
           }}
           className="absolute -left-16 top-1/2 -translate-y-1/2 opacity-25 hover:opacity-50 transition-opacity cursor-pointer flex items-center gap-2 z-10"
         >
@@ -195,7 +195,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
         <div
           onClick={() => {
             onSelectIndex((currentIndex + 1) % albums.length);
-            audioEngine.triggerHaptic('light');
+            hapticsService.triggerHaptic('light');
           }}
           className="absolute -right-16 top-1/2 -translate-y-1/2 opacity-25 hover:opacity-50 transition-opacity cursor-pointer flex items-center gap-2 z-10"
         >

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface SettingsViewProps {
   onBack: () => void;
@@ -16,7 +16,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
 
   const handleClearCache = () => {
     setCacheSize('0 KB');
-    audioEngine.triggerHaptic('medium');
+    hapticsService.triggerHaptic('medium');
   };
 
   return (
@@ -90,7 +90,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 type="button"
                 onClick={() => {
                   setRiaaEq(!riaaEq);
-                  audioEngine.triggerHaptic('light');
+                  hapticsService.triggerHaptic('light');
                 }}
                 className={`w-11 h-6 rounded-full p-0.5 transition-colors relative ${
                   riaaEq ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'
@@ -114,7 +114,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 type="button"
                 onClick={() => {
                   setNeedleCrackle(!needleCrackle);
-                  audioEngine.triggerHaptic('light');
+                  hapticsService.triggerHaptic('light');
                 }}
                 className={`w-11 h-6 rounded-full p-0.5 transition-colors relative ${
                   needleCrackle ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'
@@ -138,7 +138,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 type="button"
                 onClick={() => {
                   setCrossfade(!crossfade);
-                  audioEngine.triggerHaptic('light');
+                  hapticsService.triggerHaptic('light');
                 }}
                 className={`w-11 h-6 rounded-full p-0.5 transition-colors relative ${
                   crossfade ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'
@@ -169,7 +169,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 type="button"
                 onClick={() => {
                   setHapticFeedback(!hapticFeedback);
-                  audioEngine.triggerHaptic('medium');
+                  hapticsService.triggerHaptic('medium');
                 }}
                 className={`w-11 h-6 rounded-full p-0.5 transition-colors relative ${
                   hapticFeedback ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'
@@ -191,7 +191,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
                 type="button"
                 onClick={() => {
                   setNotifications(!notifications);
-                  audioEngine.triggerHaptic('light');
+                  hapticsService.triggerHaptic('light');
                 }}
                 className={`w-11 h-6 rounded-full p-0.5 transition-colors relative ${
                   notifications ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'

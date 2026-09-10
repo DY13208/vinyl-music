@@ -1,7 +1,7 @@
 import React from 'react';
 import { MainTab } from '../types';
 import { Home, Heart, Compass, User } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface BottomNavProps {
   activeTab: MainTab;
@@ -72,7 +72,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
             type="button"
             onClick={() => {
               onChangeTab(tab.id);
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="flex-1 flex flex-col items-center justify-center py-1 transition-colors"
             style={{ color }}

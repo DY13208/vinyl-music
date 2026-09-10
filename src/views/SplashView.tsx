@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Disc } from 'lucide-react';
 import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface SplashViewProps {
   onEnterApp: () => void;
@@ -56,7 +57,7 @@ export const SplashView: React.FC<SplashViewProps> = ({ onEnterApp }) => {
           onClick={() => {
             onEnterApp();
             audioEngine.playNeedleDrop();
-            audioEngine.triggerHaptic('medium');
+            hapticsService.triggerHaptic('medium');
           }}
           className="w-full h-12 rounded-[6px] bg-[#2FE92B] hover:bg-[#28d124] text-[#0F0F0F] font-bold text-[15px] tracking-wide flex items-center justify-center gap-2 shadow-[0_2px_16px_rgba(47,233,43,0.3)] active:scale-98 transition-all"
         >

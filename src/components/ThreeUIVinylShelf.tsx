@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Album } from '../types';
 import { VinylItem } from './VinylItem';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 import './VinylCollectionShelf.css';
 
 interface ThreeUIVinylShelfProps {
@@ -24,7 +24,7 @@ export const ThreeUIVinylShelf: React.FC<ThreeUIVinylShelfProps> = ({ items, pag
     if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy)) {
       gesture.current.swiped = true;
       onPageChange(Math.max(0, Math.min(Math.ceil(items.length / PAGE_SIZE) - 1, page + (dx < 0 ? 1 : -1))));
-      audioEngine.triggerHaptic('light');
+      hapticsService.triggerHaptic('light');
     }
   }}>
     {Array.from({ length: Math.ceil(visibleItems.length / 2) }, (_, row) => <div className="vinyl-collection-shelf__row" key={row}>
@@ -32,7 +32,7 @@ export const ThreeUIVinylShelf: React.FC<ThreeUIVinylShelfProps> = ({ items, pag
       {visibleItems.slice(row * 2, row * 2 + 2).map(album =>
         <VinylItem key={album.id} album={album} onOpen={() => {
             if (gesture.current.swiped) { gesture.current.swiped = false; return; }
-            onOpenAlbumDetail(album); audioEngine.triggerHaptic('light');
+            onOpenAlbumDetail(album); hapticsService.triggerHaptic('light');
           }} />
       )}
       </div>

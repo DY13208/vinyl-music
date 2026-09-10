@@ -9,9 +9,15 @@ import {
   WishlistItem,
 } from './types';
 import { ALBUMS, ARTISTS, WISHLIST } from './data/mockData';
-import { audioEngine, PreviewTrack } from './services/audioEngine';
-import { loadServerCollection, removeAlbumFromServer, saveAlbumsToServer, saveAlbumToServer } from './services/collectionApi';
+import { audioEngine } from './services/audioEngine';
+import { fileService } from './platform/files';
+import { localMusicProvider, playbackResolver } from './music';
+import type { MusicTrack, TrackSource } from './music';
+import { trackMatcher } from './music/matching/TrackMatcher';
+import type { LocalAudioSelection } from './platform/files/types';
+import { collectionRepository } from './repositories/collection';
 import { HomeView } from './views/HomeView';
+import { useHomeTheme } from './hooks/useHomeTheme';
 import { PlayerView } from './views/PlayerView';
 import { AlbumDetailView } from './views/AlbumDetailView';
 import { DiscoverView } from './views/DiscoverView';
@@ -30,50 +36,14 @@ const CollectionView = lazy(() => import('./views/CollectionView').then((module)
 const ImportVinylModal = lazy(() => import('./components/ImportVinylModal').then((module) => ({ default: module.ImportVinylModal })));
 
 export default function App() {
+  const { theme, selectTheme, themeMessage } = useHomeTheme();
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
   const [activeTab, setActiveTab] = useState<MainTab>('home');
   const [isImportOpen, setIsImportOpen] = useState(false);
 
-  // User Vinyl Collection with LocalStorage Persistence
-  const [albums, setAlbums] = useState<Album[]>(() => {
-    try {
-      const saved = localStorage.getItem('vinyl_user_collection');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((album: Album) => {
-            const catalogAlbum = ALBUMS.find((item) => item.id === album.id);
-            return album.vinylVariant || !catalogAlbum ? album : { ...album, vinylVariant: catalogAlbum.vinylVariant, vinylColors: catalogAlbum.vinylColors };
-          });
-        }
-      }
-    } catch (e) {
-      console.error('Failed to load saved collection', e);
-    }
-    return ALBUMS;
-  });
-
-  // Persist collection changes
-  useEffect(() => {
-    try {
-      localStorage.setItem('vinyl_user_collection', JSON.stringify(albums));
-    } catch (e) {
-      console.error('Failed to save vinyl collection', e);
-    }
-  }, [albums]);
-
-  useEffect(() => {
-    let active = true;
-    loadServerCollection().then((savedAlbums) => {
-      if (!active || !savedAlbums.length) return;
-      setAlbums((current) => {
-        const serverIds = new Set(savedAlbums.map(album => album.id));
-        return [...savedAlbums, ...current.filter(album => !serverIds.has(album.id))];
-      });
-    }).catch((error) => console.warn('Backend collection unavailable', error));
-    return () => { active = false; };
-  }, []);
+  // Local-first collection. The repository preserves the existing storage key and data.
+  const [albums, setAlbums] = useState<Album[]>(() => collectionRepository.getAlbums());
 
   // Carousel & Content State
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
@@ -89,12 +59,18 @@ export default function App() {
   const [currentTimeSec, setCurrentTimeSec] = useState<number>(138); // 2:18 initial sample time
   const [progressPercent, setProgressPercent] = useState<number>(33.4);
   const [previewDurationSec, setPreviewDurationSec] = useState<number>(30);
-  const [previewMatch, setPreviewMatch] = useState<PreviewTrack | null>(null);
+  const [playbackSource, setPlaybackSource] = useState<TrackSource | null>(null);
   const [playbackMessage, setPlaybackMessage] = useState('');
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [pendingLocalFile, setPendingLocalFile] = useState<LocalAudioSelection | null>(null);
   const previewRequestRef = useRef(0);
 
-  const durationSec = previewMatch ? previewDurationSec : (currentTrack?.durationSec || 30);
+  const durationSec = playbackSource ? previewDurationSec : (currentTrack?.durationSec || 30);
+
+  const toMusicTrack = (album: Album, track: Track): MusicTrack => ({
+    id: track.id, title: track.title, artist: album.artist, album: album.title,
+    duration: track.durationSec, trackNumber: track.number, artwork: album.coverUrl,
+  });
 
   const startTrackPreview = async (album: Album, track: Track) => {
     const requestId = ++previewRequestRef.current;
@@ -102,14 +78,23 @@ export default function App() {
     setCurrentTrack(track);
     setCurrentTimeSec(0);
     setProgressPercent(0);
-    setPreviewMatch(null);
-    setPlaybackMessage('正在查找官方试听…');
+    setPlaybackSource(null);
+    setPendingLocalFile(null);
+    setPlaybackMessage('正在查找可靠音源…');
     setIsPreviewLoading(true);
     setIsPlaying(false);
     audioEngine.playNeedleDrop();
     try {
-      const match = await audioEngine.playTrackPreview(
-        { title: track.title, artist: album.artist, album: album.title },
+      const resolution = await playbackResolver.resolve(toMusicTrack(album, track));
+      if (previewRequestRef.current !== requestId) return;
+      if (resolution.status !== 'MATCHED' || !resolution.source) {
+        setIsPreviewLoading(false);
+        setPlaybackMessage(resolution.status === 'POSSIBLE_MATCH' ? '只找到待确认候选，未自动播放' : '暂无可靠音源');
+        return;
+      }
+      const source = resolution.source;
+      await audioEngine.load(
+        { uri: source.uri, id: `${source.provider}:${source.providerTrackId}` },
         {
           onTimeUpdate: (time, duration) => {
             if (previewRequestRef.current !== requestId) return;
@@ -130,21 +115,17 @@ export default function App() {
         },
       );
       if (previewRequestRef.current !== requestId) return;
-      setPreviewMatch(match);
+      await audioEngine.play();
+      if (previewRequestRef.current !== requestId) return;
+      setPlaybackSource(source);
       setIsPreviewLoading(false);
-      if (match) {
-        setPlaybackMessage('试听音频由 iTunes 提供');
-        setIsPlaying(true);
-      } else {
-        setPlaybackMessage((message) =>
-          message === '正在查找官方试听…' ? '暂未找到这首歌的官方试听' : message,
-        );
-      }
+      setPlaybackMessage(source.provider === 'local' ? '正在播放已绑定的本地音源' : source.provider === 'audius' ? '音源由 Audius 提供' : '试听音频由 Apple Music 提供');
+      setIsPlaying(true);
     } catch {
       if (previewRequestRef.current !== requestId) return;
       setIsPreviewLoading(false);
       setIsPlaying(false);
-      setPlaybackMessage('暂时无法连接试听服务，请检查网络后重试');
+      setPlaybackMessage('音源暂时不可用，请稍后重试或导入本地音频');
     }
   };
 
@@ -156,13 +137,12 @@ export default function App() {
 
     if (isPlaying) {
       setIsPlaying(false);
-      audioEngine.pausePreview();
+      void audioEngine.pause();
     } else {
-      const query = { title: track.title, artist: alb.artist, album: alb.title };
-      if (currentPlayingAlbum?.id === alb.id && currentTrack?.id === track.id && audioEngine.hasPreview(query)) {
-        void audioEngine.resumePreview().then(resumed => {
-          setIsPlaying(resumed);
-          if (!resumed) setPlaybackMessage('浏览器阻止了音频播放，请再次点击播放');
+      if (currentPlayingAlbum?.id === alb.id && currentTrack?.id === track.id && playbackSource) {
+        void audioEngine.play().then(() => setIsPlaying(true)).catch(() => {
+          setIsPlaying(false);
+          setPlaybackMessage('音频无法继续播放，请重试');
         });
       } else {
         void startTrackPreview(alb, track);
@@ -191,7 +171,7 @@ export default function App() {
   };
 
   const handleSeek = (percent: number) => {
-    audioEngine.seekPreview(percent);
+    void audioEngine.seek((percent / 100) * durationSec);
     setProgressPercent(percent);
     setCurrentTimeSec(Math.floor((percent / 100) * durationSec));
   };
@@ -241,26 +221,39 @@ export default function App() {
 
   // Vinyl Collection CRUD handlers
   const handleAddAlbum = async (newAlbum: Album) => {
-    await saveAlbumToServer(newAlbum);
-    setAlbums((prev) => [newAlbum, ...prev]);
+    setAlbums(collectionRepository.saveAlbum(newAlbum));
     setFavorites((prev) => (prev.includes(newAlbum.id) ? prev : [newAlbum.id, ...prev]));
   };
 
   const handleImportMultiple = async (newAlbums: Album[]) => {
-    await saveAlbumsToServer(newAlbums);
-    setAlbums((prev) => {
-      const existingIds = new Set(prev.map((a) => a.id));
-      const existingTitles = new Set(prev.map((a) => a.title.toLowerCase().trim()));
-      const toAdd = newAlbums.filter(
-        (a) => !existingIds.has(a.id) && !existingTitles.has(a.title.toLowerCase().trim())
-      );
-      return [...toAdd, ...prev];
-    });
+    setAlbums(collectionRepository.saveAlbums(newAlbums));
   };
 
   const handleRemoveAlbum = (albumId: string) => {
-    setAlbums((prev) => prev.filter((a) => a.id !== albumId));
-    void removeAlbumFromServer(albumId).catch((error) => console.warn('Backend delete unavailable', error));
+    setAlbums(collectionRepository.deleteAlbum(albumId));
+  };
+
+  const handleImportLocalSource = async () => {
+    if (!currentPlayingAlbum || !currentTrack) return;
+    try {
+      if (!pendingLocalFile) {
+        const file = await fileService.pickLocalAudio();
+        if (!file) return;
+        const match = trackMatcher.score(toMusicTrack(currentPlayingAlbum, currentTrack), {
+          title: file.title, artist: file.artist, album: currentPlayingAlbum.title, duration: file.duration,
+        });
+        setPendingLocalFile(file);
+        setPlaybackMessage(`本地文件匹配分 ${match.score}；请确认将 ${file.filename} 绑定到《${currentTrack.title}》`);
+        return;
+      }
+      setPlaybackMessage('正在保存并绑定本地音源…');
+      await localMusicProvider.bindUserFile(toMusicTrack(currentPlayingAlbum, currentTrack), pendingLocalFile);
+      setPlaybackMessage(`已将 ${pendingLocalFile.filename} 绑定为当前歌曲音源`);
+      setPendingLocalFile(null);
+      await startTrackPreview(currentPlayingAlbum, currentTrack);
+    } catch {
+      setPlaybackMessage('本地音源保存失败；浏览器存储空间或文件权限可能不可用');
+    }
   };
 
   // Check if current view is Landscape
@@ -316,10 +309,11 @@ export default function App() {
     <div className="fixed inset-0 w-full h-full bg-[#000000] flex justify-center overflow-hidden select-none">
       <div
         id="mobile-viewport"
-        className="relative w-full max-w-md h-full flex flex-col bg-[#000000] text-white overflow-hidden shadow-2xl border-x border-[#1C1C20]/40"
+        data-home-theme={currentScreen === 'home' ? theme : undefined}
+        className={`relative w-full max-w-md h-full flex flex-col bg-[#000000] text-white overflow-hidden shadow-2xl border-x border-[#1C1C20]/40 ${currentScreen === 'home' ? 'home-shell' : ''}`}
       >
         {/* Scrollable Body Content Area (Fixed Full-Height Mobile Canvas) */}
-        <div className="flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full">
+        <div className="home-body flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full">
           {currentScreen === 'splash' && (
             <SplashView onEnterApp={() => setCurrentScreen('home')} />
           )}
@@ -331,6 +325,18 @@ export default function App() {
               onSelectCarouselIndex={setCarouselIndex}
               onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSearch={() => setCurrentScreen('search')}
+              onAddAlbum={() => setIsImportOpen(true)}
+              theme={theme}
+              onSelectTheme={selectTheme}
+              themeMessage={themeMessage}
+              playingAlbum={currentPlayingAlbum}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
+              isLoading={isPreviewLoading}
+              playbackMessage={playbackMessage}
+              onPlayTrack={handleSelectTrack}
+              onTogglePlay={() => handleTogglePlay()}
+              onOpenPlayer={() => setCurrentScreen('player')}
             />
           )}
 
@@ -423,9 +429,11 @@ export default function App() {
               onSeek={handleSeek}
               onClose={() => setCurrentScreen(activeTab)}
               onSelectTrack={(trk) => handleSelectTrack(currentPlayingAlbum, trk)}
-              previewMatch={previewMatch}
+              playbackSource={playbackSource}
               playbackMessage={playbackMessage}
               isPreviewLoading={isPreviewLoading}
+              onImportLocalSource={() => void handleImportLocalSource()}
+              localImportPending={!!pendingLocalFile}
             />
           )}
         </div>

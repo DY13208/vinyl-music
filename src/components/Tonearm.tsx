@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 export interface TonearmProps {
   /** Whether the turntable is actively playing */
@@ -46,12 +46,12 @@ export const Tonearm: React.FC<TonearmProps> = ({
       if (isPlaying) {
         // Needle drops down onto the spinning vinyl record groove
         const timer = setTimeout(() => {
-          audioEngine.triggerHaptic('medium');
+          hapticsService.triggerHaptic('medium');
         }, 360);
         return () => clearTimeout(timer);
       } else {
         // Needle lifts up from the groove to park on the cradle rest
-        audioEngine.triggerHaptic('light');
+        hapticsService.triggerHaptic('light');
       }
       prevPlayingRef.current = isPlaying;
     }

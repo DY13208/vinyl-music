@@ -1,7 +1,7 @@
 import React from 'react';
 import { Album, Track } from '../types';
 import { Play, Pause } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 import { VinylDisc } from './VinylDisc';
 import { getVinylAppearance } from '../utils/vinylAppearance';
 import './MiniPlayer.css';
@@ -40,7 +40,7 @@ export const MiniPlayer: React.FC<MiniPlayerProps> = ({ currentAlbum, currentTra
       <p className="mini-player__pressing">{position ? `${position} · ` : ''}{currentAlbum.rpm}</p>
     </div>
     <button id="mini-player-play-btn" type="button" className={`mini-player__toggle ${isPlaying ? 'is-playing' : ''}`}
-      aria-label={isPlaying ? '暂停' : '播放'} onClick={event => { event.stopPropagation(); onTogglePlay(); audioEngine.triggerHaptic('medium'); }}>
+      aria-label={isPlaying ? '暂停' : '播放'} onClick={event => { event.stopPropagation(); onTogglePlay(); hapticsService.triggerHaptic('medium'); }}>
       {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" />}
     </button>
   </section>;

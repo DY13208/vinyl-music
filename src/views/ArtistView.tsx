@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Artist, Album } from '../types';
 import { ChevronLeft, Disc, Check, Plus, Share2 } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface ArtistViewProps {
   artist: Artist;
@@ -68,7 +68,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
             type="button"
             onClick={() => {
               setIsFollowed(!isFollowed);
-              audioEngine.triggerHaptic('medium');
+              hapticsService.triggerHaptic('medium');
             }}
             className={`px-4 py-1.5 rounded-[4px] text-[13px] font-bold tracking-wide flex items-center gap-1.5 transition-all ${
               isFollowed

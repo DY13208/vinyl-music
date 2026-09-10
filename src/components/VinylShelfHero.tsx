@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { animate, motion, MotionValue, PanInfo, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
 import { Album } from '../types';
 import { VinylCarouselItem } from './VinylCarouselItem';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface VinylShelfHeroProps {
   albums: Album[];
@@ -98,7 +98,7 @@ export const VinylShelfHero: React.FC<VinylShelfHeroProps> = ({ albums, currentI
     setVirtualIndex(targetVirtualIndex);
     onSelectIndex(modulo(targetVirtualIndex, albums.length));
     animationRef.current = null;
-    if (changed) audioEngine.triggerHaptic('light');
+    if (changed) hapticsService.triggerHaptic('light');
   };
 
   useEffect(() => {

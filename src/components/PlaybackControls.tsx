@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, Play, Pause, SkipForward } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface PlaybackControlsProps {
   isPlaying: boolean;
@@ -30,7 +30,7 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         type="button"
         onClick={() => {
           onToggleFavorite();
-          audioEngine.triggerHaptic('light');
+          hapticsService.triggerHaptic('light');
         }}
         className="w-12 h-12 flex items-center justify-center text-[#BBCBB2] hover:text-white active:scale-90 transition-all"
         title="收藏"
@@ -48,7 +48,7 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         type="button"
         onClick={() => {
           onTogglePlay();
-          audioEngine.triggerHaptic('medium');
+          hapticsService.triggerHaptic('medium');
         }}
         className="w-[60px] h-[60px] rounded-full bg-[#2FE92B] hover:bg-[#28D824] active:scale-95 flex items-center justify-center flex-shrink-0 transition-transform"
         style={{
@@ -69,7 +69,7 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
         type="button"
         onClick={() => {
           onNextTrack();
-          audioEngine.triggerHaptic('light');
+          hapticsService.triggerHaptic('light');
         }}
         className="w-12 h-12 flex items-center justify-center text-[#BBCBB2] hover:text-white active:scale-90 transition-all"
         title="下一首"

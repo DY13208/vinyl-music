@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowDownUp, MoreHorizontal, Plus, Search, X } from 'lucide-react';
 import { Album } from '../types';
 import { ThreeUIVinylShelf } from '../components/ThreeUIVinylShelf';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface CollectionViewProps {
   albums: Album[];
@@ -39,7 +39,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
   const updateCollection = (next: () => void) => {
     next();
     setPage(0);
-    audioEngine.triggerHaptic('light');
+    hapticsService.triggerHaptic('light');
   };
   const pageCount = Math.max(1, Math.ceil(shelfAlbums.length / 6));
   const safePage = Math.min(page, pageCount - 1);
@@ -80,7 +80,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
             <ThreeUIVinylShelf key={`${genre}-${sort}-${query}-${safePage}`} items={shelfAlbums} page={safePage} onPageChange={setPage} onOpenAlbumDetail={onOpenAlbumDetail} />
             {pageCount > 1 && (
               <div className="collection-room__pages" aria-label={`收藏柜第 ${safePage + 1} 层，共 ${pageCount} 层`}>
-                {Array.from({ length: pageCount }, (_, index) => <button key={index} type="button" aria-label={`查看第 ${index + 1} 层`} aria-current={safePage === index ? 'true' : undefined} onClick={() => { setPage(index); audioEngine.triggerHaptic('light'); }} />)}
+                {Array.from({ length: pageCount }, (_, index) => <button key={index} type="button" aria-label={`查看第 ${index + 1} 层`} aria-current={safePage === index ? 'true' : undefined} onClick={() => { setPage(index); hapticsService.triggerHaptic('light'); }} />)}
               </div>
             )}
           </>

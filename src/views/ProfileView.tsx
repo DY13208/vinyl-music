@@ -13,7 +13,7 @@ import {
   LayoutTemplate,
   RotateCw,
 } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface ProfileViewProps {
   onOpenSettings: () => void;
@@ -159,7 +159,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             id={`profile-menu-${item.id}`}
             onClick={() => {
               item.action();
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer transition-all flex items-center justify-between group"
           >

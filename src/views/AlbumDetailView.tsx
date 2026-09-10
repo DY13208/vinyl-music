@@ -5,7 +5,7 @@ import { VinylSideIcon } from '../components/VinylSideIcon';
 import { useVinylSideTransition } from '../hooks/useVinylSideTransition';
 import { AlbumSleeve } from '../components/AlbumSleeve';
 import { ChevronLeft, Play, Heart, BookmarkPlus, ArrowLeftRight } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 import { getVinylAppearance } from '../utils/vinylAppearance';
 import { albumForSide, durationOf, getAlbumDiscs } from '../utils/vinylSides';
 import './AlbumDetailView.css';
@@ -39,12 +39,12 @@ const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
   const allTracks = discs.flatMap(record => record.sides.flatMap(face => face.tracks));
   const changeSide = (discIndex: number, sideIndex: number) => {
     selectSide({ disc: discIndex, side: sideIndex });
-    audioEngine.triggerHaptic('light');
+    hapticsService.triggerHaptic('light');
   };
   const play = (tracks: Track[]) => {
     if (!tracks.length) return;
     onSelectTrack(albumForSide(album, tracks), tracks[0]);
-    audioEngine.triggerHaptic('medium');
+    hapticsService.triggerHaptic('medium');
   };
 
   return <main id="album-detail-view" className="album-archive" translate="no">
@@ -76,8 +76,8 @@ const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
       <p className="archive-info__label">{album.label}</p>
       <div className="archive-actions">
         <button id="album-detail-play-btn" className="archive-actions__play" type="button" disabled={!allTracks.length} onClick={() => play(allTracks)}><Play size={17} fill="currentColor" />播放整张</button>
-        <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消收藏' : '收藏'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); audioEngine.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>
-        {onToggleWishlist && <button id="album-detail-wishlist-btn" type="button" aria-label="切换愿望单标记" onClick={() => { onToggleWishlist(album); audioEngine.triggerHaptic('light'); }}><BookmarkPlus size={21} /></button>}
+        <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消收藏' : '收藏'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); hapticsService.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>
+        {onToggleWishlist && <button id="album-detail-wishlist-btn" type="button" aria-label="切换愿望单标记" onClick={() => { onToggleWishlist(album); hapticsService.triggerHaptic('light'); }}><BookmarkPlus size={21} /></button>}
       </div>
     </section>
 
@@ -114,7 +114,7 @@ const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
             const current = isPlayingAlbum && currentTrackId === track.id;
             return <li key={track.id}><button type="button" id={`track-item-${track.id}`} className={`archive-track ${current ? 'is-current' : ''}`}
               aria-current={current ? 'true' : undefined}
-              onClick={() => { onSelectTrack(albumForSide(album, side.tracks), track); audioEngine.triggerHaptic('light'); }}>
+              onClick={() => { onSelectTrack(albumForSide(album, side.tracks), track); hapticsService.triggerHaptic('light'); }}>
               <span className="archive-track__number">{side.side}{index + 1}</span>
               <span className="archive-track__name"><strong>{track.title}</strong><small>{album.artist}</small></span>
               <span className="archive-track__duration">{current && isPlaying && <i aria-label="正在播放" />}{track.duration}</span>

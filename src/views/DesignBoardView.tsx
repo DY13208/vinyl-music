@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Album, ScreenId, DevicePlatform } from '../types';
 import { Eye, Smartphone, ArrowRight, Disc, Sparkles } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface DesignBoardViewProps {
   albums: Album[];
@@ -201,7 +201,7 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
             id={`board-card-${item.id}`}
             onClick={() => {
               onOpenScreen(item.screenId);
-              audioEngine.triggerHaptic('medium');
+              hapticsService.triggerHaptic('medium');
             }}
             className="group p-4 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#2FE92B]/60 transition-all cursor-pointer flex flex-col justify-between"
           >

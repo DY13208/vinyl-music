@@ -19,9 +19,10 @@ import {
   Sparkles,
   Disc,
   Maximize2,
+  Upload,
 } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
-import type { PreviewTrack } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
+import type { TrackSource } from '../music';
 
 interface PlayerViewProps {
   album: Album;
@@ -36,9 +37,11 @@ interface PlayerViewProps {
   onSeek: (percent: number) => void;
   onClose: () => void;
   onSelectTrack: (track: Track) => void;
-  previewMatch: PreviewTrack | null;
+  playbackSource: TrackSource | null;
   playbackMessage: string;
   isPreviewLoading: boolean;
+  onImportLocalSource: () => void;
+  localImportPending: boolean;
 }
 
 export const PlayerView: React.FC<PlayerViewProps> = ({
@@ -54,9 +57,11 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onSeek,
   onClose,
   onSelectTrack,
-  previewMatch,
+  playbackSource,
   playbackMessage,
   isPreviewLoading,
+  onImportLocalSource,
+  localImportPending,
 }) => {
   const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
@@ -97,7 +102,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               setViewMode('turntable');
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             aria-pressed={viewMode === 'turntable'}
             className={`full-player__mode ${viewMode === 'turntable' ? 'is-active' : ''}`}
@@ -110,7 +115,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               setViewMode('lyrics');
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             aria-pressed={viewMode === 'lyrics'}
             className={`full-player__mode ${viewMode === 'lyrics' ? 'is-active' : ''}`}
@@ -126,7 +131,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           type="button"
           onClick={() => {
             setIsCrackleEnabled(!isCrackleEnabled);
-            audioEngine.triggerHaptic('light');
+            hapticsService.triggerHaptic('light');
           }}
           className="full-player__quiet-button"
           aria-pressed={isCrackleEnabled}
@@ -139,19 +144,22 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
         <TurntableScene album={album} side={face?.side} isPlaying={isPlaying} progressPercent={progressPercent}
-          onShowLyrics={() => { setViewMode('lyrics'); audioEngine.triggerHaptic('light'); }} />
+          onShowLyrics={() => { setViewMode('lyrics'); hapticsService.triggerHaptic('light'); }} />
         <div className="full-player__info">
           <h2 title={currentTrack.title}>{currentTrack.title}</h2>
           <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
           <small>{album.rpm}{face ? ` · Side ${face.side} · ${position}` : ''}</small>
-          {(playbackMessage || previewMatch) && (
+          {(playbackMessage || playbackSource) && (
             <div className="full-player__source" aria-live="polite" aria-busy={isPreviewLoading}>
               <span>{playbackMessage}</span>
-              {previewMatch && (
-                <a href={previewMatch.storeUrl} target="_blank" rel="noreferrer">
+              {playbackSource?.metadata.storeUrl && (
+                <a href={playbackSource.metadata.storeUrl} target="_blank" rel="noreferrer">
                   在 Apple Music 查看
                 </a>
               )}
+              <button type="button" onClick={onImportLocalSource} disabled={isPreviewLoading}>
+                <Upload />{localImportPending ? '确认绑定本地音源' : '导入本地音源'}
+              </button>
             </div>
           )}
         </div>
@@ -172,7 +180,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
               type="button"
               onClick={() => {
                 setViewMode('turntable');
-                audioEngine.triggerHaptic('light');
+                hapticsService.triggerHaptic('light');
               }}
               className="px-2.5 py-1 rounded-[4px] bg-[#141418] border border-[#222228] text-[10.5px] text-white/80 hover:text-white flex items-center gap-1.5 flex-shrink-0 transition-colors"
               title="切回唱片机视图"
@@ -214,7 +222,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               setIsShuffle(!isShuffle);
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className={`w-9 h-9 rounded-[6px] flex items-center justify-center transition-colors ${
               isShuffle ? 'text-[#2FE92B]' : 'text-white/40 hover:text-white'
@@ -230,7 +238,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               onPrevTrack();
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="w-10 h-10 rounded-[6px] text-white/80 hover:text-white flex items-center justify-center transition-colors active:scale-95"
             title="上一首"
@@ -244,7 +252,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               onTogglePlay();
-              audioEngine.triggerHaptic('medium');
+              hapticsService.triggerHaptic('medium');
             }}
             className="full-player__play"
             title={isPreviewLoading ? '正在加载试听' : isPlaying ? '暂停' : '播放'}
@@ -264,7 +272,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               onNextTrack();
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="w-10 h-10 rounded-[6px] text-white/80 hover:text-white flex items-center justify-center transition-colors active:scale-95"
             title="下一首"
@@ -278,7 +286,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             type="button"
             onClick={() => {
               setRepeatMode(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off');
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className={`w-9 h-9 rounded-[6px] flex items-center justify-center transition-colors ${
               repeatMode !== 'off' ? 'text-[#2FE92B]' : 'text-white/40 hover:text-white'
@@ -297,7 +305,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             onClick={() => {
               setViewMode(viewMode === 'lyrics' ? 'turntable' : 'lyrics');
               setActiveBottomModal('none');
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className={`flex items-center gap-1.5 text-[11px] py-1 px-2.5 rounded-[4px] transition-all ${
               viewMode === 'lyrics'
@@ -368,7 +376,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                   onClick={() => {
                     setViewMode('lyrics');
                     setActiveBottomModal('none');
-                    audioEngine.triggerHaptic('light');
+                    hapticsService.triggerHaptic('light');
                   }}
                   className="flex items-center gap-1 text-[11px] text-white/80 hover:text-white px-2 py-0.5 rounded-[4px] bg-[#16161C] border border-[#262730]"
                   title="全屏歌词流"
@@ -410,7 +418,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                       onClick={() => {
                         onSelectTrack(track);
                         setActiveBottomModal('none');
-                        audioEngine.triggerHaptic('light');
+                        hapticsService.triggerHaptic('light');
                       }}
                       className={`flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
                         isCurrent

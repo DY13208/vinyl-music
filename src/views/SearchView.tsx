@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Album, Artist, Track } from '../types';
 import { Search as SearchIcon, X, ArrowLeft, Disc, User, Music } from 'lucide-react';
 import { ARTISTS } from '../data/mockData';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface SearchViewProps {
   albums: Album[];
@@ -125,7 +125,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                   type="button"
                   onClick={() => {
                     setQuery(item);
-                    audioEngine.triggerHaptic('light');
+                    hapticsService.triggerHaptic('light');
                   }}
                   className="px-3 py-1.5 rounded-[4px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#2FE92B]/40 text-[12px] text-white/80 hover:text-white transition-colors"
                 >
@@ -144,7 +144,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                     key={idx}
                     onClick={() => {
                       setQuery(cat.slice(0, 2));
-                      audioEngine.triggerHaptic('light');
+                      hapticsService.triggerHaptic('light');
                     }}
                     className="p-3 rounded-[4px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer"
                   >
