@@ -1,18 +1,29 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowDownUp, MoreHorizontal, Plus, Search, X } from 'lucide-react';
 import { Album } from '../types';
-import { ThreeUIVinylShelf } from '../components/ThreeUIVinylShelf';
 import { hapticsService } from '../platform/platformService';
+import { AlbumBrowser } from '../components/browse/AlbumBrowser';
+import { BrowseState } from '../hooks/useAlbumBrowserState';
+import { CollectionBrowseState, Genre, genres } from '../hooks/useCollectionBrowseState';
+import { CollectionThemeState } from '../features/collection/themes/useCollectionTheme';
+import { collectionThemeRegistry } from '../features/collection/themes/collectionThemeRegistry';
+import { CollectionDefaultLayout } from '../features/collection/themes/CollectionDefaultLayout';
+import { CollectionActionMenu, collectionModes } from '../features/collection/CollectionActionMenu';
+import type { CollectionViewMode } from '../features/collection/themes/CollectionTheme';
+import { CollectionArtwork } from '../features/collection/themes/CollectionAlbumCard';
+import '../features/collection/themes/collectionThemes.css';
 
 interface CollectionViewProps {
   albums: Album[];
+  browse: BrowseState;
+  filters: CollectionBrowseState;
+  themePreference: CollectionThemeState;
+  favoriteIds: readonly string[];
+  onToggleFavorite: (id: string) => void;
   onOpenAlbumDetail: (album: Album) => void;
   onAddVinyl: () => void;
 }
 
-type Genre = '全部' | '摇滚' | '流行' | '爵士' | '电子' | '古典' | '其他';
-type SortOption = 'recent' | 'artist' | 'year';
-const genres: Genre[] = ['全部', '摇滚', '流行', '爵士', '电子', '古典', '其他'];
 
 const genreMatches = (album: Album, genre: Genre) => {
   if (genre === '全部') return true;
@@ -20,13 +31,12 @@ const genreMatches = (album: Album, genre: Genre) => {
   return album.genre.includes(genre);
 };
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAlbumDetail, onAddVinyl }) => {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [query, setQuery] = useState('');
+export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, filters, themePreference, favoriteIds, onToggleFavorite, onOpenAlbumDetail, onAddVinyl }) => {
+  const theme = collectionThemeRegistry[themePreference.themeId];
+  const Header = theme.Header;
+  const { query, setQuery, genre, setGenre, sort, setSort } = filters;
+  const [searchOpen, setSearchOpen] = useState(Boolean(query));
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [genre, setGenre] = useState<Genre>('全部');
-  const [sort, setSort] = useState<SortOption>('recent');
-  const [page, setPage] = useState(0);
 
   const shelfAlbums = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -38,17 +48,20 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
 
   const updateCollection = (next: () => void) => {
     next();
-    setPage(0);
     hapticsService.triggerHaptic('light');
   };
-  const pageCount = Math.max(1, Math.ceil(shelfAlbums.length / 6));
-  const safePage = Math.min(page, pageCount - 1);
+  const empty = <div className="collection-room__empty"><span>没有找到匹配的唱片</span><button type="button" onClick={() => updateCollection(() => { setQuery(''); setGenre('全部'); })}>查看全部收藏</button></div>;
+  const defaultLayout = <CollectionDefaultLayout theme={theme} albums={shelfAlbums} selectedAlbumId={browse.selectedAlbumId} onSelectAlbum={browse.selectAlbum} favoriteIds={favoriteIds} onOpenAlbumDetail={onOpenAlbumDetail} onToggleFavorite={onToggleFavorite} cardVariant={theme.cardVariant} />;
+  const modeMap = { default: 'default', 'gallery-grid': 'grid', 'spine-carousel': 'spine' } as const;
+  const viewModeMap = { default: 'default', grid: 'gallery-grid', spine: 'spine-carousel' } as const;
+  const collectionBrowser: BrowseState = { ...browse, mode: modeMap[themePreference.viewMode], setMode: mode => themePreference.setViewMode(viewModeMap[mode]), message: themePreference.viewMessage };
 
   return (
-    <main id="collection-view" className="collection-room">
-      <header className="collection-room__header">
+    <main id="collection-view" className="collection-room ct-page" data-view-mode={themePreference.viewMode}>
+      <Header>
         <div className="collection-room__title"><h1>我的收藏</h1><p>黑胶，是时光的收藏。</p></div>
         <div className="collection-room__actions">
+          <select className="ct-compact-mode" aria-label="收藏浏览模式" value={themePreference.viewMode} onChange={event => themePreference.setViewMode(event.target.value as CollectionViewMode)}>{collectionModes.map(mode => <option key={mode.id} value={mode.id}>{mode.label}</option>)}</select>
           <button type="button" onClick={() => { setSearchOpen((value) => !value); setSheetOpen(false); }} aria-label={searchOpen ? '关闭搜索' : '搜索收藏'} aria-expanded={searchOpen}>
             {searchOpen ? <X /> : <Search />}
           </button>
@@ -56,7 +69,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
             <MoreHorizontal />
           </button>
         </div>
-      </header>
+      </Header>
 
       {searchOpen && (
         <div className="collection-room__search">
@@ -74,32 +87,11 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, onOpenAl
         </div>
       </nav>
 
-      <section className="collection-room__shelf" aria-label="3D 黑胶收藏柜">
-        {shelfAlbums.length ? (
-          <>
-            <ThreeUIVinylShelf key={`${genre}-${sort}-${query}-${safePage}`} items={shelfAlbums} page={safePage} onPageChange={setPage} onOpenAlbumDetail={onOpenAlbumDetail} />
-            {pageCount > 1 && (
-              <div className="collection-room__pages" aria-label={`收藏柜第 ${safePage + 1} 层，共 ${pageCount} 层`}>
-                {Array.from({ length: pageCount }, (_, index) => <button key={index} type="button" aria-label={`查看第 ${index + 1} 层`} aria-current={safePage === index ? 'true' : undefined} onClick={() => { setPage(index); hapticsService.triggerHaptic('light'); }} />)}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="collection-room__empty"><span>没有找到匹配的唱片</span><button type="button" onClick={() => updateCollection(() => { setQuery(''); setGenre('全部'); })}>查看全部收藏</button></div>
-        )}
+      <section className="collection-room__shelf" aria-label="收藏浏览">
+        <AlbumBrowser showToolbar={false} galleryLayout={theme.coversOnly ? defaultLayout : undefined} showSelection={!theme.coversOnly || themePreference.viewMode === 'spine-carousel'} albums={shelfAlbums} browse={collectionBrowser} onOpenAlbumDetail={onOpenAlbumDetail} empty={empty} defaultLayout={defaultLayout} portrait={shelfAlbums.length ? defaultLayout : empty} renderArtwork={album => <CollectionArtwork album={album} variant={theme.cardVariant} />} />
       </section>
 
-      {sheetOpen && (
-        <div className="collection-sheet-backdrop" role="presentation" onClick={() => setSheetOpen(false)}>
-          <section className="collection-sheet" role="dialog" aria-modal="true" aria-labelledby="collection-filter-title" onClick={(event) => event.stopPropagation()}>
-            <div className="collection-sheet__handle" />
-            <div className="collection-sheet__heading"><h2 id="collection-filter-title">筛选与排序</h2><button type="button" onClick={() => setSheetOpen(false)} aria-label="关闭"><X /></button></div>
-            <fieldset><legend>类型</legend><div className="collection-sheet__options">{genres.map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div></fieldset>
-            <fieldset><legend>排序</legend><div className="collection-sheet__sort">{([['recent', '最近收藏'], ['artist', '艺术家'], ['year', '发行年份']] as const).map(([value, label]) => <button key={value} type="button" className={sort === value ? 'is-selected' : ''} onClick={() => updateCollection(() => setSort(value))}><span>{label}</span><i /></button>)}</div></fieldset>
-            <button type="button" className="collection-sheet__done" onClick={() => setSheetOpen(false)}>完成</button>
-          </section>
-        </div>
-      )}
+      <CollectionActionMenu open={sheetOpen} onClose={() => setSheetOpen(false)} filters={filters} preference={themePreference} onAddVinyl={onAddVinyl}/>
     </main>
   );
 };

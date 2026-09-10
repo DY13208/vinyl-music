@@ -1,6 +1,7 @@
 import { WebAudioEngine } from './audio/WebAudioEngine';
 import { WebHapticsAdapter } from './haptics/WebHapticsAdapter';
 import { WebStorageAdapter } from './storage/WebStorageAdapter';
+import { WebViewportAdapter } from './viewport/WebViewportAdapter';
 
 const audio = new WebAudioEngine();
 
@@ -11,6 +12,7 @@ export const platformService = {
   isIOS: () => false,
   isAndroid: () => false,
   audio,
+  viewport: new WebViewportAdapter(),
   storage: new WebStorageAdapter(),
   haptics: new WebHapticsAdapter((style) => audio.playHapticSound(style)),
 } as const;

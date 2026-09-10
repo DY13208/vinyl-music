@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Album, Track } from '../types';
-import { TurntableScene } from '../components/TurntableScene';
+import { PlayerThemeRenderer } from '../features/player/themes/PlayerThemeRenderer';
+import { PlayerControls } from '../features/player/themes/shared/PlayerControls';
+import { PlayerProgress } from '../features/player/themes/shared/PlayerProgress';
+import { PlayerTrackInfo } from '../features/player/themes/shared/PlayerTrackInfo';
+import { PlayerThemeSelector } from '../features/player/themes/settings/PlayerThemeSelector';
+import { playerThemeRegistry } from '../features/player/themes/playerThemeRegistry';
+import type { PlayerThemePreference } from '../features/player/themes/usePlayerTheme';
+import type { RepeatMode } from '../features/player/themes/PlayerTheme';
 import './PlayerView.css';
 import { LyricsView } from '../components/LyricsView';
 import {
   ChevronDown,
+  Palette,
   Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Shuffle,
-  Repeat,
   Volume2,
   FileText,
   ListMusic,
@@ -19,12 +22,18 @@ import {
   Sparkles,
   Disc,
   Maximize2,
-  Upload,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
 
 interface PlayerViewProps {
+  themePreference: PlayerThemePreference;
+  favorite: boolean;
+  onToggleFavorite: () => void;
+  isShuffle: boolean;
+  onShuffleChange: (value: boolean) => void;
+  repeatMode: RepeatMode;
+  onRepeatChange: (value: RepeatMode) => void;
   album: Album;
   currentTrack: Track;
   isPlaying: boolean;
@@ -45,6 +54,7 @@ interface PlayerViewProps {
 }
 
 export const PlayerView: React.FC<PlayerViewProps> = ({
+  themePreference, favorite, onToggleFavorite, isShuffle, onShuffleChange, repeatMode, onRepeatChange,
   album,
   currentTrack,
   isPlaying,
@@ -66,22 +76,11 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
   const [isCrackleEnabled, setIsCrackleEnabled] = useState(true);
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('all');
-
-  const face = album.discs?.flatMap(disc => disc.sides).find(side => side.tracks.some(track => track.id === currentTrack.id));
-  const position = face ? `${face.side}${face.tracks.findIndex(track => track.id === currentTrack.id) + 1}` : undefined;
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
+  const themeDialog = useRef<HTMLDialogElement>(null);
   return (
     <div
       id="player-view-container"
-      className="full-player" translate="no"
+      className="full-player" translate="no" data-player-theme={themePreference.themeId} data-player-view={viewMode} style={playerThemeRegistry[themePreference.themeId].tokens}
     >
       {/* Top Bar - Minimalist Hardware Feel */}
       <header className="full-player__header">
@@ -125,6 +124,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </button>
         </div>
 
+        <div className="pt-header-actions">
+        <button type="button" className="full-player__quiet-button" title="播放器样式" aria-label="播放器样式" onClick={() => themeDialog.current?.showModal()}><Palette size={18}/></button>
         {/* Vinyl Surface Noise / Crackle Audio Switch */}
         <button
           id="player-crackle-toggle"
@@ -139,30 +140,13 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         >
           <Volume2 className="w-4 h-4" />
         </button>
+        </div>
       </header>
 
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
-        <TurntableScene album={album} side={face?.side} isPlaying={isPlaying} progressPercent={progressPercent}
-          onShowLyrics={() => { setViewMode('lyrics'); hapticsService.triggerHaptic('light'); }} />
-        <div className="full-player__info">
-          <h2 title={currentTrack.title}>{currentTrack.title}</h2>
-          <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
-          <small>{album.rpm}{face ? ` · Side ${face.side} · ${position}` : ''}</small>
-          {(playbackMessage || playbackSource) && (
-            <div className="full-player__source" aria-live="polite" aria-busy={isPreviewLoading}>
-              <span>{playbackMessage}</span>
-              {playbackSource?.metadata.storeUrl && (
-                <a href={playbackSource.metadata.storeUrl} target="_blank" rel="noreferrer">
-                  在 Apple Music 查看
-                </a>
-              )}
-              <button type="button" onClick={onImportLocalSource} disabled={isPreviewLoading}>
-                <Upload />{localImportPending ? '确认绑定本地音源' : '导入本地音源'}
-              </button>
-            </div>
-          )}
-        </div>
+        <PlayerThemeRenderer themeId={themePreference.themeId} album={album} currentTrack={currentTrack} queue={album.tracks} isPlaying={isPlaying} isPreviewLoading={isPreviewLoading} progressPercent={progressPercent} onSelectTrack={onSelectTrack} onTogglePlay={onTogglePlay} onShowLyrics={() => setViewMode('lyrics')} />
+        <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />
       </div>
       {viewMode === 'lyrics' && (
         /* Full Synchronized Lyrics Viewport (Folia Major / QQ Music inspired) */
@@ -206,96 +190,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
       <div className="full-player__controls">
-        <div className="full-player__progress">
-          <input id="player-progress-track" type="range" min="0" max="100" step="0.1" aria-label="播放进度"
-            value={Number.isFinite(progressPercent) ? Math.min(100, Math.max(0, progressPercent)) : 0}
-            style={{ '--played': `${Math.min(100, Math.max(0, progressPercent || 0))}%` } as React.CSSProperties}
-            onChange={event => onSeek(Number(event.target.value))} />
-          <div><span>{formatTime(currentTimeSec)}</span><span>-{formatTime(Math.max(0, durationSec - currentTimeSec))}</span></div>
-        </div>
-
-        {/* Transport Hardware Controls */}
-        <div className="full-player__transport">
-          {/* Shuffle */}
-          <button
-            id="player-btn-shuffle"
-            type="button"
-            onClick={() => {
-              setIsShuffle(!isShuffle);
-              hapticsService.triggerHaptic('light');
-            }}
-            className={`w-9 h-9 rounded-[6px] flex items-center justify-center transition-colors ${
-              isShuffle ? 'text-[#2FE92B]' : 'text-white/40 hover:text-white'
-            }`}
-            title="随机播放"
-          >
-            <Shuffle className="w-4 h-4" />
-          </button>
-
-          {/* Previous Track */}
-          <button
-            id="player-btn-prev"
-            type="button"
-            onClick={() => {
-              onPrevTrack();
-              hapticsService.triggerHaptic('light');
-            }}
-            className="w-10 h-10 rounded-[6px] text-white/80 hover:text-white flex items-center justify-center transition-colors active:scale-95"
-            title="上一首"
-          >
-            <SkipBack className="w-5 h-5 fill-current" />
-          </button>
-
-          {/* Center Play/Pause: Tactile hardware dial styling with subtle #2FE92B indicator */}
-          <button
-            id="player-btn-play-pause"
-            type="button"
-            onClick={() => {
-              onTogglePlay();
-              hapticsService.triggerHaptic('medium');
-            }}
-            className="full-player__play"
-            title={isPreviewLoading ? '正在加载试听' : isPlaying ? '暂停' : '播放'}
-            aria-label={isPreviewLoading ? '正在加载试听' : isPlaying ? '暂停' : '播放'}
-            disabled={isPreviewLoading}
-          >
-            {isPlaying ? (
-              <Pause className="w-5 h-5 fill-[#2FE92B] text-[#2FE92B]" />
-            ) : (
-              <Play className="w-5 h-5 fill-white text-white ml-0.5" />
-            )}
-          </button>
-
-          {/* Next Track */}
-          <button
-            id="player-btn-next"
-            type="button"
-            onClick={() => {
-              onNextTrack();
-              hapticsService.triggerHaptic('light');
-            }}
-            className="w-10 h-10 rounded-[6px] text-white/80 hover:text-white flex items-center justify-center transition-colors active:scale-95"
-            title="下一首"
-          >
-            <SkipForward className="w-5 h-5 fill-current" />
-          </button>
-
-          {/* Repeat */}
-          <button
-            id="player-btn-repeat"
-            type="button"
-            onClick={() => {
-              setRepeatMode(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off');
-              hapticsService.triggerHaptic('light');
-            }}
-            className={`w-9 h-9 rounded-[6px] flex items-center justify-center transition-colors ${
-              repeatMode !== 'off' ? 'text-[#2FE92B]' : 'text-white/40 hover:text-white'
-            }`}
-            title="循环模式"
-          >
-            <Repeat className="w-4 h-4" />
-          </button>
-        </div>
+        <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} />
+        <PlayerControls isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
 
         {/* Bottom 4 Utility Tools */}
         <div className="full-player__utilities">
@@ -355,6 +251,11 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </button>
         </div>
       </div>
+
+      <dialog ref={themeDialog} className="pt-theme-dialog" aria-label="播放器样式">
+        <header><h2>播放器样式</h2><button type="button" onClick={() => themeDialog.current?.close()}>完成</button></header>
+        <PlayerThemeSelector preference={themePreference}/>
+      </dialog>
 
       {/* Modal Drawers */}
       {activeBottomModal !== 'none' && (

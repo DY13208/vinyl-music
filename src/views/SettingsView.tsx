@@ -1,12 +1,25 @@
 import React, { useState } from 'react';
 import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
+import { CollectionThemePicker } from '../features/collection/themes/CollectionThemePicker';
+import { CollectionThemeState } from '../features/collection/themes/useCollectionTheme';
+import { PlayerThemeSelector } from '../features/player/themes/settings/PlayerThemeSelector';
+import type { PlayerThemePreference } from '../features/player/themes/usePlayerTheme';
+import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
 
 interface SettingsViewProps {
   onBack: () => void;
+  floatingPlayerVisible: boolean;
+  onFloatingPlayerVisibleChange: (visible: boolean) => void;
+  preferenceMessage: string;
+  collectionTheme: CollectionThemeState;
+  playerTheme: PlayerThemePreference;
+  homeTheme: HomeTheme;
+  onSelectHomeTheme: (theme: HomeTheme) => void;
+  homeThemeMessage: string;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlayerVisible, onFloatingPlayerVisibleChange, preferenceMessage, collectionTheme, playerTheme, homeTheme, onSelectHomeTheme, homeThemeMessage }) => {
   const [crossfade, setCrossfade] = useState(true);
   const [hapticFeedback, setHapticFeedback] = useState(true);
   const [notifications, setNotifications] = useState(false);
@@ -38,6 +51,28 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack }) => {
       </header>
 
       <div className="px-4 py-4 space-y-5">
+        <section className="rounded-[6px] bg-[#0F0F0F] border border-[#26272D] p-3.5">
+          <div className="flex items-center justify-between gap-4">
+            <div><h2 id="floating-player-setting" className="text-[13.5px] font-medium">显示悬浮播放器</h2><p id="floating-player-setting-help" className="text-[12px] text-[#BBCBB2] mt-1">隐藏悬浮球后，音乐继续播放</p></div>
+            <button type="button" role="switch" aria-checked={floatingPlayerVisible} aria-labelledby="floating-player-setting" aria-describedby="floating-player-setting-help" onClick={() => onFloatingPlayerVisibleChange(!floatingPlayerVisible)} className="w-14 h-11 flex-shrink-0 flex items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-[#2FE92B]">
+              <span className={`block w-11 h-6 rounded-full p-0.5 ${floatingPlayerVisible ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'}`}><span className={`block w-5 h-5 rounded-full bg-[#0F0F0F] ${floatingPlayerVisible ? 'translate-x-5' : 'translate-x-0'}`} /></span>
+            </button>
+          </div>
+          {preferenceMessage && <p role="status" className="mt-2 text-[12px] text-[#BBCBB2]">{preferenceMessage}</p>}
+        </section>
+        <section aria-label="外观" className="space-y-3">
+          <h2 className="text-[16px] font-medium">外观</h2>
+          <details className="pt-settings-section">
+            <summary>首页样式</summary>
+            <div className="grid grid-cols-2 gap-2">{HOME_THEMES.map(item => <button key={item.id} type="button" aria-pressed={homeTheme === item.id} onClick={() => onSelectHomeTheme(item.id)} className={`min-h-12 rounded border p-3 text-left text-sm ${homeTheme === item.id ? 'border-[#a9d69a] text-[#a9d69a]' : 'border-[#343d34]'}`}>{item.name}</button>)}</div>
+            {homeThemeMessage && <p role="status">{homeThemeMessage}</p>}
+          </details>
+          <CollectionThemePicker preference={collectionTheme} />
+          <details className="pt-settings-section">
+            <summary>播放器样式</summary>
+            <PlayerThemeSelector preference={playerTheme}/>
+          </details>
+        </section>
         {/* Section 1: 账号与安全 */}
         <section className="space-y-1">
           <span className="text-[11px] font-bold text-white/40 tracking-wider uppercase px-1 font-mono">

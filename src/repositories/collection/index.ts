@@ -1,6 +1,6 @@
 import { ALBUMS } from '../../data/mockData';
 import { storageService } from '../../platform/platformService';
-import { WebCollectionRepository } from './WebCollectionRepository';
-
-export const collectionRepository = new WebCollectionRepository(storageService, ALBUMS);
+import { IndexedDBCollectionRepository } from './IndexedDBCollectionRepository';
+export const collectionRepository = new IndexedDBCollectionRepository(storageService, ALBUMS);
+export { WebCollectionRepository } from './WebCollectionRepository';
 export type { CollectionRepository } from './CollectionRepository';

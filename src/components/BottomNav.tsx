@@ -1,92 +1,30 @@
 import React from 'react';
+import { Compass, Heart, House, UserRound, type LucideIcon } from 'lucide-react';
 import { MainTab } from '../types';
-import { Home, Heart, Compass, User } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
+import './BottomNav.css';
 
 interface BottomNavProps {
   activeTab: MainTab;
   onChangeTab: (tab: MainTab) => void;
 }
 
-export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) => {
-  const tabs: { id: MainTab; label: string; icon: (isActive: boolean) => React.ReactNode }[] = [
-    {
-      id: 'home',
-      label: '首页',
-      icon: (isActive) => (
-        <Home
-          className={`w-5 h-5 transition-colors ${
-            isActive ? 'text-[#2FE92B]' : 'text-[#6B6B78]'
-          }`}
-        />
-      ),
-    },
-    {
-      id: 'collection',
-      label: '收藏',
-      icon: (isActive) => (
-        <Heart
-          className={`w-5 h-5 transition-colors ${
-            isActive ? 'fill-[#2FE92B] text-[#2FE92B]' : 'text-[#6B6B78]'
-          }`}
-        />
-      ),
-    },
-    {
-      id: 'discover',
-      label: '发现',
-      icon: (isActive) => (
-        <Compass
-          className={`w-5 h-5 transition-colors ${
-            isActive ? 'text-[#2FE92B]' : 'text-[#6B6B78]'
-          }`}
-        />
-      ),
-    },
-    {
-      id: 'profile',
-      label: '我的',
-      icon: (isActive) => (
-        <User
-          className={`w-5 h-5 transition-colors ${
-            isActive ? 'text-[#2FE92B]' : 'text-[#6B6B78]'
-          }`}
-        />
-      ),
-    },
-  ];
+const tabs: { id: MainTab; label: string; icon: LucideIcon }[] = [
+  { id: 'home', label: '首页', icon: House },
+  { id: 'collection', label: '收藏', icon: Heart },
+  { id: 'discover', label: '发现', icon: Compass },
+  { id: 'profile', label: '我的', icon: UserRound },
+];
 
-  return (
-    <nav
-      id="bottom-navigation-bar"
-      className="w-full h-[58px] bg-[#000000] border-t border-[#26272D] px-4 flex items-center justify-around select-none z-30 flex-shrink-0"
-    >
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        const color = isActive ? '#2FE92B' : '#6B6B78';
-
-        return (
-          <button
-            key={tab.id}
-            id={`nav-tab-${tab.id}`}
-            type="button"
-            onClick={() => {
-              onChangeTab(tab.id);
-              hapticsService.triggerHaptic('light');
-            }}
-            className="flex-1 flex flex-col items-center justify-center py-1 transition-colors"
-            style={{ color }}
-          >
-            {tab.icon(isActive)}
-            <span
-              className="text-[11px] mt-1 font-medium tracking-tight transition-colors"
-              style={{ color }}
-            >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
-    </nav>
-  );
-};
+export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) => (
+  <nav id="bottom-navigation-bar" className="bottom-nav" aria-label="主要导航">
+    {tabs.map(tab => {
+      const active = activeTab === tab.id;
+      const Icon = tab.icon;
+      return <button key={tab.id} id={`nav-tab-${tab.id}`} type="button" className="bottom-nav__item" aria-current={active ? 'page' : undefined} onClick={() => { onChangeTab(tab.id); hapticsService.triggerHaptic('light'); }}>
+        <span className="bottom-nav__icon" aria-hidden="true"><Icon size={21} strokeWidth={1.8} /></span>
+        <span className="bottom-nav__label">{tab.label}</span>
+      </button>;
+    })}
+  </nav>
+);

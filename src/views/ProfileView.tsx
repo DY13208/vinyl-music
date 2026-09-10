@@ -12,8 +12,11 @@ import {
   ShieldCheck,
   LayoutTemplate,
   RotateCw,
+  Palette,
+  Check,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
+import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
 
 interface ProfileViewProps {
   onOpenSettings: () => void;
@@ -21,6 +24,9 @@ interface ProfileViewProps {
   onOpenCollection: () => void;
   onOpenDesignBoard?: () => void;
   onOpenLandscape?: () => void;
+  homeTheme: HomeTheme;
+  onSelectHomeTheme: (theme: HomeTheme) => void;
+  themeMessage: string;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -29,6 +35,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onOpenCollection,
   onOpenDesignBoard,
   onOpenLandscape,
+  homeTheme,
+  onSelectHomeTheme,
+  themeMessage,
 }) => {
   const menuItems = [
     {
@@ -188,6 +197,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
         ))}
       </div>
+
+      <section className="px-4 mt-5" aria-labelledby="home-theme-heading">
+        <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">
+          <div className="flex items-center gap-2 mb-3">
+            <Palette className="w-4 h-4 text-[#2FE92B]" />
+            <h3 id="home-theme-heading" className="text-[13.5px] font-medium text-white">首页陈列样式</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {HOME_THEMES.map(item => <button key={item.id} type="button" aria-pressed={homeTheme === item.id} onClick={() => onSelectHomeTheme(item.id)} className={`min-h-11 px-3 rounded-[6px] border flex items-center justify-between text-left transition-colors ${homeTheme === item.id ? 'border-[#2FE92B] bg-[#162316] text-white' : 'border-[#26272D] bg-[#1B1B1D] text-white/60'}`}>
+              <span><strong className="block text-[12px] font-medium">{item.name}</strong><small className="block text-[9px] mt-0.5 opacity-60">{item.detail.split(' · ')[0]}</small></span>
+              {homeTheme === item.id && <Check className="w-3.5 h-3.5 text-[#2FE92B]" />}
+            </button>)}
+          </div>
+          {themeMessage && <p className="text-[10px] text-[#FF9821] mt-2" role="status">{themeMessage}</p>}
+        </div>
+      </section>
 
       {/* Equipment Badge */}
       <div className="px-4 mt-5">
