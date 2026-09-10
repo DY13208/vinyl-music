@@ -7,6 +7,7 @@ interface VinylDiscProps {
   artistName?: string;
   isPlaying?: boolean;
   size?: number | string;
+  rpm?: string;
   showAmbientGlow?: boolean;
   className?: string;
   useTextureAsset?: boolean;
@@ -21,6 +22,7 @@ export const VinylDisc: React.FC<VinylDiscProps> = ({
   artistName,
   isPlaying = false,
   size = 256,
+  rpm = '33 ⅓ RPM',
   showAmbientGlow = false,
   className = '',
   useTextureAsset = false,
@@ -82,7 +84,7 @@ export const VinylDisc: React.FC<VinylDiscProps> = ({
           {/* Printed Label Information Overlay */}
           <div className={`relative z-10 w-full h-full rounded-full flex flex-col items-center justify-between p-2 pointer-events-none text-center ${useTextureAsset ? 'vinyl-label--minimal' : ''}`}>
             {/* Top Arc Micro Label: RPM / Stereo */}
-            {!useTextureAsset && <span className="text-[6.5px] font-mono tracking-widest text-[#BBCBB2] uppercase scale-90 pt-0.5">33 ⅓ RPM · STEREO</span>}
+            {!useTextureAsset && <span className="text-[6.5px] font-mono tracking-widest text-[#BBCBB2] uppercase scale-90 pt-0.5">{rpm} · STEREO</span>}
 
             {/* Center Spindle Hole Structure */}
             <div className="relative flex items-center justify-center">
