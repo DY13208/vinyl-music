@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Album, Track } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { Album, Track, VinylSide } from '../types';
 import { PlayerThemeRenderer } from '../features/player/themes/PlayerThemeRenderer';
 import { PlayerControls } from '../features/player/themes/shared/PlayerControls';
 import { PlayerProgress } from '../features/player/themes/shared/PlayerProgress';
@@ -11,6 +11,8 @@ import type { RepeatMode } from '../features/player/themes/PlayerTheme';
 import './PlayerView.css';
 import '../features/player/themes/themes/crescent/crescentPlayer.css';
 import { LyricsView } from '../components/LyricsView';
+import { SideFlipAnimation } from '../components/SideFlipAnimation';
+import { usePlayerSideState } from '../hooks/usePlayerSideState';
 import {
   ChevronDown,
   Heart,
@@ -27,6 +29,8 @@ import {
   MoreHorizontal,
   Shuffle,
   Repeat,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
@@ -82,6 +86,113 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
   const [isCrackleEnabled, setIsCrackleEnabled] = useState(true);
   const themeDialog = useRef<HTMLDialogElement>(null);
+  
+  // 翻面状态管理
+  const sideState = usePlayerSideState(album);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(0);
+
+  // 获取当前面信息
+  const currentVinylSide = sideState.getCurrentVinylSide();
+  const availableSides = sideState.getAvailableSides();
+
+  /**
+   * 处理翻面动画
+   */
+  const handleFlipSide = (disc: number, side: string) => {
+    if (sideState.currentSide === side && sideState.currentDisc === disc) return;
+    
+    setIsFlipping(true);
+    hapticsService.triggerHaptic('medium');
+    
+    setTimeout(() => {
+      sideState.switchToSide(disc, side);
+      setIsFlipping(false);
+    }, 200); // 动画时长
+  };
+
+  /**
+   * 翻到下一面
+   */
+  const handleNextSide = () => {
+    setIsFlipping(true);
+    hapticsService.triggerHaptic('medium');
+    
+    setTimeout(() => {
+      sideState.nextSide();
+      setIsFlipping(false);
+    }, 200);
+  };
+
+  /**
+   * 翻到上一面
+   */
+  const handlePrevSide = () => {
+    setIsFlipping(true);
+    hapticsService.triggerHaptic('medium');
+    
+    setTimeout(() => {
+      sideState.prevSide();
+      setIsFlipping(false);
+    }, 200);
+  };
+
+  /**
+   * 处理唱片滑动翻面
+   */
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+
+    // 向左滑动 > 30px 翻到下一面，向右滑动 > 30px 翻到上一面
+    if (Math.abs(diff) > 30) {
+      if (diff > 0) {
+        handleNextSide();
+      } else {
+        handlePrevSide();
+      }
+    }
+  };
+
+  /**
+   * 获取标签信息（支持图片或文字）
+   */
+  const getLabelContent = () => {
+    if (!currentVinylSide) return null;
+
+    if (currentVinylSide.labelImage) {
+      return (
+        <img
+          src={currentVinylSide.labelImage}
+          alt={`Side ${currentVinylSide.side}`}
+          className="w-full h-full object-cover rounded-full"
+        />
+      );
+    }
+
+    // 降级到文字标签
+    const bgColor = currentVinylSide.labelColor || '#d8c9a7';
+    return (
+      <div
+        className="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-2xl"
+        style={{ backgroundColor: bgColor }}
+      >
+        {currentVinylSide.side}
+      </div>
+    );
+  };
+
+  /**
+   * 获取当前面的曲目
+   */
+  const getCurrentSideTracks = (): Track[] => {
+    return currentVinylSide?.tracks || [];
+  };
+
   return (
     <div
       id="player-view-container"
@@ -102,7 +213,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         {themePreference.themeId === 'crescent' ? <div className="crescent-header-track">
           <div className="crescent-header-track__title">
             <h2 title={currentTrack.title}>{currentTrack.title}</h2>
-            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
+            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} /></button>
           </div>
           <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
         </div> : <div className="full-player__brand" aria-hidden="true">
@@ -142,29 +253,119 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
         <div className="pt-header-actions">
         <button type="button" className="full-player__quiet-button" title="播放器样式" aria-label="播放器样式" onClick={() => themeDialog.current?.showModal()}><Palette size={18}/></button>
-        {/* Vinyl Surface Noise / Crackle Audio Switch */}
-        <button
-          id="player-crackle-toggle"
-          type="button"
-          onClick={() => {
-            setIsCrackleEnabled(!isCrackleEnabled);
-            hapticsService.triggerHaptic('light');
-          }}
-          className="full-player__quiet-button"
-          aria-pressed={isCrackleEnabled}
-          title="实体唱针底噪模拟"
-        >
-          <Volume2 className="w-4 h-4" />
-        </button>
+         {/* Vinyl Surface Noise / Crackle Audio Switch */}
+         <button
+           id="player-crackle-toggle"
+           type="button"
+           onClick={() => {
+             setIsCrackleEnabled(!isCrackleEnabled);
+             hapticsService.triggerHaptic('light');
+           }}
+           className="full-player__quiet-button"
+           aria-pressed={isCrackleEnabled}
+           title="实体唱针底噪模拟"
+         >
+           <Volume2 className="w-4 h-4" />
+         </button>
         </div>
-        <button type="button" className="full-player__more-button" aria-label="更多播放操作" aria-expanded={activeBottomModal !== 'none'} onClick={() => setActiveBottomModal(activeBottomModal === 'none' ? 'more' : 'none')}><MoreHorizontal size={21}/></button>
+        <button type="button" className="full-player__more-button" aria-label="更多播放操作" aria-expanded={activeBottomModal !== 'none'} onClick={() => setActiveBottomModal(activeBottomModal === 'more' ? 'none' : 'more')}><MoreHorizontal size={18}/></button>
       </header>
 
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
-        <PlayerThemeRenderer themeId={themePreference.themeId} album={album} currentTrack={currentTrack} queue={album.tracks} isPlaying={isPlaying} isPreviewLoading={isPreviewLoading} progressPercent={progressPercent} onSelectTrack={onSelectTrack} onTogglePlay={onTogglePlay} onShowLyrics={() => setViewMode('lyrics')} />
-        {themePreference.themeId !== 'crescent' && <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />}
+        {/* 翻面控制区 - 仅在有多面时显示 */}
+        {availableSides.length > 1 && (
+          <div className="flex items-center justify-between px-4 py-2 bg-black/20">
+            <button
+              type="button"
+              onClick={handlePrevSide}
+              disabled={isFlipping}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] text-white/70 hover:text-white disabled:opacity-50 transition-colors"
+              title="翻到上一面"
+            >
+              <ChevronLeft className="w-3 h-3" />
+              <span>上一面</span>
+            </button>
+
+            {/* 当前面状态指示 */}
+            <div className="flex items-center gap-2">
+              {sideState.getDiscs().map((disc) => (
+                <div key={disc.disc} className="flex items-center gap-1">
+                  {disc.sides.map((side) => (
+                    <button
+                      key={side.side}
+                      type="button"
+                      onClick={() => handleFlipSide(disc.disc, side.side)}
+                      disabled={isFlipping}
+                      className={`px-2 py-0.5 rounded-[3px] text-[10px] font-bold transition-all ${
+                        sideState.currentSide === side.side && sideState.currentDisc === disc.disc
+                          ? 'bg-[#2FE92B] text-black'
+                          : 'bg-[#1a1a1f] text-white/60 hover:text-white'
+                      }`}
+                      title={`切换到 Disc ${disc.disc} Side ${side.side}`}
+                    >
+                      {disc.discs && disc.discs.length > 1 ? `${disc.disc}${side.side}` : side.side}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNextSide}
+              disabled={isFlipping}
+              className="flex items-center gap-1 px-2 py-1 text-[11px] text-white/70 hover:text-white disabled:opacity-50 transition-colors"
+              title="翻到下一面"
+            >
+              <span>下一面</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        {/* 唱片容器 - 支持滑动翻面 */}
+        <div
+          className="flex-1 flex items-center justify-center touch-none"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* 唱片渲染区 - 集成翻面动画 */}
+          <SideFlipAnimation
+            isFlipping={isFlipping}
+            duration={200}
+            respectMotionPreference
+            className="w-full h-full flex items-center justify-center"
+            exitContent={
+              <PlayerThemeRenderer
+                themeId={themePreference.themeId}
+                album={album}
+                currentTrack={currentTrack}
+                queue={getCurrentSideTracks()}
+                isPlaying={isPlaying}
+                isPreviewLoading={isPreviewLoading}
+                progressPercent={progressPercent}
+              />
+            }
+            enterContent={
+              <PlayerThemeRenderer
+                themeId={themePreference.themeId}
+                album={album}
+                currentTrack={currentTrack}
+                queue={getCurrentSideTracks()}
+                isPlaying={isPlaying}
+                isPreviewLoading={isPreviewLoading}
+                progressPercent={progressPercent}
+              />
+            }
+          />
+        </div>
+
+        {themePreference.themeId !== 'crescent' && (
+          <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} />
+        )}
       </div>
+
       {viewMode === 'lyrics' && (
         /* Full Synchronized Lyrics Viewport (Folia Major / QQ Music inspired) */
         <div className="relative flex-1 flex flex-col w-full h-full min-h-0 overflow-hidden z-20 animate-in fade-in duration-200">
@@ -208,7 +409,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
       <div className="full-player__controls">
         <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} animated={themePreference.themeId === 'crescent'} />
-        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
+        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} onShuffleChange={onShuffleChange} repeat={repeatMode} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />
 
         {/* Bottom 4 Utility Tools */}
         <div className="full-player__utilities">
@@ -284,7 +485,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             <span className="text-[13px] font-bold text-white flex items-center gap-2">
               {activeBottomModal === 'more' && '更多播放操作'}
               {activeBottomModal === 'lyrics' && '全量同步歌词 · Folia Major'}
-              {activeBottomModal === 'queue' && `曲目清单 · ${album.title}`}
+              {activeBottomModal === 'queue' && `曲目清单 · ${album.title} (${currentVinylSide?.side || 'N/A'})`}
               {activeBottomModal === 'output' && '输出硬件'}
               {activeBottomModal === 'quality' && '黑胶声学与均衡'}
             </span>
@@ -326,7 +527,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 </div>
                 <div className="player-more__actions">
                   <button type="button" aria-pressed={isShuffle} onClick={() => onShuffleChange(!isShuffle)}><Shuffle/><span>随机播放</span></button>
-                  <button type="button" aria-pressed={repeatMode !== 'off'} onClick={() => onRepeatChange(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}><Repeat/><span>{repeatMode === 'one' ? '单曲循环' : repeatMode === 'all' ? '列表循环' : '循环关闭'}</span></button>
+                  <button type="button" aria-pressed={repeatMode !== 'off'} onClick={() => onRepeatChange(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}><Repeat/><span>{repeatMode === 'off' ? '全曲循环' : repeatMode === 'all' ? '单曲循环' : '关闭循环'}</span></button>
                   <button type="button" onClick={() => { setViewMode('lyrics'); setActiveBottomModal('none'); }}><FileText/><span>歌词</span></button>
                   <button type="button" onClick={() => setActiveBottomModal('queue')}><ListMusic/><span>曲目</span></button>
                   <button type="button" onClick={() => setActiveBottomModal('output')}><Speaker/><span>唱放</span></button>
@@ -349,36 +550,41 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
             {activeBottomModal === 'queue' && (
               <div className="space-y-1">
-                {album.tracks.map((track) => {
-                  const isCurrent = track.id === currentTrack.id;
-                  return (
-                    <div
-                      key={track.id}
-                      onClick={() => {
-                        onSelectTrack(track);
-                        setActiveBottomModal('none');
-                        hapticsService.triggerHaptic('light');
-                      }}
-                      className={`flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
-                        isCurrent
-                          ? 'bg-[#16161C] text-[#2FE92B]'
-                          : 'hover:bg-[#141418] text-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-[11px] font-mono opacity-50 w-4">
-                          {track.number}
-                        </span>
-                        <span className="text-[13px] font-medium truncate">
-                          {track.title}
+                {/* 显示当前面的曲目 */}
+                {getCurrentSideTracks().length > 0 ? (
+                  getCurrentSideTracks().map((track) => {
+                    const isCurrent = track.id === currentTrack.id;
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => {
+                          onSelectTrack(track);
+                          setActiveBottomModal('none');
+                          hapticsService.triggerHaptic('light');
+                        }}
+                        className={`flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
+                          isCurrent
+                            ? 'bg-[#16161C] text-[#2FE92B]'
+                            : 'hover:bg-[#141418] text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-[11px] font-mono opacity-50 w-6">
+                            {currentVinylSide?.side}{track.number}
+                          </span>
+                          <span className="text-[13px] font-medium truncate">
+                            {track.title}
+                          </span>
+                        </div>
+                        <span className="text-[11px] font-mono text-white/40">
+                          {track.duration}
                         </span>
                       </div>
-                      <span className="text-[11px] font-mono text-white/40">
-                        {track.duration}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                ) : (
+                  <p className="text-[12px] text-white/50 py-4 text-center">无此面曲目信息</p>
+                )}
               </div>
             )}
 
