@@ -190,7 +190,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
    * 获取当前面的曲目
    */
   const getCurrentSideTracks = (): Track[] => {
-    return currentVinylSide?.tracks || [];
+    return currentVinylSide?.tracks ?? album.tracks;
   };
 
   return (
@@ -210,13 +210,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           <ChevronDown className="w-5 h-5" />
         </button>
 
-        {themePreference.themeId === 'crescent' ? <div className="crescent-header-track">
-          <div className="crescent-header-track__title">
-            <h2 title={currentTrack.title}>{currentTrack.title}</h2>
-            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} /></button>
-          </div>
-          <p title={`${album.artist} · ${album.title}`}>{album.artist} · {album.title}</p>
-        </div> : <div className="full-player__brand" aria-hidden="true">
+        {themePreference.themeId === 'crescent' ? <span className="crescent-header-spacer" aria-hidden="true" /> : <div className="full-player__brand" aria-hidden="true">
           <strong>ORBIT</strong>
           <span>轻触封面播放</span>
         </div>}
@@ -304,7 +298,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                       }`}
                       title={`切换到 Disc ${disc.disc} Side ${side.side}`}
                     >
-                      {disc.discs && disc.discs.length > 1 ? `${disc.disc}${side.side}` : side.side}
+                      {sideState.getDiscs().length > 1 ? `${disc.disc}${side.side}` : side.side}
                     </button>
                   ))}
                 </div>
@@ -335,7 +329,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             isFlipping={isFlipping}
             duration={200}
             respectMotionPreference
-            className="w-full h-full flex items-center justify-center"
+            className="player-stage-shell w-full h-full flex items-center justify-center"
             exitContent={
               <PlayerThemeRenderer
                 themeId={themePreference.themeId}
@@ -345,6 +339,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 isPlaying={isPlaying}
                 isPreviewLoading={isPreviewLoading}
                 progressPercent={progressPercent}
+                onSelectTrack={onSelectTrack}
+                onTogglePlay={onTogglePlay}
+                onShowLyrics={() => setViewMode('lyrics')}
               />
             }
             enterContent={
@@ -356,13 +353,16 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 isPlaying={isPlaying}
                 isPreviewLoading={isPreviewLoading}
                 progressPercent={progressPercent}
+                onSelectTrack={onSelectTrack}
+                onTogglePlay={onTogglePlay}
+                onShowLyrics={() => setViewMode('lyrics')}
               />
             }
           />
         </div>
 
         {themePreference.themeId !== 'crescent' && (
-          <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} />
+          <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />
         )}
       </div>
 
@@ -408,8 +408,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
       <div className="full-player__controls">
+        {themePreference.themeId === 'crescent' && <div className="crescent-controls__track" aria-label="当前播放">
+          <div className="crescent-controls__track-title">
+            <strong title={currentTrack.title}>{currentTrack.title}</strong>
+          </div>
+          <div className="crescent-controls__track-meta">
+            <span title={`${album.artist} · ${album.title}`}>{album.artist}</span>
+            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
+          </div>
+        </div>}
+        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />
         <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} animated={themePreference.themeId === 'crescent'} />
-        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} onShuffleChange={onShuffleChange} repeat={repeatMode} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />
 
         {/* Bottom 4 Utility Tools */}
         <div className="full-player__utilities">

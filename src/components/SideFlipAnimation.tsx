@@ -80,6 +80,7 @@ export const SideFlipAnimation: React.FC<SideFlipAnimationProps> = ({
         {!isFlipping ? (
           <motion.div
             key="exit-side"
+            className="player-stage-motion w-full h-full"
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.92 }}
@@ -90,6 +91,7 @@ export const SideFlipAnimation: React.FC<SideFlipAnimationProps> = ({
         ) : (
           <motion.div
             key="enter-side"
+            className="player-stage-motion w-full h-full"
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: animationDuration }}

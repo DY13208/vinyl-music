@@ -28,6 +28,42 @@ export async function removeAlbumFromServer(albumId: string) {
   await readJson(await fetch(`/api/collection/${encodeURIComponent(albumId)}`, { method: 'DELETE' }));
 }
 
-export async function lookupVinylBarcode(barcode: string) {
-  return readJson<Album>(await fetch(`/api/releases/barcode/${encodeURIComponent(barcode)}`));
+export interface BarcodeLookupResult {
+  barcode: string;
+  source: 'local' | 'apple-music' | 'netease-music' | 'kugou-music' | 'tencent-music' | 'migu-music' | 'discogs' | 'musicbrainz' | 'deezer';
+  matches: Album[];
+  album?: Album;
+  vinylRelease?: Album | null;
+  vinylReleaseFound?: boolean;
+  matchConfidence?: number;
+  message?: string;
+}
+
+export interface VinylSearchResponse extends BarcodeLookupResult {
+  query: { query: string; barcode?: string; catalogNumber?: string; artist?: string; album?: string; year?: number };
+  results: Array<{
+    album: Album;
+    vinylRelease: Album | null;
+    vinylReleaseFound: boolean;
+    matchConfidence: number;
+    sources: BarcodeLookupResult['source'][];
+    sourceIds: Partial<Record<BarcodeLookupResult['source'], string[]>>;
+    message?: string;
+    alternatives: Album[];
+  }>;
+  providers: Array<{ provider: string; available: boolean; attempted: boolean; hitCount: number; durationMs: number; httpStatus?: number; errorCode?: string; error?: string }>;
+  cached: boolean;
+}
+
+export async function lookupVinylBarcode(barcode: string): Promise<BarcodeLookupResult> {
+  const normalized = barcode.trim().replace(/[\s-]+/g, '');
+  return readJson<BarcodeLookupResult>(await fetch(`/api/releases/barcode/${encodeURIComponent(normalized)}`));
+}
+
+export async function searchVinyl(query: { query?: string; barcode?: string; catalogNumber?: string; artist?: string; album?: string; year?: number }): Promise<VinylSearchResponse> {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') params.set(key, String(value));
+  }
+  return readJson<VinylSearchResponse>(await fetch(`/api/releases/search?${params.toString()}`));
 }
