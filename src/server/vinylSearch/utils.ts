@@ -48,7 +48,15 @@ export function providerAlbumToAlbum(candidate: ProviderAlbum): Album {
   return {
     id: `${candidate.provider}-${candidate.providerId}`,
     title: candidate.title || 'Unnamed album', artist: candidate.artist || 'Unknown artist', artistId: `${candidate.provider}-artist-${normalizeText(candidate.artist) || candidate.providerId}`,
-    year: candidateYear || (releaseYear >= 1900 && releaseYear <= 2100 ? releaseYear : new Date().getFullYear()), genre: candidate.genres?.join(' / ') || 'Other', coverUrl: candidate.coverUrl || '', label: candidate.label || 'Unknown label', rpm: candidate.rpm || '33⅓ RPM', weight: 'Standard', edition: candidate.edition || candidate.formats?.join(' / ') || 'Physical release', matrixCode: candidate.matrixCode || '', trackCount: tracks.length, totalDuration: duration(totalSeconds * 1000), description: `Metadata supplied by ${providerName}. Verify the exact pressing before saving.`, color: '#131316', tracks, discs: candidate.discs ?? [], isCollected: true, condition: 'Near Mint (NM)', vinylType: 'black', vinylVariant: 'black', vinylTexture: 'black', vinylColor: '#171719', vinylColors: ['#171719'], addedAt: new Date().toISOString().slice(0, 10), barcode: candidate.barcode, catalogNumber: candidate.catalogNumber, country: candidate.country, collectionTags: [],
+    year: candidateYear || (releaseYear >= 1900 && releaseYear <= 2100 ? releaseYear : 0),
+    genre: candidate.genres?.join(' / ') || '其他', coverUrl: candidate.coverUrl || '', label: candidate.label || '未知厂牌',
+    rpm: candidate.rpm || '待确认', weight: '待确认',
+    edition: candidate.isVinylRelease ? (candidate.edition || candidate.formats?.join(' / ') || '发行版本待确认') : '未确认黑胶发行版本',
+    matrixCode: candidate.matrixCode || '', trackCount: tracks.length, totalDuration: duration(totalSeconds * 1000),
+    description: `Metadata supplied by ${providerName}. Verify the exact pressing before saving.`,
+    color: '#131316', tracks, discs: candidate.discs ?? [], isCollected: true, condition: '',
+    vinylType: 'black', vinylVariant: 'black', vinylTexture: 'black', vinylColor: '#171719', vinylColors: ['#171719'],
+    addedAt: new Date().toISOString().slice(0, 10), barcode: candidate.barcode, catalogNumber: candidate.catalogNumber, country: candidate.country, collectionTags: [],
   };
 }
 

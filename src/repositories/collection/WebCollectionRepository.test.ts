@@ -12,6 +12,13 @@ class MemoryStorage implements StorageService {
 }
 const album = (id: string, title = id) => ({ id, title, artist: 'Artist', tracks: [] }) as Album;
 
+test('deleting the final album does not restore defaults on refresh', () => {
+  const storage = new MemoryStorage();
+  const repository = new WebCollectionRepository(storage, [album('default')]);
+  repository.deleteAlbum('default');
+  assert.deepEqual(new WebCollectionRepository(storage, [album('default')]).getAlbums(), []);
+});
+
 test('reads the existing localStorage-compatible collection key without migration', () => {
   const storage = new MemoryStorage();
   storage.setItem('vinyl_user_collection', JSON.stringify([album('existing')]));

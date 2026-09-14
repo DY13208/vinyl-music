@@ -29,8 +29,6 @@ import {
   MoreHorizontal,
   Shuffle,
   Repeat,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
@@ -269,52 +267,27 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
         {/* 翻面控制区 - 仅在有多面时显示 */}
         {availableSides.length > 1 && (
-          <div className="flex items-center justify-between px-4 py-2 bg-black/20">
-            <button
-              type="button"
-              onClick={handlePrevSide}
-              disabled={isFlipping}
-              className="flex items-center gap-1 px-2 py-1 text-[11px] text-white/70 hover:text-white disabled:opacity-50 transition-colors"
-              title="翻到上一面"
-            >
-              <ChevronLeft className="w-3 h-3" />
-              <span>上一面</span>
-            </button>
-
+          <div className="player-side-controls">
             {/* 当前面状态指示 */}
-            <div className="flex items-center gap-2">
-              {sideState.getDiscs().map((disc) => (
-                <div key={disc.disc} className="flex items-center gap-1">
-                  {disc.sides.map((side) => (
+            <div className="player-side-pill" role="group" aria-label="选择唱片面">
+              {availableSides.slice(0, 2).map((side, index) => (
                     <button
                       key={side.side}
                       type="button"
-                      onClick={() => handleFlipSide(disc.disc, side.side)}
+                      onClick={() => handleFlipSide(sideState.currentDisc, side.side)}
                       disabled={isFlipping}
-                      className={`px-2 py-0.5 rounded-[3px] text-[10px] font-bold transition-all ${
-                        sideState.currentSide === side.side && sideState.currentDisc === disc.disc
-                          ? 'bg-[#2FE92B] text-black'
-                          : 'bg-[#1a1a1f] text-white/60 hover:text-white'
+                      className={`player-side-pill__option ${
+                        sideState.currentSide === side.side
+                          ? 'is-active'
+                          : ''
                       }`}
-                      title={`切换到 Disc ${disc.disc} Side ${side.side}`}
+                      title={`切换到 ${index === 0 ? 'A' : 'B'} 面`}
                     >
-                      {sideState.getDiscs().length > 1 ? `${disc.disc}${side.side}` : side.side}
+                      {index === 0 ? 'A' : 'B'}
                     </button>
-                  ))}
-                </div>
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={handleNextSide}
-              disabled={isFlipping}
-              className="flex items-center gap-1 px-2 py-1 text-[11px] text-white/70 hover:text-white disabled:opacity-50 transition-colors"
-              title="翻到下一面"
-            >
-              <span>下一面</span>
-              <ChevronRight className="w-3 h-3" />
-            </button>
           </div>
         )}
 

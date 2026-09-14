@@ -1,4 +1,3 @@
-import { ALBUMS } from '../../../data/mockData.js';
 import type { Album } from '../../../types.js';
 import type { ProviderAlbum, ProviderAvailability, VinylSearchProvider } from '../types.js';
 import { logProviderHits } from '../http.js';
@@ -9,7 +8,7 @@ export class LocalDatabaseProvider implements VinylSearchProvider {
   public readonly role = 'local' as const;
   public readonly priority = 1;
 
-  public constructor(private readonly albums: Album[] = ALBUMS) {}
+  public constructor(private readonly albums: Album[] = []) {}
 
   public availability(): ProviderAvailability { return { available: true }; }
 

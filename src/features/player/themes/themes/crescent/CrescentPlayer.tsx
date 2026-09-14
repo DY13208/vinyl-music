@@ -9,7 +9,7 @@ export function CrescentPlayer(props:PlayerStageProps) {
   return <section className="crescent-stage" aria-label="当前专辑唱片" data-playing={props.isPlaying} data-vinyl-type={appearance.variant}>
     <div className="crescent-stage__crop">
       <div className="crescent-stage__disc">
-          <VinylDisc size="100%" coverUrl={props.album.coverUrl} labelImage={appearance.label?.image} labelColor={appearance.label?.color} labelText={appearance.label?.text} albumTitle={props.album.title} artistName={props.album.artist} type={appearance.variant} texture={appearance.texture} vinylColors={appearance.colors} side={side} rpm={props.album.rpm} isPlaying={props.isPlaying}/>
+          <VinylDisc size="100%" coverUrl={props.album.coverUrl} labelImage={appearance.label?.image || props.album.coverUrl || undefined} labelColor={appearance.label?.color} labelText={appearance.label?.text} albumTitle={props.album.title} artistName={props.album.artist} type={appearance.variant} texture={appearance.texture} vinylColors={appearance.colors} side={side} rpm={props.album.rpm} isPlaying={props.isPlaying}/>
       </div>
     </div>
   </section>;

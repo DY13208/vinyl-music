@@ -1,6 +1,7 @@
 import type { StorageService } from '../../platform/storage/StorageService';
 import type { Album } from '../../types';
 import type { CollectionRepository } from './CollectionRepository';
+import { cleanLegacyAlbum } from '../../utils/legacyAlbumMetadata';
 
 const STORAGE_KEY = 'vinyl_user_collection';
 
@@ -12,11 +13,8 @@ export class WebCollectionRepository implements CollectionRepository {
       const saved = this.storage.getItem(STORAGE_KEY);
       if (!saved) return this.defaults;
       const parsed = JSON.parse(saved) as unknown;
-      if (!Array.isArray(parsed) || !parsed.length) return this.defaults;
-      return parsed.map((album: Album) => {
-        const catalogAlbum = this.defaults.find(item => item.id === album.id);
-        return album.vinylVariant || !catalogAlbum ? album : { ...album, vinylVariant: catalogAlbum.vinylVariant, vinylColors: catalogAlbum.vinylColors };
-      });
+      if (!Array.isArray(parsed)) return this.defaults;
+      return parsed.map(cleanLegacyAlbum);
     } catch (error) {
       console.error('Failed to load saved collection', error);
       return this.defaults;

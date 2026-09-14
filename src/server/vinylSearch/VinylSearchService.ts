@@ -37,6 +37,7 @@ function scoreCandidate(input: VinylSearchQuery, candidate: ProviderAlbum) {
   const artistTarget = input.artist || '';
   const titleScore = similarity(titleTarget, candidate.title);
   const artistScore = artistTarget ? similarity(artistTarget, candidate.artist) : 0;
+  if (artistTarget && artistScore < 0.7) return 0;
   let score = Math.round(titleScore * (artistTarget ? 52 : 78) + artistScore * 38);
   if (input.year && candidate.year && input.year === candidate.year) score += 10;
   if (input.catalogNumber && candidate.catalogNumber) score = Math.max(score, Math.round(similarity(input.catalogNumber, candidate.catalogNumber) * 92));
@@ -44,19 +45,17 @@ function scoreCandidate(input: VinylSearchQuery, candidate: ProviderAlbum) {
 }
 
 function groupKey(candidate: ProviderAlbum) {
-  const title = candidate.title.replace(/[（(][^）)]*[）)]/g, '');
-  return `${normalizeText(candidate.artist)}|${normalizeText(title)}`;
+  return `${normalizeText(candidate.artist)}|${normalizeText(candidate.title)}`;
 }
 
 function mergeAlbum(primary: ProviderAlbum, candidates: ScoredCandidate[]): Album {
   const album = providerAlbumToAlbum(primary);
-  const first = <K extends keyof ProviderAlbum>(key: K) => candidates.map(candidate => candidate[key]).find(value => value !== undefined && value !== '' && (!Array.isArray(value) || value.length));
+  const compatible = primary.role === 'physical' ? [primary] : candidates.filter(candidate => candidate.role !== 'physical');
+  const first = <K extends keyof ProviderAlbum>(key: K) => compatible.map(candidate => candidate[key]).find(value => value !== undefined && value !== '' && (!Array.isArray(value) || value.length));
   album.coverUrl ||= String(first('coverUrl') ?? '');
   album.label = album.label === '未知厂牌' ? String(first('label') ?? album.label) : album.label;
   album.genre = album.genre === '其他' ? ((first('genres') as string[] | undefined)?.join(' · ') || album.genre) : album.genre;
-  album.barcode ||= String(first('barcode') ?? '') || undefined;
-  album.catalogNumber ||= String(first('catalogNumber') ?? '') || undefined;
-  album.country ||= String(first('country') ?? '') || undefined;
+  // Pressing identifiers belong to one release; never borrow from another edition.
   if (!album.tracks.length) {
     const tracks = first('tracks') as Album['tracks'] | undefined;
     if (tracks?.length) {

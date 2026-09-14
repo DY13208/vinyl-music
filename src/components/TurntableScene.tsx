@@ -13,7 +13,7 @@ export const TurntableScene: React.FC<{ album: Album; side?: string; isPlaying: 
       <button className="turntable-record" type="button" aria-label="点击唱片查看歌词" onClick={onShowLyrics}>
         <VinylDisc coverUrl={album.coverUrl} albumTitle={album.title} artistName={album.artist}
           size="100%" type={appearance.variant} texture={appearance.texture} labelColor={appearance.label?.color}
-          labelImage={appearance.label?.image} labelText={appearance.label?.text} rpm={album.rpm} side={side} isPlaying={isPlaying} />
+          labelImage={appearance.label?.image || album.coverUrl || undefined} labelText={appearance.label?.text} rpm={album.rpm} side={side} isPlaying={isPlaying} />
       </button>
       <PhotographicTonearm albumId={album.id} isPlaying={isPlaying} progressPercent={progressPercent} />
     </div>

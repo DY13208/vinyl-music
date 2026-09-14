@@ -27,6 +27,15 @@ test('resolver chooses the highest-priority reliable full source across provider
   assert.equal(result.source?.provider, 'audius');
 });
 
+test('complete source wins over a higher scoring Apple preview', async () => {
+  const repository = new MusicSourceRepository(new MemoryStorage());
+  const apple = source('apple-music', 'apple', { title: '晴天', artist: '周杰伦', album: '叶惠美', duration: 269 }, true);
+  const audius = source('audius', 'audius', { title: '晴天', artist: 'Jay Chou', album: '叶惠美', duration: 269 });
+  const resolver = new PlaybackResolver(new MusicProviderRegistry([provider('apple-music', [apple]), provider('audius', [audius])]), repository);
+  const result = await resolver.resolve(track);
+  assert.equal(result.source?.provider, 'audius');
+});
+
 test('resolver never auto-plays a low-confidence same-title wrong artist', async () => {
   const repository = new MusicSourceRepository(new MemoryStorage());
   const wrong = source('apple-music', 'wrong', { title: '晴天', artist: '其他歌手', album: '叶惠美', duration: 269 }, true);

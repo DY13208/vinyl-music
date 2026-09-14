@@ -26,7 +26,25 @@ export class WebAudioEngine implements AudioEngine {
 
   public async play(): Promise<void> {
     if (!this.previewAudio) throw new Error('No audio source loaded');
-    await this.previewAudio.play();
+    try {
+      await this.previewAudio.play();
+    } catch (error) {
+      // Resolving a remote source is asynchronous, so the original click's
+      // transient user activation may have expired by the time play() runs.
+      // Start muted (allowed by autoplay policy), then restore the requested
+      // volume once playback has actually begun.
+      if ((error as DOMException)?.name !== 'NotAllowedError') throw error;
+      const volume = this.previewAudio.volume;
+      this.previewAudio.muted = true;
+      try {
+        await this.previewAudio.play();
+        this.previewAudio.muted = false;
+        this.previewAudio.volume = volume;
+      } catch (fallbackError) {
+        this.previewAudio.muted = false;
+        throw fallbackError;
+      }
+    }
   }
 
   public async pause(): Promise<void> { this.previewAudio?.pause(); }

@@ -8,7 +8,7 @@ import {
   DevicePlatform,
   WishlistItem,
 } from './types';
-import { ALBUMS, ARTISTS, WISHLIST } from './data/mockData';
+import { ALBUMS, ARTISTS } from './data/mockData';
 import { audioEngine } from './services/audioEngine';
 import { fileService } from './platform/files';
 import { localMusicProvider, playbackResolver } from './music';
@@ -63,23 +63,38 @@ export default function App({ repository = collectionRepository }: { repository?
   const collectionBrowse = useCollectionBrowseState();
   const carouselIndex = Math.max(0, albums.findIndex(album => album.id === browse.selectedAlbumId));
   const setCarouselIndex = (index: number) => { if (albums[index]) browse.selectAlbum(albums[index].id); };
-  const [selectedAlbum, setSelectedAlbum] = useState<Album>(albums[0] || ALBUMS[0]);
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(albums[0] || null);
   const [selectedArtist, setSelectedArtist] = useState<Artist>(ARTISTS[0]);
-  const [favorites, setFavorites] = useState<string[]>([ALBUMS[0].id, ALBUMS[1].id]);
-  const [wishlist, setWishlist] = useState<WishlistItem[]>(WISHLIST);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
   // Playback State
-  const [currentPlayingAlbum, setCurrentPlayingAlbum] = useState<Album | null>(albums[0] || ALBUMS[0]);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(albums[0]?.tracks[0] || ALBUMS[0].tracks[0]);
+  const [currentPlayingAlbum, setCurrentPlayingAlbum] = useState<Album | null>(albums[0] || null);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(albums[0]?.tracks[0] || null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentTimeSec, setCurrentTimeSec] = useState<number>(138); // 2:18 initial sample time
-  const [progressPercent, setProgressPercent] = useState<number>(33.4);
+  const [currentTimeSec, setCurrentTimeSec] = useState<number>(0);
+  const [progressPercent, setProgressPercent] = useState<number>(0);
   const [previewDurationSec, setPreviewDurationSec] = useState<number>(30);
   const [playbackSource, setPlaybackSource] = useState<TrackSource | null>(null);
   const [playbackMessage, setPlaybackMessage] = useState('');
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [pendingLocalFile, setPendingLocalFile] = useState<LocalAudioSelection | null>(null);
   const previewRequestRef = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    void (repository.whenReady?.() ?? Promise.resolve()).then(() => {
+      if (!active) return;
+      const loaded = repository.getAlbums();
+      setAlbums(loaded);
+      setSelectedAlbum(current => current ? loaded.find(album => album.id === current.id) ?? current : loaded[0] ?? null);
+      if (previewRequestRef.current === 0) {
+        setCurrentPlayingAlbum(loaded[0] ?? null);
+        setCurrentTrack(loaded[0]?.tracks[0] ?? null);
+      }
+    });
+    return () => { active = false; };
+  }, [repository]);
 
   const durationSec = playbackSource ? previewDurationSec : (currentTrack?.durationSec || 30);
 
@@ -147,9 +162,11 @@ export default function App({ repository = collectionRepository }: { repository?
 
   // Audio Play / Pause control
   const handleTogglePlay = (targetAlbum?: Album) => {
-    const alb = targetAlbum || currentPlayingAlbum || ALBUMS[0];
+    const alb = targetAlbum || currentPlayingAlbum || albums[0];
+    if (!alb) { setPlaybackMessage('还没有可播放的专辑，请先添加唱片'); return; }
     const track = currentPlayingAlbum?.id === alb.id && currentTrack ? currentTrack : alb.tracks[0];
-    if (!track || isPreviewLoading) return;
+    if (!track) { setPlaybackMessage('这张专辑没有曲目，请先补充曲目或导入本地音频'); return; }
+    if (isPreviewLoading) return;
 
     if (isPlaying) {
       setIsPlaying(false);
@@ -232,18 +249,22 @@ export default function App({ repository = collectionRepository }: { repository?
   };
 
   const handleOpenArtist = (artistId: string) => {
-    const art = ARTISTS.find((a) => a.id === artistId) || ARTISTS[0];
-    setSelectedArtist(art);
+    const art = ARTISTS.find((a) => a.id === artistId);
+    if (!art) return;
+    const artistAlbums = albums.filter(album => album.artistId === artistId);
+    setSelectedArtist({ ...art, albums: artistAlbums, albumCount: artistAlbums.length });
     setCurrentScreen('artist_detail');
   };
 
   // Vinyl Collection CRUD handlers
   const handleAddAlbum = async (newAlbum: Album) => {
+    await repository.whenReady?.();
     setAlbums(repository.saveAlbum(newAlbum));
     setFavorites((prev) => (prev.includes(newAlbum.id) ? prev : [newAlbum.id, ...prev]));
   };
 
   const handleImportMultiple = async (newAlbums: Album[]) => {
+    await repository.whenReady?.();
     setAlbums(repository.saveAlbums(newAlbums));
   };
 
@@ -385,7 +406,7 @@ export default function App({ repository = collectionRepository }: { repository?
             />
           )}
 
-          {currentScreen === 'album_detail' && (
+          {currentScreen === 'album_detail' && selectedAlbum && (
             <AlbumDetailView
               album={selectedAlbum}
               currentTrackId={currentTrack?.id}

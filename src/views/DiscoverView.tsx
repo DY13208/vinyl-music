@@ -23,6 +23,19 @@ export const DiscoverView: React.FC<DiscoverViewProps> = ({
   const jazzAlbums = albums.filter((a) => a.genre.includes('摇滚') || a.genre.includes('爵士')).slice(0, 3);
   const vintageMasters = albums.slice(1, 4);
 
+  // A first visit can legitimately have an empty local-first collection.
+  // Keep Discover renderable instead of dereferencing an absent lead album.
+  if (!leadAlbum) {
+    return (
+      <div id="discover-view" className="w-full min-h-screen bg-[#070709] text-white flex flex-col items-center justify-center gap-3 px-6 pb-28" role="status">
+        <Compass className="w-10 h-10 text-white/40" />
+        <h1 className="text-lg font-semibold">发现唱片</h1>
+        <p className="text-sm text-white/50 text-center">你的唱片库还是空的。添加一张唱片后，这里会显示相关专题。</p>
+        <button type="button" onClick={onOpenSearch} className="px-4 py-2 rounded bg-[#18181E] border border-[#2B2B36] text-sm">去搜索专辑</button>
+      </div>
+    );
+  }
+
   return (
     <div
       id="discover-view"

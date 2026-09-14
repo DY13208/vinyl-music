@@ -50,7 +50,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
     );
 
     // 2. Artists second
-    const artistsRes = ARTISTS.filter((art) => art.name.toLowerCase().includes(q));
+    const artistsRes = ARTISTS.filter((art) => art.name.toLowerCase().includes(q) && albums.some(album => album.artistId === art.id));
 
     // 3. Tracks third
     const tracksRes: { album: Album; track: Track }[] = [];

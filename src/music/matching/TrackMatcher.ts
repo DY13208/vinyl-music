@@ -18,6 +18,16 @@ const overlap = (left?: string, right?: string) => {
   return common / Math.max(a.size, b.size);
 };
 const versionTerms = (value: string) => VERSION_TERMS.filter(term => normalize(value).includes(normalize(term)));
+const ARTIST_ALIASES: Record<string, string> = {
+  '周杰伦': 'jaychou', 'jaychou': 'jaychou', 'jay chou': 'jaychou',
+  '张学友': 'jackycheung', 'jackycheung': 'jackycheung', 'jacky cheung': 'jackycheung',
+};
+const sameArtistIdentity = (left?: string, right?: string) => {
+  if (same(left, right)) return true;
+  const a = ARTIST_ALIASES[normalize(left ?? '')];
+  const b = ARTIST_ALIASES[normalize(right ?? '')];
+  return !!a && a === b;
+};
 
 export class TrackMatcher {
   public score(track: MusicTrack, candidate: Partial<MusicTrack>): MatchResult {
@@ -39,6 +49,10 @@ export class TrackMatcher {
       if (delta <= 3) { score += 15; reasons.push('duration-3'); }
       else if (delta <= 8) { score += 8; reasons.push('duration-8'); }
       else if (delta >= 20) { score -= 15; reasons.push('duration-mismatch'); }
+      if (same(track.title, candidate.title) && same(track.album, candidate.album) && !same(track.artist, candidate.artist) && sameArtistIdentity(track.artist, candidate.artist) && delta <= 8) {
+        score += 10;
+        reasons.push('title-album-duration');
+      }
     }
     if (track.trackNumber && candidate.trackNumber && track.trackNumber === candidate.trackNumber) {
       score += 5; reasons.push('track-number');
@@ -48,7 +62,9 @@ export class TrackMatcher {
     const wrongVersions = candidateVersions.filter(term => !targetVersions.has(term));
     if (wrongVersions.length) { score -= 40; reasons.push(`wrong-version:${wrongVersions.join(',')}`); }
     if (titleOverlap < .5) { score -= 30; reasons.push('title-mismatch'); }
-    if (artistOverlap < .5) { score -= 35; reasons.push('artist-mismatch'); }
+    const strongAlbumEvidence = same(track.title, candidate.title) && same(track.album, candidate.album) && sameArtistIdentity(track.artist, candidate.artist) &&
+      !!track.duration && !!candidate.duration && Math.abs(track.duration - candidate.duration) <= 8;
+    if (artistOverlap < .5 && !strongAlbumEvidence) { score -= 35; reasons.push('artist-mismatch'); }
     return { score, reliable: score >= 70, possible: score >= 50 && score < 70, reasons };
   }
 

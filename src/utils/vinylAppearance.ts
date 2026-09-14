@@ -22,5 +22,6 @@ export const resolveTexture = (type: VinylType = 'black', texture?: string, colo
 export const getVinylAppearance = (album: Pick<Album, 'vinylType' | 'vinylTexture' | 'vinylColor' | 'vinylSecondaryColor' | 'vinylLabel' | 'vinylVariant' | 'vinylColors' | 'color'>) => {
   const variant = album.vinylType ?? album.vinylVariant ?? 'black';
   const colors = [album.vinylColor ?? album.vinylColors?.[0] ?? album.color, album.vinylSecondaryColor ?? album.vinylColors?.[1] ?? '#b9b0a8', album.vinylColors?.[2] ?? '#302c31'];
-  return { variant, colors, texture: resolveTexture(variant, album.vinylTexture, colors[0]), label: album.vinylLabel };
+  const texture = album.vinylType || album.vinylVariant ? album.vinylTexture : undefined;
+  return { variant, colors, texture: resolveTexture(variant, texture, colors[0]), label: album.vinylLabel };
 };
