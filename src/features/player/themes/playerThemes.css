@@ -81,9 +81,11 @@
 .pt-preview--crescent .pt-preview__disc { width:110px; height:110px; left:-55px; top:0; }
 .pt-preview--halo .pt-preview__disc, .pt-preview--nocturne .pt-preview__disc { width:108px; height:108px; left:-28px; top:1px; }
 .pt-preview--halo .pt-preview__disc { background:#213329; }
-.pt-preview--classic { background:url('/assets/turntable/turntable-plinth.webp') center / cover; }
-.pt-preview--classic .pt-preview__disc { left:12%; }
-.pt-preview--classic::after { content:''; position:absolute; right:8%; top:5%; height:90%; width:26%; background:url('/assets/turntable/tonearm.webp') center / contain no-repeat; }
+.pt-preview--classic { background:#101012; }
+/* Keep the plinth, record and arm in the same square coordinate system. */
+.pt-preview__turntable { position:absolute; width:110px; height:110px; left:50%; top:50%; transform:translate(-50%,-50%); background:url('/assets/turntable/turntable-plinth.webp') center / contain no-repeat; }
+.pt-preview--classic .pt-preview__disc { left:8%; top:18%; width:68%; height:68%; }
+.pt-preview__tonearm { position:absolute; left:69%; top:11.72%; width:26%; height:78%; background:url('/assets/turntable/tonearm.webp') center / contain no-repeat; }
 .pt-preview--classic .pt-preview__line { display:none; }
 .pt-preview__card { position: absolute; width: 23px; height: 23px; transform: translate(-50%,-50%); background-size: cover; border: 1px solid #7778; }
 .pt-preview__card.is-current { width: 30px; height: 30px; border-color: var(--player-accent); box-shadow: 0 0 8px var(--player-glow); }

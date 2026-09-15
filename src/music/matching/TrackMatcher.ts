@@ -17,10 +17,20 @@ const overlap = (left?: string, right?: string) => {
   const common = [...a].filter(item => b.has(item)).length;
   return common / Math.max(a.size, b.size);
 };
-const versionTerms = (value: string) => VERSION_TERMS.filter(term => normalize(value).includes(normalize(term)));
+const versionTerms = (value: string) => {
+  const found = VERSION_TERMS.filter(term => normalize(value).includes(normalize(term)));
+  if (/\blive\b|\bconcert\b|演唱[会會]|現場|现场/i.test(value)) found.push('live');
+  return [...new Set(found.map(term => ['现场', '現場'].includes(term) ? 'live' : term))];
+};
+// A live suffix is redundant when the album already identifies a live recording.
+// Version checks below still reject studio/live substitutions in both directions.
+const titleIdentity = (value = '') => normalize(value.replace(/[（(]\s*live\s*[）)]/gi, ''));
+const albumIdentity = (value = '') => normalize(value.replace(/\blive\s+in\s+concert\b/gi, '')).replace(/\s/g, '');
+const sameAlbum = (left?: string, right?: string) => !!left && !!right && albumIdentity(left) === albumIdentity(right);
 const ARTIST_ALIASES: Record<string, string> = {
   '周杰伦': 'jaychou', 'jaychou': 'jaychou', 'jay chou': 'jaychou',
   '张学友': 'jackycheung', 'jackycheung': 'jackycheung', 'jacky cheung': 'jackycheung',
+  '周杰倫': 'jaychou', '張學友': 'jackycheung',
 };
 const sameArtistIdentity = (left?: string, right?: string) => {
   if (same(left, right)) return true;
@@ -36,23 +46,19 @@ export class TrackMatcher {
     if (track.isrc && candidate.isrc && normalize(track.isrc) === normalize(candidate.isrc)) {
       score += 100; reasons.push('isrc');
     }
-    const titleOverlap = overlap(track.title, candidate.title);
-    if (same(track.title, candidate.title)) { score += 30; reasons.push('title'); }
+    const titleOverlap = overlap(titleIdentity(track.title), titleIdentity(candidate.title));
+    if (same(titleIdentity(track.title), titleIdentity(candidate.title))) { score += 30; reasons.push('title'); }
     else if (titleOverlap >= .8) { score += 22; reasons.push('title-close'); }
     const artistOverlap = overlap(track.artist, candidate.artist);
-    if (same(track.artist, candidate.artist)) { score += 30; reasons.push('artist'); }
+    if (sameArtistIdentity(track.artist, candidate.artist)) { score += 30; reasons.push('artist'); }
     else if (artistOverlap >= .8) { score += 22; reasons.push('artist-close'); }
-    if (same(track.album, candidate.album)) { score += 15; reasons.push('album'); }
+    if (sameAlbum(track.album, candidate.album)) { score += 15; reasons.push('album'); }
     else if (overlap(track.album, candidate.album) >= .8) { score += 10; reasons.push('album-close'); }
     if (track.duration && candidate.duration) {
       const delta = Math.abs(track.duration - candidate.duration);
       if (delta <= 3) { score += 15; reasons.push('duration-3'); }
       else if (delta <= 8) { score += 8; reasons.push('duration-8'); }
       else if (delta >= 20) { score -= 15; reasons.push('duration-mismatch'); }
-      if (same(track.title, candidate.title) && same(track.album, candidate.album) && !same(track.artist, candidate.artist) && sameArtistIdentity(track.artist, candidate.artist) && delta <= 8) {
-        score += 10;
-        reasons.push('title-album-duration');
-      }
     }
     if (track.trackNumber && candidate.trackNumber && track.trackNumber === candidate.trackNumber) {
       score += 5; reasons.push('track-number');
@@ -60,11 +66,10 @@ export class TrackMatcher {
     const targetVersions = new Set(versionTerms(`${track.title} ${track.album}`));
     const candidateVersions = versionTerms(`${candidate.title ?? ''} ${candidate.album ?? ''}`);
     const wrongVersions = candidateVersions.filter(term => !targetVersions.has(term));
+    if (targetVersions.has('live') && !candidateVersions.includes('live')) wrongVersions.push('studio-for-live');
     if (wrongVersions.length) { score -= 40; reasons.push(`wrong-version:${wrongVersions.join(',')}`); }
     if (titleOverlap < .5) { score -= 30; reasons.push('title-mismatch'); }
-    const strongAlbumEvidence = same(track.title, candidate.title) && same(track.album, candidate.album) && sameArtistIdentity(track.artist, candidate.artist) &&
-      !!track.duration && !!candidate.duration && Math.abs(track.duration - candidate.duration) <= 8;
-    if (artistOverlap < .5 && !strongAlbumEvidence) { score -= 35; reasons.push('artist-mismatch'); }
+    if (artistOverlap < .5 && !sameArtistIdentity(track.artist, candidate.artist)) { score -= 35; reasons.push('artist-mismatch'); }
     return { score, reliable: score >= 70, possible: score >= 50 && score < 70, reasons };
   }
 

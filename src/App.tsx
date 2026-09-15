@@ -120,7 +120,7 @@ export default function App({ repository = collectionRepository }: { repository?
       if (previewRequestRef.current !== requestId) return;
       if (resolution.status !== 'MATCHED' || !resolution.source) {
         setIsPreviewLoading(false);
-        setPlaybackMessage(resolution.status === 'POSSIBLE_MATCH' ? '只找到待确认候选，未自动播放' : '暂无可靠音源');
+        setPlaybackMessage(resolution.status === 'POSSIBLE_MATCH' ? '找到相近曲目，但尚不能确认是同一版本' : resolution.candidates.length ? '未找到这首歌的对应版本，可导入本地音源' : '各音源平台未返回可用结果，请重试或导入本地音源');
         return;
       }
       const source = resolution.source;
@@ -141,6 +141,7 @@ export default function App({ repository = collectionRepository }: { repository?
           onError: (message) => {
             if (previewRequestRef.current !== requestId) return;
             setPlaybackMessage(message);
+            setIsPreviewLoading(false);
             setIsPlaying(false);
           },
         },
@@ -152,11 +153,11 @@ export default function App({ repository = collectionRepository }: { repository?
       setIsPreviewLoading(false);
       setPlaybackMessage(source.provider === 'local' ? '正在播放已绑定的本地音源' : source.provider === 'audius' ? '音源由 Audius 提供' : '试听音频由 Apple Music 提供');
       setIsPlaying(true);
-    } catch {
+    } catch (error) {
       if (previewRequestRef.current !== requestId) return;
       setIsPreviewLoading(false);
       setIsPlaying(false);
-      setPlaybackMessage('音源暂时不可用，请稍后重试或导入本地音频');
+      setPlaybackMessage(error instanceof Error && error.name === 'NotAllowedError' ? '浏览器阻止了自动播放，请点击播放重试' : '音频加载失败，请检查网络后重试或导入本地音频');
     }
   };
 

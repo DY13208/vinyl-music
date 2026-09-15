@@ -392,6 +392,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         </div>}
         <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />
         <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} animated={themePreference.themeId === 'crescent'} />
+        {playbackMessage && <p className="full-player__playback-status" role="status" aria-live="polite">{playbackMessage}</p>}
 
         {/* Bottom 4 Utility Tools */}
         <div className="full-player__utilities">
@@ -537,14 +538,16 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                   getCurrentSideTracks().map((track) => {
                     const isCurrent = track.id === currentTrack.id;
                     return (
-                      <div
+                      <button
+                        type="button"
+                        aria-label={`播放歌曲：${track.title}`}
                         key={track.id}
                         onClick={() => {
                           onSelectTrack(track);
                           setActiveBottomModal('none');
                           hapticsService.triggerHaptic('light');
                         }}
-                        className={`flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
+                        className={`w-full text-left flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
                           isCurrent
                             ? 'bg-[#16161C] text-[#2FE92B]'
                             : 'hover:bg-[#141418] text-white'
@@ -561,7 +564,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                         <span className="text-[11px] font-mono text-white/40">
                           {track.duration}
                         </span>
-                      </div>
+                      </button>
                     );
                   })
                 ) : (

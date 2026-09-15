@@ -23,8 +23,10 @@ export class PlaybackResolver {
       .sort((a, b) => rank(b, this.repository.getPreferredIdentity(track.id)) - rank(a, this.repository.getPreferredIdentity(track.id)));
     // Prefer a complete stream whenever it has reasonable identity evidence.
     // Apple Music is preview-only and remains a fallback for otherwise reliable matches.
-    const reliableFull = candidates.find(source => !source.previewOnly && (source.verificationMethod === 'user' || source.matchScore >= 60));
-    const reliable = reliableFull ?? candidates.find(source => source.verificationMethod === 'user' || source.matchScore >= 70);
+    const reliableFull = candidates.find(source => !source.previewOnly && source.verified);
+    const reliable = reliableFull ?? candidates.find(source =>
+      source.verified,
+    );
     if (!raw.length) return { status: 'NO_SOURCE', candidates };
     if (!candidates.length) return { status: 'SOURCE_REJECTED', candidates };
     if (!reliable) return { status: candidates.some(source => source.matchScore >= 50) ? 'POSSIBLE_MATCH' : 'NO_RELIABLE_SOURCE', candidates };

@@ -49,3 +49,18 @@ test('explicit user verification always wins over automatic score', () => {
   assert.equal(verified.verified, true);
   assert.equal(verified.matchScore, 100);
 });
+
+const concert: MusicTrack = { id: 'concert-1999', title: '釋放自己', artist: 'Jacky Cheung', album: '友個人．演唱會 Live In Concert 1999', duration: 180 };
+test('matches the Hong Kong 1999 concert despite localized artist and redundant Live suffix', () => {
+  const result = matcher.score(concert, { title: '釋放自己 (Live)', artist: '張學友', album: '友個人演唱會1999', duration: 187.027 });
+  assert.equal(result.reliable, true);
+});
+test('a different song on the same concert album is still rejected', () => {
+  assert.equal(matcher.score(concert, { title: '離開以後 (Live)', artist: '張學友', album: '友個人演唱會1999', duration: 187 }).reliable, false);
+});
+test('does not replace a requested live recording with the studio recording', () => {
+  assert.equal(matcher.score(concert, { title: '釋放自己', artist: '張學友', album: '釋放自己', duration: 180 }).reliable, false);
+});
+test('same song from a different concert year does not auto-match', () => {
+  assert.equal(matcher.score(concert, { title: '釋放自己 (Live)', artist: '張學友', album: '友個人演唱會2000', duration: 187 }).reliable, false);
+});
