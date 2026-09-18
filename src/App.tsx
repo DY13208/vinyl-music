@@ -1,3 +1,4 @@
+import { artworkService } from './platform/artwork/WebArtworkAdapter';
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import {
   Album,
@@ -57,6 +58,7 @@ export default function App({ repository = collectionRepository }: { repository?
 
   // Local-first collection. The repository preserves the existing storage key and data.
   const [albums, setAlbums] = useState<Album[]>(() => repository.getAlbums());
+  useEffect(() => { void artworkService.prefetchCollection(albums); }, [albums]);
 
   // Carousel & Content State
   const browse = useAlbumBrowserState(albums);
@@ -116,6 +118,8 @@ export default function App({ repository = collectionRepository }: { repository?
     setIsPlaying(false);
     audioEngine.playNeedleDrop();
     try {
+      await audioEngine.pause();
+      if (previewRequestRef.current !== requestId) return;
       const resolution = await playbackResolver.resolve(toMusicTrack(album, track));
       if (previewRequestRef.current !== requestId) return;
       if (resolution.status !== 'MATCHED' || !resolution.source) {
@@ -260,17 +264,18 @@ export default function App({ repository = collectionRepository }: { repository?
   // Vinyl Collection CRUD handlers
   const handleAddAlbum = async (newAlbum: Album) => {
     await repository.whenReady?.();
-    setAlbums(repository.saveAlbum(newAlbum));
+    setAlbums(await repository.saveAlbum(newAlbum));
     setFavorites((prev) => (prev.includes(newAlbum.id) ? prev : [newAlbum.id, ...prev]));
   };
 
   const handleImportMultiple = async (newAlbums: Album[]) => {
     await repository.whenReady?.();
-    setAlbums(repository.saveAlbums(newAlbums));
+    setAlbums(await repository.saveAlbums(newAlbums));
   };
 
-  const handleRemoveAlbum = (albumId: string) => {
-    setAlbums(repository.deleteAlbum(albumId));
+  const handleRemoveAlbum = async (albumId: string) => {
+    try { setAlbums(await repository.deleteAlbum(albumId)); }
+    catch (error) { setPlaybackMessage(error instanceof Error ? error.message : '本地保存失败'); }
   };
 
   const handleImportLocalSource = async () => {
@@ -385,15 +390,23 @@ export default function App({ repository = collectionRepository }: { repository?
 
           {currentScreen === 'collection' && (
             <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开收藏柜" />}>
-              <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} />
+              <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
             </Suspense>
           )}
 
           {currentScreen === 'discover' && (
             <DiscoverView
               albums={albums}
-              onOpenAlbumDetail={handleOpenAlbumDetail}
-              onOpenSearch={() => setCurrentScreen('search')}
+              onAddAlbum={handleAddAlbum}
+              onPreview={(album, track) => {
+                if (currentPlayingAlbum?.id === album.id && currentTrack?.id === track.id && playbackSource) handleTogglePlay(album);
+                else void startTrackPreview(album, track);
+              }}
+              playingAlbumId={currentPlayingAlbum?.id}
+              playingTrackId={currentTrack?.id}
+              isPlaying={isPlaying}
+              isLoading={isPreviewLoading}
+              playbackMessage={playbackMessage}
             />
           )}
 
@@ -443,6 +456,9 @@ export default function App({ repository = collectionRepository }: { repository?
 
           {currentScreen === 'profile' && (
             <ProfileView
+              collectionCount={albums.length}
+              artistCount={new Set(albums.map(album => album.artist)).size}
+              wishlistCount={wishlist.length}
               homeTheme={theme}
               onSelectHomeTheme={selectTheme}
               themeMessage={themeMessage}
@@ -458,7 +474,7 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
 
           {currentScreen === 'settings' && (
-            <SettingsView onBack={() => setCurrentScreen('profile')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
+            <SettingsView onImportLegacy={handleImportMultiple} onBack={() => setCurrentScreen('profile')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
           )}
 
           {currentScreen === 'player' && currentPlayingAlbum && currentTrack && (

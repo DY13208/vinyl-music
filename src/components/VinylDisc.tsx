@@ -1,3 +1,4 @@
+import { ArtworkImage } from './ArtworkImage';
 import React from 'react';
 import { SideTransitionPhase } from '../hooks/useVinylSideTransition';
 import { VinylType, VinylVariant } from '../types';
@@ -37,13 +38,13 @@ export const VinylDisc: React.FC<VinylDiscProps> = ({
   return <div className={`vinyl-disc ${showAmbientGlow ? 'vinyl-ambient-glow' : ''} ${className}`} style={{ width: size, height: size }} role="img" aria-label={`${albumTitle} · Side ${side}`} data-texture={material} data-side={side} data-transition={transitionPhase}>
     <div className="vinyl-disc__surface">
       <div className={`vinyl-disc__rotation ${(rotating ?? isPlaying) ? 'is-rotating' : ''}`}>
-        {type === 'picture' && <img className="vinyl-disc__picture" src={coverUrl} alt="" draggable={false} referrerPolicy="no-referrer" />}
+        {type === 'picture' && <ArtworkImage className="vinyl-disc__picture" src={coverUrl} alt="" draggable={false} referrerPolicy="no-referrer" />}
         <img className="vinyl-disc__texture" src={`/assets/vinyl-textures/${material}.webp`} alt="" draggable={false} decoding="async" onError={event => {
           const img = event.currentTarget;
           if (!img.src.endsWith('/black.webp')) img.src = '/assets/vinyl-textures/black.webp';
         }} />
         <div className="vinyl-disc__label" style={{ backgroundColor: labelColor }} translate="no">
-          {labelImage && <img src={labelImage} alt="" draggable={false} className="vinyl-disc__label-image" />}
+          {labelImage && <ArtworkImage src={labelImage} alt="" draggable={false} className="vinyl-disc__label-image" />}
           <span className="vinyl-disc__label-title">{labelText || albumTitle}</span>
           <strong className="vinyl-disc__side">{side}</strong>
           <span className="vinyl-disc__rpm">{rpm} · STEREO</span>

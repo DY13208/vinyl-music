@@ -4,8 +4,8 @@ import type { Album } from '../../types';
 export interface CollectionRepository {
   whenReady?: () => Promise<void>;
   getAlbums(): Album[];
-  saveAlbum(album: Album): Album[];
-  saveAlbums(albums: Album[]): Album[];
-  updateAlbum(album: Album): Album[];
-  deleteAlbum(albumId: string): Album[];
+  saveAlbum(album: Album): Album[] | Promise<Album[]>;
+  saveAlbums(albums: Album[]): Album[] | Promise<Album[]>;
+  updateAlbum(album: Album): Album[] | Promise<Album[]>;
+  deleteAlbum(albumId: string): Album[] | Promise<Album[]>;
 }

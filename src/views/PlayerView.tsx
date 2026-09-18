@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { ArtworkImage } from '../components/ArtworkImage';
 import { Album, Track, VinylSide } from '../types';
 import { PlayerThemeRenderer } from '../features/player/themes/PlayerThemeRenderer';
 import { PlayerControls } from '../features/player/themes/shared/PlayerControls';
@@ -164,7 +165,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
     if (currentVinylSide.labelImage) {
       return (
-        <img
+        <ArtworkImage
           src={currentVinylSide.labelImage}
           alt={`Side ${currentVinylSide.side}`}
           className="w-full h-full object-cover rounded-full"

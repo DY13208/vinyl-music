@@ -1,12 +1,13 @@
 import type { DatabaseAdapter, DatabaseMode, DatabaseTransaction } from './DatabaseAdapter';
 import { isQuotaError, StorageError } from './StorageError';
+import { accountStorageName } from '../storage/accountScope';
 
 export const VINYL_DB_NAME = 'vinyl-music';
-export const VINYL_DB_VERSION = 1;
+export const VINYL_DB_VERSION = 2;
 export const STORES = {
   collections: 'collections', tracks: 'tracks', trackSources: 'track_sources',
   rejectedSources: 'rejected_sources', playHistory: 'play_history',
-  localAudioFiles: 'local_audio_files', providerCache: 'provider_cache', meta: 'meta',
+  localAudioFiles: 'local_audio_files', providerCache: 'provider_cache', meta: 'meta', artwork: 'artwork',
 } as const;
 
 type Migration = (database: IDBDatabase) => void;
@@ -22,6 +23,7 @@ const migrations: Record<number, Migration> = {
     const cache = create(STORES.providerCache); cache?.createIndex('expiresAt', 'expiresAt');
     create(STORES.meta);
   },
+  2: database => { if (!database.objectStoreNames.contains(STORES.artwork)) database.createObjectStore(STORES.artwork); },
 };
 
 const result = <T>(request: IDBRequest<T>): Promise<T> => new Promise((resolve, reject) => {
@@ -37,12 +39,15 @@ const completed = (tx: IDBTransaction): Promise<void> => new Promise((resolve, r
 export class WebIndexedDBAdapter implements DatabaseAdapter {
   public readonly version = VINYL_DB_VERSION;
   private databasePromise?: Promise<IDBDatabase>;
+  constructor(private readonly name = accountStorageName(VINYL_DB_NAME)) {}
 
   public async initialize(): Promise<void> { await this.open(); }
 
   public async transaction<T>(stores: string[], mode: DatabaseMode, work: (tx: DatabaseTransaction) => Promise<T>): Promise<T> {
     const db = await this.open();
     const transaction = db.transaction(stores, mode);
+    const done = completed(transaction);
+    void done.catch(() => undefined);
     const adapter: DatabaseTransaction = {
       get: async <V>(store: string, key: IDBValidKey) => result(transaction.objectStore(store).get(key)) as Promise<V | undefined>,
       getAll: async <V>(store: string) => result(transaction.objectStore(store).getAll()) as Promise<V[]>,
@@ -52,7 +57,7 @@ export class WebIndexedDBAdapter implements DatabaseAdapter {
     };
     try {
       const value = await work(adapter);
-      await completed(transaction);
+      await done;
       return value;
     } catch (error) {
       // IndexedDB has no standard readyState property. abort() is safe while
@@ -68,7 +73,7 @@ export class WebIndexedDBAdapter implements DatabaseAdapter {
     if (this.databasePromise) return this.databasePromise;
     if (typeof indexedDB === 'undefined') return Promise.reject(new StorageError('STORAGE_UNAVAILABLE', 'IndexedDB is unavailable'));
     this.databasePromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(VINYL_DB_NAME, VINYL_DB_VERSION);
+      const request = indexedDB.open(this.name, VINYL_DB_VERSION);
       request.onupgradeneeded = (event) => {
         for (let version = event.oldVersion + 1; version <= VINYL_DB_VERSION; version += 1) migrations[version]?.(request.result);
       };

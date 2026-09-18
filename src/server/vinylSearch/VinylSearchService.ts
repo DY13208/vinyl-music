@@ -1,3 +1,4 @@
+import { isDomesticArtwork, publicArtworkUrl } from '../../utils/artworkUrl.js';
 import type { Album } from '../../types.js';
 import { ProviderHttpError, ProviderUnavailableError } from './errors.js';
 import { AppleMusicProvider } from './providers/AppleMusicProvider.js';
@@ -35,6 +36,12 @@ function scoreCandidate(input: VinylSearchQuery, candidate: ProviderAlbum) {
   if (input.catalogNumber && normalizeText(candidate.catalogNumber) === normalizeText(input.catalogNumber)) return 96;
   const titleTarget = input.album || input.query;
   const artistTarget = input.artist || '';
+  // A public catalogue search can name an artist, not only an album title.
+  // Keep explicitly supplied album/artist constraints on the stricter path below.
+  if (!input.album && !input.artist && !input.catalogNumber) {
+    const combined = `${candidate.artist} ${candidate.title}`;
+    return Math.round(Math.max(similarity(input.query, candidate.title), similarity(input.query, candidate.artist), similarity(input.query, combined)) * 90);
+  }
   const titleScore = similarity(titleTarget, candidate.title);
   const artistScore = artistTarget ? similarity(artistTarget, candidate.artist) : 0;
   if (artistTarget && artistScore < 0.7) return 0;
@@ -52,7 +59,9 @@ function mergeAlbum(primary: ProviderAlbum, candidates: ScoredCandidate[]): Albu
   const album = providerAlbumToAlbum(primary);
   const compatible = primary.role === 'physical' ? [primary] : candidates.filter(candidate => candidate.role !== 'physical');
   const first = <K extends keyof ProviderAlbum>(key: K) => compatible.map(candidate => candidate[key]).find(value => value !== undefined && value !== '' && (!Array.isArray(value) || value.length));
-  album.coverUrl ||= String(first('coverUrl') ?? '');
+  const covers = compatible.map(candidate => candidate.coverUrl).filter((url): url is string => !!url);
+  const cover = covers.find(isDomesticArtwork) || album.coverUrl || covers[0] || '';
+  album.coverUrl = publicArtworkUrl(cover) || cover;
   album.label = album.label === '未知厂牌' ? String(first('label') ?? album.label) : album.label;
   album.genre = album.genre === '其他' ? ((first('genres') as string[] | undefined)?.join(' · ') || album.genre) : album.genre;
   // Pressing identifiers belong to one release; never borrow from another edition.
@@ -102,6 +111,16 @@ export class VinylSearchService {
     this.cache.set(cacheKey, { expiresAt: Date.now() + CACHE_TTL_MS, response });
     console.log(`[vinyl-search] complete query=${JSON.stringify(input.query || input.barcode)} candidates=${candidates.length} results=${results.length}`);
     return response;
+  }
+
+  public async getAlbum(providerId: string, id: string): Promise<Album | null> {
+    const provider = this.providers.find(item => item.id === providerId && item.role !== 'local');
+    if (!provider || !provider.availability().available) return null;
+    const candidate = await provider.getAlbum(id);
+    if (!candidate) return null;
+    const album = providerAlbumToAlbum(candidate);
+    album.coverUrl = publicArtworkUrl(album.coverUrl) || album.coverUrl;
+    return album;
   }
 
   private async runProvider(provider: VinylSearchProvider, input: VinylSearchQuery): Promise<{ status: ProviderSearchStatus; candidates: ProviderAlbum[] }> {

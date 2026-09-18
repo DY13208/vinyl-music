@@ -5,6 +5,19 @@ import { normalizeBarcode, parseSearchQuery } from './utils.js';
 const service = new VinylSearchService();
 
 export function registerVinylSearchRoutes(app: Express) {
+  app.get('/api/releases/detail', async (req, res, next) => {
+    const provider = String(req.query.provider ?? '');
+    const id = String(req.query.id ?? '');
+    if (!['apple-music', 'discogs', 'musicbrainz', 'deezer'].includes(provider) || !/^[a-zA-Z0-9-]{1,80}$/.test(id)) {
+      return res.status(400).json({ error: '唱片来源或编号无效' });
+    }
+    try {
+      const album = await service.getAlbum(provider, id);
+      if (!album) return res.status(404).json({ error: '暂时没有更多曲目资料' });
+      return res.json({ album });
+    } catch (error) { return next(error); }
+  });
+
   app.get('/api/releases/search', async (req, res, next) => {
     try {
       const input = parseSearchQuery({

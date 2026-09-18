@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { artworkService } from '../platform/artwork/WebArtworkAdapter';
+import { importLegacyCollection } from '../platform/storage/LegacyCollectionImport';
+import type { Album } from '../types';
 import { ArrowLeft, ChevronRight, Check } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import { CollectionThemePicker } from '../features/collection/themes/CollectionThemePicker';
@@ -8,6 +11,7 @@ import type { PlayerThemePreference } from '../features/player/themes/usePlayerT
 import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
 
 interface SettingsViewProps {
+  onImportLegacy?: (albums: Album[]) => Promise<void>;
   onBack: () => void;
   floatingPlayerVisible: boolean;
   onFloatingPlayerVisibleChange: (visible: boolean) => void;
@@ -19,17 +23,39 @@ interface SettingsViewProps {
   homeThemeMessage: string;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlayerVisible, onFloatingPlayerVisibleChange, preferenceMessage, collectionTheme, playerTheme, homeTheme, onSelectHomeTheme, homeThemeMessage }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlayerVisible, onFloatingPlayerVisibleChange, preferenceMessage, collectionTheme, playerTheme, homeTheme, onSelectHomeTheme, homeThemeMessage, onImportLegacy }) => {
+  const [importMessage, setImportMessage] = useState('');
+  const [importing, setImporting] = useState(false);
+  const importOriginal = async () => {
+    if (!onImportLegacy) return;
+    setImporting(true);
+    try { const count = await importLegacyCollection(onImportLegacy); setImportMessage(count ? `已读取 ${count} 张原有唱片，重复唱片自动跳过，原始数据仍保留在本机。` : '没有找到未登录时的本机馆藏。'); }
+    catch (error) { setImportMessage(error instanceof Error ? error.message : '导入失败'); }
+    finally { setImporting(false); }
+  };
   const [crossfade, setCrossfade] = useState(true);
   const [hapticFeedback, setHapticFeedback] = useState(true);
   const [notifications, setNotifications] = useState(false);
   const [riaaEq, setRiaaEq] = useState(true);
   const [needleCrackle, setNeedleCrackle] = useState(true);
-  const [cacheSize, setCacheSize] = useState('312 MB');
+  const [cacheSize, setCacheSize] = useState('读取中');
+  const [savedSize, setSavedSize] = useState('读取中');
+  const [cacheMessage, setCacheMessage] = useState('');
+  const [clearing, setClearing] = useState(false);
+  const refreshCache = async () => {
+    const stats = await artworkService.stats();
+    const format = (bytes: number) => bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    setCacheSize(format(stats.browsingBytes));
+    setSavedSize(format(stats.collectionBytes));
+    setCacheMessage(stats.pendingCount ? `${stats.pendingCount} 张收藏图片尚未保存到本机，请联网后重试；空间不足时请先清理浏览缓存。` : '收藏封面已保存在本机。');
+  };
+  useEffect(() => { void refreshCache().catch(() => setCacheMessage('无法读取本地存储，请检查浏览器权限。')); }, []);
 
-  const handleClearCache = () => {
-    setCacheSize('0 KB');
-    hapticsService.triggerHaptic('medium');
+  const handleClearCache = async () => {
+    setClearing(true);
+    try { await artworkService.clearBrowsing(); await refreshCache(); hapticsService.triggerHaptic('medium'); }
+    catch { setCacheMessage('缓存清理失败，请稍后重试。'); }
+    finally { setClearing(false); }
   };
 
   return (
@@ -241,18 +267,24 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
             </div>
 
             {/* 清理缓存 */}
-            <div
+            <button type="button" disabled={clearing}
               onClick={handleClearCache}
-              className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-[#151518]"
+              className="w-full text-left p-3.5 flex items-center justify-between cursor-pointer hover:bg-[#151518]"
             >
               <div>
-                <p className="text-[13.5px] font-medium text-white">清理音频与封面缓存</p>
-                <p className="text-[10.5px] text-[#BBCBB2] opacity-70">释放本地存储空间</p>
+                <p className="text-[13.5px] font-medium text-white">{clearing ? '正在清理…' : '清理浏览封面缓存'}</p>
+                <p className="text-[10.5px] text-[#BBCBB2] opacity-70">最多 32 MB，保留收藏封面和本地音乐</p>
               </div>
               <div className="flex items-center gap-1.5 text-white/40 text-[12px] font-mono">
                 <span>{cacheSize}</span>
                 <ChevronRight className="w-4 h-4" />
               </div>
+            </button>
+            <div className="p-3.5 border-t border-[#26272D] text-[12px] text-[#BBCBB2] space-y-2">
+              <p>收藏图片占用：{savedSize}</p>
+              <p role="status">{cacheMessage}</p>
+              <p>馆藏与上传图片仅保存在当前设备，不上传服务器。清除站点数据会丢失本地内容；设备之间不会自动同步。</p>
+              {onImportLegacy && <><p>如果此设备升级前的馆藏属于你，可将它归入当前账户。只会在本机复制，不会上传。</p><button type="button" disabled={importing} onClick={importOriginal} className="min-h-11 text-[#2FE92B]">{importing ? '正在导入…' : '将原有本机馆藏归入此账户'}</button><p role="status">{importMessage}</p></>}
             </div>
           </div>
         </section>

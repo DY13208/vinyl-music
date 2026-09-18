@@ -1,3 +1,4 @@
+import { ArtworkImage } from '../components/ArtworkImage';
 import React, { useState } from 'react';
 import { Artist, Album } from '../types';
 import { ChevronLeft, Disc, Check, Plus, Share2 } from 'lucide-react';
@@ -23,7 +24,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
     >
       {/* Top Banner Image with gradient */}
       <div className="relative w-full h-[230px] overflow-hidden">
-        <img
+        <ArtworkImage
           src={artist.bannerUrl}
           alt={artist.name}
           className="w-full h-full object-cover"
@@ -119,7 +120,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
                 className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer transition-all flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <img
+                  <ArtworkImage
                     src={album.coverUrl}
                     alt={album.title}
                     className="w-12 h-12 rounded-[4px] object-cover"

@@ -1,36 +1,18 @@
 import type { Album } from '../types';
 
-const jsonHeaders = { 'Content-Type': 'application/json' };
+export class CatalogueError extends Error {
+  constructor(message: string, public readonly status: number) { super(message); }
+}
 
 async function readJson<T>(response: Response): Promise<T> {
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error((body as { error?: string }).error || `请求失败 (${response.status})`);
+  if (!response.ok) throw new CatalogueError((body as { error?: string }).error || `请求失败 (${response.status})`, response.status);
   return body as T;
-}
-
-/** @deprecated User collections are local-first. Retained only for legacy/local tooling. */
-export async function loadServerCollection() {
-  return readJson<Album[]>(await fetch('/api/collection'));
-}
-
-/** @deprecated User collections are local-first. Retained only for legacy/local tooling. */
-export async function saveAlbumToServer(album: Album) {
-  return readJson<Album>(await fetch('/api/collection', { method: 'POST', headers: jsonHeaders, body: JSON.stringify(album) }));
-}
-
-/** @deprecated User collections are local-first. Retained only for legacy/local tooling. */
-export async function saveAlbumsToServer(albums: Album[]) {
-  return readJson<Album[]>(await fetch('/api/collection/import', { method: 'POST', headers: jsonHeaders, body: JSON.stringify({ albums }) }));
-}
-
-/** @deprecated User collections are local-first. Retained only for legacy/local tooling. */
-export async function removeAlbumFromServer(albumId: string) {
-  await readJson(await fetch(`/api/collection/${encodeURIComponent(albumId)}`, { method: 'DELETE' }));
 }
 
 export interface BarcodeLookupResult {
   barcode: string;
-  source: 'local' | 'apple-music' | 'netease-music' | 'kugou-music' | 'tencent-music' | 'migu-music' | 'discogs' | 'musicbrainz' | 'deezer';
+  source: 'local' | 'apple-music' | 'chinese-music' | 'netease-music' | 'kugou-music' | 'tencent-music' | 'migu-music' | 'discogs' | 'musicbrainz' | 'deezer';
   matches: Album[];
   album?: Album;
   vinylRelease?: Album | null;
@@ -60,10 +42,16 @@ export async function lookupVinylBarcode(barcode: string): Promise<BarcodeLookup
   return readJson<BarcodeLookupResult>(await fetch(`/api/releases/barcode/${encodeURIComponent(normalized)}`));
 }
 
-export async function searchVinyl(query: { query?: string; barcode?: string; catalogNumber?: string; artist?: string; album?: string; year?: number }): Promise<VinylSearchResponse> {
+export async function searchVinyl(query: { query?: string; barcode?: string; catalogNumber?: string; artist?: string; album?: string; year?: number }, signal?: AbortSignal): Promise<VinylSearchResponse> {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined && value !== '') params.set(key, String(value));
   }
-  return readJson<VinylSearchResponse>(await fetch(`/api/releases/search?${params.toString()}`));
+  return readJson<VinylSearchResponse>(await fetch(`/api/releases/search?${params.toString()}`, { signal }));
+}
+
+export async function getPublicAlbum(provider: string, id: string, signal?: AbortSignal): Promise<Album> {
+  const params = new URLSearchParams({ provider, id });
+  const result = await readJson<{ album: Album }>(await fetch(`/api/releases/detail?${params}`, { signal }));
+  return result.album;
 }

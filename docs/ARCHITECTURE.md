@@ -107,10 +107,10 @@ api/            # 必要的轻量 Vercel Functions；不是常驻后端或数据
 
 - App 启动只通过 `collectionRepository.getAlbums()` 恢复本地收藏，不再请求或合并 `/api/collection`。
 - 新增、批量导入、更新和删除只依赖 Repository 成功，不再以服务端 POST/DELETE 为前提。
-- WebCollectionRepository 继续读写原有 `vinyl_user_collection` key，保留已有用户数据和去重行为。
-- `server.ts` 与 `services/collectionApi.ts` 中的收藏端点暂为遗留/本地工具保留，但已没有 App 收藏调用者；不得重新接回权威主链路。
+- IndexedDBCollectionRepository 在账户独立的数据库里保存 `vinyl_user_collection`，排队等待事务成功后才更新成功状态。未登录旧数据通过设置中的明确归属操作在本机导入。
+- 旧 `/api/collection` 接口已关闭并返回 410；服务器不再读取或写入馆藏文件，前端服务仅保留公共唱片查询。
 
-当前 WebCollectionRepository 仍使用 StorageService/localStorage adapter，这是兼容阶段而非最终结构化存储。后续 IndexedDBCollectionRepository 必须迁移同一份数据并提供 schema version/回滚策略；未来 App 使用 SQLiteCollectionRepository。替换 adapter 不得改变 UI 或业务调用。
+数据库 schema v2 新增本地封面 Blob 存储。收藏封面保留，未收藏浏览封面采用 32 MiB LRU 上限。登录采用本站无状态 Functions + Supabase Auth；认证信息与本地馆藏分离。账号在应用模块加载前确定，切换与退出重载页面，防止异步写入跨账号。配置与平台边界见 [ACCOUNT_SETUP.md](ACCOUNT_SETUP.md)。WebCollectionRepository 仅保留为旧接口兼容实现；未来 App 可替换 SQLite/Native adapters。
 
 ## 演进原则
 

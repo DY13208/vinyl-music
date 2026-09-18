@@ -1,3 +1,4 @@
+import { ArtworkImage } from './ArtworkImage';
 import React, { useRef, useState } from 'react';
 import { Pause, Play, X } from 'lucide-react';
 import { Album, Track } from '../types';
@@ -32,11 +33,11 @@ export const FloatingPlayer: React.FC<Props> = ({ currentAlbum, currentTrack, is
     {...dragHandlers}>
     {!expanded ? <button type="button" className="floating-player__disc" aria-label={`展开播放器：${currentTrack.title}`}
       onClick={() => { if (suppressClick.current) { suppressClick.current = false; return; } setExpanded(true); }}>
-      <span className="floating-player__art"><img src={currentAlbum.coverUrl} alt="" draggable={false} /></span>
+      <span className="floating-player__art"><ArtworkImage src={currentAlbum.coverUrl} alt="" draggable={false} /></span>
       <span className="floating-player__state" aria-hidden="true">{isPlaying ? <Pause size={17} fill="currentColor" /> : <Play size={18} fill="currentColor" />}</span>
     </button> : <div className="floating-player__expanded">
       <button type="button" className="floating-player__open" aria-label={`打开全屏播放器：${currentTrack.title}`} onClick={onOpenPlayer}>
-        <span className="floating-player__thumb"><img src={currentAlbum.coverUrl} alt="" draggable={false} /></span>
+        <span className="floating-player__thumb"><ArtworkImage src={currentAlbum.coverUrl} alt="" draggable={false} /></span>
         <span className="floating-player__copy"><strong>{currentTrack.title}</strong><small>{currentAlbum.artist}</small></span>
       </button>
       <button data-floating-action type="button" className="floating-player__control" aria-label={isPlaying ? '暂停' : '播放'} onClick={togglePlayback}>{isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}</button>

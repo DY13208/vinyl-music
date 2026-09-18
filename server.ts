@@ -1,15 +1,23 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import path from 'node:path';
-import { promises as fs } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import type { Album } from './src/types.js';
+import { artworkHandler } from './src/server/artwork.js';
+import { authHandler } from './src/server/auth.js';
 import { registerVinylSearchRoutes } from './src/server/vinylSearch/registerVinylSearchRoutes.js';
 
+// Vercel's `vercel env pull` commonly writes .env.development.local. Load the
+// local variants for development; existing process environment variables win.
+// .env.auth.local is a safe local-only override for the app's own auth values.
+dotenv.config({ path: '.env.auth.local', quiet: true });
+dotenv.config({ path: '.env.local', quiet: true });
+dotenv.config({ path: '.env.development.local', quiet: true });
+dotenv.config({ path: '.env', quiet: true });
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
-const dataFile = path.join(rootDir, 'data', 'vinyl-collection.json');
 const app = express();
 const port = Number(process.env.API_PORT || process.env.PORT || 3001);
-app.use(express.json({ limit: '8mb' }));
+// Auth parses its own small JSON body and returns sanitized errors. Do not let
+// a generic JSON-parser error log include a submitted password.
 app.use('/api', (req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
@@ -22,66 +30,11 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-async function readCollection(): Promise<Album[]> {
-  try {
-    const value = JSON.parse(await fs.readFile(dataFile, 'utf8'));
-    return Array.isArray(value) ? value : [];
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
-    throw error;
-  }
-}
-
-let writeQueue = Promise.resolve();
-function writeCollection(albums: Album[]) {
-  writeQueue = writeQueue.then(async () => {
-    await fs.mkdir(path.dirname(dataFile), { recursive: true });
-    const tempFile = `${dataFile}.tmp`;
-    await fs.writeFile(tempFile, `${JSON.stringify(albums, null, 2)}\n`, 'utf8');
-    await fs.rename(tempFile, dataFile);
-  });
-  return writeQueue;
-}
-
-function validAlbum(value: unknown): value is Album {
-  const item = value as Partial<Album> | null;
-  return !!item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.artist === 'string' && Array.isArray(item.tracks);
-}
-
+// Private collections must never be read from or written to server storage.
+app.use('/api/collection', (_req, res) => res.status(410).json({ error: '个人馆藏仅保存在当前设备，不提供服务器存取接口' }));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
-app.get('/api/collection', async (_req, res, next) => {
-  try { res.json(await readCollection()); } catch (error) { next(error); }
-});
-app.post('/api/collection', async (req, res, next) => {
-  try {
-    if (!validAlbum(req.body)) return res.status(400).json({ error: '唱片数据不完整' });
-    const albums = await readCollection();
-    const index = albums.findIndex(item => item.id === req.body.id || (req.body.barcode && item.barcode === req.body.barcode));
-    if (index >= 0) albums[index] = req.body; else albums.unshift(req.body);
-    await writeCollection(albums);
-    res.status(index >= 0 ? 200 : 201).json(req.body);
-  } catch (error) { next(error); }
-});
-app.post('/api/collection/import', async (req, res, next) => {
-  try {
-    const incoming = Array.isArray(req.body?.albums) ? req.body.albums.filter(validAlbum) : [];
-    if (!incoming.length) return res.status(400).json({ error: '没有可保存的唱片数据' });
-    const albums = await readCollection();
-    for (const album of incoming) {
-      const index = albums.findIndex(item => item.id === album.id || (album.barcode && item.barcode === album.barcode));
-      if (index >= 0) albums[index] = album; else albums.unshift(album);
-    }
-    await writeCollection(albums);
-    res.status(201).json(incoming);
-  } catch (error) { next(error); }
-});
-app.delete('/api/collection/:id', async (req, res, next) => {
-  try {
-    const albums = await readCollection();
-    await writeCollection(albums.filter(item => item.id !== req.params.id));
-    res.json({ ok: true });
-  } catch (error) { next(error); }
-});
+app.all('/api/artwork', artworkHandler);
+app.all('/api/auth', authHandler);
 
 // Register the provider-backed lookup before the static app fallback.
 registerVinylSearchRoutes(app);

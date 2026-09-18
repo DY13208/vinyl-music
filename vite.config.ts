@@ -18,7 +18,7 @@ export default defineConfig(() => {
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       proxy: {
-        '/api': 'http://127.0.0.1:3001',
+        '/api': `http://127.0.0.1:${process.env.DEV_API_PORT || '3001'}`,
       },
     },
   };

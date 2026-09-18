@@ -4,6 +4,8 @@ dist/
 data/vinyl-collection.json
 data/vinyl-collection.json.tmp
 coverage/
+test-results/
+playwright-report/
 .DS_Store
 *.log
 .env*

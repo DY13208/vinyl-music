@@ -1,3 +1,4 @@
+import { useArtwork } from '../../../hooks/useArtwork';
 import React, { Component, ErrorInfo, ReactNode, Suspense, useEffect, useMemo, useRef } from 'react';
 import { Canvas, ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { AdaptiveDpr, ContactShadows, RoundedBox, useTexture } from '@react-three/drei';
@@ -24,7 +25,7 @@ interface VinylMeshProps {
   onOpen: () => void;
 }
 
-const FALLBACK_COVER = '/assets/browse-demo/cover-01.svg';
+const FALLBACK_COVER = '/assets/cover-placeholder.svg';
 
 class ThreeStageBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -38,7 +39,8 @@ class ThreeStageBoundary extends Component<{ children: ReactNode }, { failed: bo
 function VinylMesh({ album, offset, reducedMotion, onSelect, onOpen }: VinylMeshProps) {
   const group = useRef<Group>(null);
   const invalidate = useThree(state => state.invalidate);
-  const texture = useTexture(album.coverUrl || FALLBACK_COVER) as Texture;
+  const artwork = useArtwork(album.coverUrl);
+  const texture = useTexture(artwork.local && artwork.url ? artwork.url : FALLBACK_COVER) as Texture;
   const appearance = getVinylAppearance(album);
   const colors = album.vinylColors?.length ? album.vinylColors : [album.vinylColor || '#111214'];
   const discColor = appearance.variant === 'black' ? '#090a0b' : colors[0];

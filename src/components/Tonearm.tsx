@@ -374,8 +374,9 @@ export const Tonearm: React.FC<TonearmProps> = ({
               ? 'drop-shadow(-6px 12px 14px rgba(0,0,0,0.92)) drop-shadow(-2px 4px 6px rgba(0,0,0,0.8))'
               : 'drop-shadow(-4px 8px 10px rgba(0,0,0,0.7))',
           }}
-          title="点击起落黑胶唱针 (播放 / 暂停)"
+          aria-label="点击起落黑胶唱针 (播放 / 暂停)"
         >
+          <title>点击起落黑胶唱针 (播放 / 暂停)</title>
           {/* 1. REAR EXTENSION STUB (Extends backward into top-right plinth corner) */}
           <line
             x1="104"

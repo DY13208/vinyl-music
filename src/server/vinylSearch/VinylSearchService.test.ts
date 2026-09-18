@@ -15,6 +15,27 @@ test('local provider does not return demo albums as search evidence', async () =
   assert.deepEqual(await new LocalDatabaseProvider().search('Abbey Road'), []);
 });
 
+test('catalogue searches find albums by artist without requiring an album title', async () => {
+  const service = new VinylSearchService([provider(identity), provider({ ...physical, title: 'Another record', artist: 'Artist' })]);
+  const results = (await service.search({ query: 'Artist' })).results;
+  assert.equal(results.length, 2);
+  assert.ok(results.some(result => result.album.title === 'Another record'));
+});
+
+test('public detail resolves only known remote providers', async () => {
+  const service = new VinylSearchService([provider(identity)]);
+  assert.equal((await service.getAlbum('deezer', 'album'))?.title, 'Example');
+  assert.equal(await service.getAlbum('local', 'album'), null);
+  assert.equal(await service.getAlbum('https://other-host.test', 'album'), null);
+});
+
+test('equivalent album identities prefer a mainland CDN and normalize HTTPS', async () => {
+  const domestic = { ...identity, provider: 'chinese-music' as const, coverUrl: 'http://y.gtimg.cn/music/photo_new/test.jpg' };
+  const service = new VinylSearchService([provider(identity), provider(domestic)]);
+  const result = (await service.search({ query: 'Example', artist: 'Artist' })).results[0];
+  assert.equal(result.album.coverUrl, 'https://y.gtimg.cn/music/photo_new/test.jpg');
+});
+
 test('identity-only metadata supplies black vinyl without invented pressing, year or condition', () => {
   const album = providerAlbumToAlbum(identity);
   assert.equal(album.vinylTexture, 'black');

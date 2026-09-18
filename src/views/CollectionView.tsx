@@ -22,6 +22,7 @@ interface CollectionViewProps {
   onToggleFavorite: (id: string) => void;
   onOpenAlbumDetail: (album: Album) => void;
   onAddVinyl: () => void;
+  onDiscover?: () => void;
 }
 
 
@@ -31,7 +32,7 @@ const genreMatches = (album: Album, genre: Genre) => {
   return album.genre.includes(genre);
 };
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, filters, themePreference, favoriteIds, onToggleFavorite, onOpenAlbumDetail, onAddVinyl }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, filters, themePreference, favoriteIds, onToggleFavorite, onOpenAlbumDetail, onAddVinyl, onDiscover }) => {
   const theme = collectionThemeRegistry[themePreference.themeId];
   const Header = theme.Header;
   const { query, setQuery, genre, setGenre, sort, setSort } = filters;
@@ -50,7 +51,9 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
     next();
     hapticsService.triggerHaptic('light');
   };
-  const empty = <div className="collection-room__empty"><span>没有找到匹配的唱片</span><button type="button" onClick={() => updateCollection(() => { setQuery(''); setGenre('全部'); })}>查看全部收藏</button></div>;
+  const empty = albums.length
+    ? <div className="collection-room__empty"><span>没有找到匹配的唱片</span><button type="button" onClick={() => updateCollection(() => { setQuery(''); setGenre('全部'); })}>清除筛选</button></div>
+    : <div className="collection-room__empty"><span>你的唱片库还是空的</span><p>去发现喜欢的唱片，试听后再收入收藏。</p><button type="button" onClick={onDiscover ?? onAddVinyl}>{onDiscover ? '去发现唱片' : '添加第一张唱片'}</button></div>;
   const defaultLayout = <CollectionDefaultLayout theme={theme} albums={shelfAlbums} selectedAlbumId={browse.selectedAlbumId} onSelectAlbum={browse.selectAlbum} favoriteIds={favoriteIds} onOpenAlbumDetail={onOpenAlbumDetail} onToggleFavorite={onToggleFavorite} cardVariant={theme.cardVariant} />;
   const modeMap = { default: 'default', 'gallery-grid': 'grid', 'spine-carousel': 'spine' } as const;
   const viewModeMap = { default: 'default', grid: 'gallery-grid', spine: 'spine-carousel' } as const;

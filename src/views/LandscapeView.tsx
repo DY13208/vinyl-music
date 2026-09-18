@@ -1,3 +1,4 @@
+import { ArtworkImage } from '../components/ArtworkImage';
 import React from 'react';
 import { Album } from '../types';
 import { VinylDisc } from '../components/VinylDisc';
@@ -69,7 +70,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
           }}
           className="absolute -left-16 top-1/2 -translate-y-1/2 opacity-25 hover:opacity-50 transition-opacity cursor-pointer flex items-center gap-2 z-10"
         >
-          <img
+          <ArtworkImage
             src={prevAlbum.coverUrl}
             alt={prevAlbum.title}
             className="w-28 h-28 rounded-[4px] object-cover filter blur-[2px]"
@@ -78,7 +79,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
 
         {/* 1. LEFT: Album Cover Sleeve */}
         <div className="w-[180px] sm:w-[220px] aspect-square rounded-[4px] overflow-hidden bg-[#0F0F0F] border border-[#26272D] shadow-2xl relative flex-shrink-0 z-20">
-          <img
+          <ArtworkImage
             src={currentAlbum.coverUrl}
             alt={currentAlbum.title}
             className="w-full h-full object-cover"
@@ -199,7 +200,7 @@ export const LandscapeView: React.FC<LandscapeViewProps> = ({
           }}
           className="absolute -right-16 top-1/2 -translate-y-1/2 opacity-25 hover:opacity-50 transition-opacity cursor-pointer flex items-center gap-2 z-10"
         >
-          <img
+          <ArtworkImage
             src={nextAlbum.coverUrl}
             alt={nextAlbum.title}
             className="w-28 h-28 rounded-[4px] object-cover filter blur-[2px]"

@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/api/collection/:path*", "destination": "/api/collection" },
+    { "source": "/api/releases/search", "destination": "/api/releases?route=search" },
+    { "source": "/api/releases/detail", "destination": "/api/releases?route=detail" },
+    { "source": "/api/releases/barcode/:barcode", "destination": "/api/releases?route=barcode/:barcode" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" }
+    ] }
+  ]
+}

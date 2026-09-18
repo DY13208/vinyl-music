@@ -53,7 +53,7 @@ vinyl-music/
 ## 🚀 快速开始
 
 ### 环境要求
-- Node.js >= 16
+- Node.js >= 22
 - npm 或 yarn
 
 ### 安装依赖
@@ -72,7 +72,7 @@ cp .env.example .env
 
 ### 开发模式
 
-启动前端与收藏后端（前端端口 3000，API 端口 3001）：
+先按 [账户服务接入说明](docs/ACCOUNT_SETUP.md) 配置 Supabase，再启动前端与公共内容/账户接口（前端端口 3000，API 端口 3001）：
 
 ```bash
 npm run dev
@@ -80,7 +80,7 @@ npm run dev
 
 访问 [http://localhost:3000](http://localhost:3000)
 
-新增唱片会持久化到后端的 `data/vinyl-collection.json`。扫码功能需要通过 HTTPS 或 localhost 打开并允许摄像头权限；识别到 EAN / UPC 后，会通过 MusicBrainz 与 Cover Art Archive 补全发行资料。
+个人馆藏和封面只保存到当前账号在本设备的 IndexedDB，服务器不接收馆藏上传。公共封面通过本站受限接口获取并压缩到本机；扫码查询只发送公共条码。旧 `data/vinyl-collection.json` 不再读取或写入，原文件不会自动删除。
 
 ### 构建生产版本
 

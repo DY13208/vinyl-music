@@ -35,3 +35,19 @@ test('first visit stays empty instead of creating a sample collection', async ()
   await repository.whenReady();
   assert.deepEqual(repository.getAlbums(), []);
 });
+
+test('failed local writes reject without falsely changing the collection', async () => {
+  const storage: StorageService = { getItem: () => null, setItem() {}, removeItem() {} };
+  const db = { get: async <T>() => undefined as T | undefined, put: async () => { throw new Error('QuotaExceededError'); } };
+  const repository = new IndexedDBCollectionRepository(storage, [], db);
+  await repository.whenReady();
+  await assert.rejects(repository.saveAlbum(ALBUMS[0]), /本地保存失败/);
+  assert.deepEqual(repository.getAlbums(), []);
+});
+
+test('overlapping additions are queued without losing either album', async () => {
+  const repository = fixture([]);
+  await repository.whenReady();
+  await Promise.all([repository.saveAlbum(ALBUMS[0]), repository.saveAlbum(ALBUMS[1])]);
+  assert.equal(repository.getAlbums().length, 2);
+});

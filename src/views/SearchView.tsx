@@ -1,3 +1,4 @@
+import { ArtworkImage } from '../components/ArtworkImage';
 import React, { useState, useMemo } from 'react';
 import { Album, Artist, Track } from '../types';
 import { Search as SearchIcon, X, ArrowLeft, Disc, User, Music } from 'lucide-react';
@@ -188,7 +189,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                     className="p-2.5 rounded-[4px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#2FE92B]/50 cursor-pointer transition-all flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <img
+                      <ArtworkImage
                         src={album.coverUrl}
                         alt={album.title}
                         className="w-12 h-12 rounded-[3px] object-cover flex-shrink-0"
@@ -231,7 +232,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                     className="p-2.5 rounded-[4px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer transition-all flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <img
+                      <ArtworkImage
                         src={artist.avatarUrl}
                         alt={artist.name}
                         className="w-11 h-11 rounded-full object-cover border border-[#26272D]"
