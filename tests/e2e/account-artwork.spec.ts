@@ -165,7 +165,7 @@ test('private collection and cached cover survive reload, remain local and are i
   await profile(page);
   await page.getByRole('button', { name: '系统设置' }).click();
   await page.getByRole('button', { name: /清理浏览封面缓存/ }).click();
-  await expect(page.getByText('收藏封面已保存在本机。')).toBeVisible();
+  await expect(page.getByText('唱片架封面已保存在本机。')).toBeVisible();
   await page.reload();
   await expect(page.locator('.album-artwork img').first()).toHaveAttribute('src', /^blob:/);
   await profile(page);

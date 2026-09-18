@@ -76,7 +76,7 @@ const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
       <p className="archive-info__label">{album.label}</p>
       <div className="archive-actions">
         <button id="album-detail-play-btn" className="archive-actions__play" type="button" disabled={!allTracks.length} onClick={() => play(allTracks)}><Play size={17} fill="currentColor" />播放整张</button>
-        <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消收藏' : '收藏'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); hapticsService.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>
+        <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消唱片架喜爱标记' : '唱片架'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); hapticsService.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>
         {onToggleWishlist && <button id="album-detail-wishlist-btn" type="button" aria-label="切换愿望单标记" onClick={() => { onToggleWishlist(album); hapticsService.triggerHaptic('light'); }}><BookmarkPlus size={21} /></button>}
       </div>
     </section>

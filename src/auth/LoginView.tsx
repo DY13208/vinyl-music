@@ -34,7 +34,7 @@ export function LoginView({ initialError = '', recovery = false, onAuthenticated
     <div className="auth-content">
       <a className="auth-brand" href="/" aria-label="Vinyl Shelf 首页"><Disc3 size={25} /> Vinyl Shelf</a>
       <div className="auth-record" aria-hidden="true"><span>VINYL<br />SHELF</span></div>
-      <header><h1>{titles[mode]}</h1><p>{mode === 'login' || mode === 'register' ? '每一张收藏，都有只属于你的故事。' : '使用注册邮箱，重新连接你的音乐生活。'}</p></header>
+      <header><h1>{titles[mode]}</h1><p>{mode === 'login' || mode === 'register' ? '每一张唱片，都有只属于你的故事。' : '使用注册邮箱，重新连接你的音乐生活。'}</p></header>
       <form onSubmit={submit} aria-busy={busy}>
         <fieldset disabled={busy}>
           {mode !== 'password' && <label htmlFor="auth-email">邮箱<input id="auth-email" type="email" autoComplete="email" inputMode="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} placeholder="you@example.com" /></label>}
@@ -48,7 +48,7 @@ export function LoginView({ initialError = '', recovery = false, onAuthenticated
       </form>
       {mode === 'login' && <p className="auth-switch">还没有账户？<button type="button" disabled={busy} onClick={() => switchMode('register')}>注册</button></p>}
       {(mode === 'register' || mode === 'recover') && <button type="button" className="auth-back" disabled={busy} onClick={() => switchMode('login')}><ArrowLeft size={16} />返回登录</button>}
-      <footer><LockKeyhole size={16} /><p>馆藏和私人图片只保存在当前设备。<br />登录用于账户识别，不会上传或同步你的唱片收藏。</p></footer>
+      <footer><LockKeyhole size={16} /><p>馆藏和私人图片只保存在当前设备。<br />登录用于账户识别，不会上传或同步你的唱片架。</p></footer>
     </div>
   </main>;
 }

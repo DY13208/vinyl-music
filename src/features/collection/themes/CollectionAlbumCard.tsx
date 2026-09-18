@@ -21,7 +21,7 @@ export const CollectionAlbumCard: React.FC<Omit<CollectionPresentationProps, 'al
   const favorite = favoriteIds.includes(album.id);
   return <article className={`ct-card${featured ? ' ct-card--featured' : ''}`} data-album-id={album.id} data-selected={selectedAlbumId === album.id || undefined}>
     <button type="button" className="ct-card__open" aria-label={`打开专辑：${album.title}`} onClick={() => onOpenAlbumDetail(album)}><CollectionArtwork album={album} variant={cardVariant} /></button>
-    <div className="ct-card__info"><div><h2 title={album.title}>{album.title}</h2><p>{album.artist}</p></div><button type="button" className="ct-card__favorite" aria-label={`${favorite ? '取消收藏' : '收藏'}：${album.title}`} aria-pressed={favorite} onClick={() => onToggleFavorite(album.id)}><Heart size={16} fill={favorite ? 'currentColor' : 'none'} /></button></div>
+    <div className="ct-card__info"><div><h2 title={album.title}>{album.title}</h2><p>{album.artist}</p></div><button type="button" className="ct-card__favorite" aria-label={`${favorite ? '取消喜爱标记' : '标记为喜爱'}：${album.title}`} aria-pressed={favorite} onClick={() => onToggleFavorite(album.id)}><Heart size={16} fill={favorite ? 'currentColor' : 'none'} /></button></div>
     <button type="button" className="ct-card__more" aria-label={`查看专辑详情：${album.title}`} onClick={() => onOpenAlbumDetail(album)}><MoreHorizontal size={17} /></button>
   </article>;
 }

@@ -5,7 +5,7 @@ import { artworkService } from '../platform/artwork/WebArtworkAdapter';
 import './ProfileIdentity.css';
 
 export function ProfileIdentity({ email }: { email: string }) {
-  const fallbackName = email.split('@')[0] || '唱片收藏者';
+  const fallbackName = email.split('@')[0] || '唱片爱好者';
   const [profile, setProfile] = useState<LocalProfile>({ displayName: '', avatar: '' });
   const [draft, setDraft] = useState<LocalProfile>(profile);
   const [loaded, setLoaded] = useState(false);

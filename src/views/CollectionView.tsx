@@ -53,7 +53,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
   };
   const empty = albums.length
     ? <div className="collection-room__empty"><span>没有找到匹配的唱片</span><button type="button" onClick={() => updateCollection(() => { setQuery(''); setGenre('全部'); })}>清除筛选</button></div>
-    : <div className="collection-room__empty"><span>你的唱片库还是空的</span><p>去发现喜欢的唱片，试听后再收入收藏。</p><button type="button" onClick={onDiscover ?? onAddVinyl}>{onDiscover ? '去发现唱片' : '添加第一张唱片'}</button></div>;
+    : <div className="collection-room__empty"><span>你的唱片架还是空的</span><p>去发现喜欢的唱片，试听后放进唱片架。</p><button type="button" onClick={onDiscover ?? onAddVinyl}>{onDiscover ? '去发现唱片' : '添加第一张唱片'}</button></div>;
   const defaultLayout = <CollectionDefaultLayout theme={theme} albums={shelfAlbums} selectedAlbumId={browse.selectedAlbumId} onSelectAlbum={browse.selectAlbum} favoriteIds={favoriteIds} onOpenAlbumDetail={onOpenAlbumDetail} onToggleFavorite={onToggleFavorite} cardVariant={theme.cardVariant} />;
   const modeMap = { default: 'default', 'gallery-grid': 'grid', 'spine-carousel': 'spine' } as const;
   const viewModeMap = { default: 'default', grid: 'gallery-grid', spine: 'spine-carousel' } as const;
@@ -62,13 +62,13 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
   return (
     <main id="collection-view" className="collection-room ct-page" data-view-mode={themePreference.viewMode}>
       <Header>
-        <div className="collection-room__title"><h1>我的收藏</h1><p>黑胶，是时光的收藏。</p></div>
+        <div className="collection-room__title"><h1>我的唱片架</h1><p>把喜欢的声音，放进唱片架。</p></div>
         <div className="collection-room__actions">
-          <select className="ct-compact-mode" aria-label="收藏浏览模式" value={themePreference.viewMode} onChange={event => themePreference.setViewMode(event.target.value as CollectionViewMode)}>{collectionModes.map(mode => <option key={mode.id} value={mode.id}>{mode.label}</option>)}</select>
-          <button type="button" onClick={() => { setSearchOpen((value) => !value); setSheetOpen(false); }} aria-label={searchOpen ? '关闭搜索' : '搜索收藏'} aria-expanded={searchOpen}>
+          <select className="ct-compact-mode" aria-label="唱片架浏览模式" value={themePreference.viewMode} onChange={event => themePreference.setViewMode(event.target.value as CollectionViewMode)}>{collectionModes.map(mode => <option key={mode.id} value={mode.id}>{mode.label}</option>)}</select>
+          <button type="button" onClick={() => { setSearchOpen((value) => !value); setSheetOpen(false); }} aria-label={searchOpen ? '关闭搜索' : '搜索唱片架'} aria-expanded={searchOpen}>
             {searchOpen ? <X /> : <Search />}
           </button>
-          <button type="button" onClick={() => { setSheetOpen(true); setSearchOpen(false); }} aria-label="更多收藏选项" aria-expanded={sheetOpen} className={genre !== '全部' || sort !== 'recent' ? 'is-active' : ''}>
+          <button type="button" onClick={() => { setSheetOpen(true); setSearchOpen(false); }} aria-label="更多唱片架选项" aria-expanded={sheetOpen} className={genre !== '全部' || sort !== 'recent' ? 'is-active' : ''}>
             <MoreHorizontal />
           </button>
         </div>
@@ -82,15 +82,15 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
         </div>
       )}
 
-      <nav className="collection-room__filters" aria-label="收藏分类">
+      <nav className="collection-room__filters" aria-label="唱片架分类">
         <div className="collection-room__categories">{genres.map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div>
         <div className="collection-room__toolbar-actions">
           <button type="button" className="collection-room__add" onClick={onAddVinyl} aria-label="新增唱片"><Plus /><span className="collection-room__add-label"><span>新增唱片</span><span>新增</span></span></button>
-          <button type="button" className="collection-room__sort" onClick={() => setSheetOpen(true)}><ArrowDownUp /><span>{sort === 'recent' ? '最近收藏' : sort === 'artist' ? '艺术家' : '发行年份'}</span></button>
+          <button type="button" className="collection-room__sort" onClick={() => setSheetOpen(true)}><ArrowDownUp /><span>{sort === 'recent' ? '最近入架' : sort === 'artist' ? '艺术家' : '发行年份'}</span></button>
         </div>
       </nav>
 
-      <section className="collection-room__shelf" aria-label="收藏浏览">
+      <section className="collection-room__shelf" aria-label="唱片架浏览">
         <AlbumBrowser showToolbar={false} galleryLayout={theme.coversOnly ? defaultLayout : undefined} showSelection={!theme.coversOnly || themePreference.viewMode === 'spine-carousel'} albums={shelfAlbums} browse={collectionBrowser} onOpenAlbumDetail={onOpenAlbumDetail} empty={empty} defaultLayout={defaultLayout} portrait={shelfAlbums.length ? defaultLayout : empty} renderArtwork={album => <CollectionArtwork album={album} variant={theme.cardVariant} />} />
       </section>
 

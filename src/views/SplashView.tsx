@@ -43,7 +43,7 @@ export const SplashView: React.FC<SplashViewProps> = ({ onEnterApp }) => {
           让音乐，<br />回到生活的形状
         </h1>
         <p className="text-[14px] text-[#BBCBB2] font-normal tracking-wide">
-          收藏 · 聆听 · 发现 · 分享
+          唱片架 · 聆听 · 发现 · 分享
         </p>
         <p className="text-[11px] text-white/40 font-mono tracking-widest pt-2">
           MUSIC LIVES LONGER

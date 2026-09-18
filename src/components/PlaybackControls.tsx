@@ -33,7 +33,7 @@ export const PlaybackControls: React.FC<PlaybackControlsProps> = ({
           hapticsService.triggerHaptic('light');
         }}
         className="w-12 h-12 flex items-center justify-center text-[#BBCBB2] hover:text-white active:scale-90 transition-all"
-        title="收藏"
+        title={isFavorite ? '取消喜爱标记' : '标记为喜爱'}
       >
         <Heart
           className={`w-[23px] h-[23px] transition-colors ${

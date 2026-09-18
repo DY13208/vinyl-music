@@ -59,7 +59,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const menuItems = [
     {
       id: 'collection',
-      label: '我的收藏',
+      label: '我的唱片架',
       icon: <Heart className="w-4 h-4 text-[#2FE92B]" />,
       action: onOpenCollection,
       badge: String(collectionCount),

@@ -388,7 +388,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </div>
           <div className="crescent-controls__track-meta">
             <span title={`${album.artist} · ${album.title}`}>{album.artist}</span>
-            <button type="button" id="player-favorite" aria-label={favorite ? '取消收藏当前专辑' : '收藏当前专辑'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
+            <button type="button" id="player-favorite" aria-label={favorite ? '取消当前专辑的喜爱标记' : '将当前专辑标记为喜爱'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
           </div>
         </div>}
         <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />

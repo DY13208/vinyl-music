@@ -1,6 +1,6 @@
 import { vinylDatabase } from '../db/VinylDatabase';
 import { ArtworkCache, ARTWORK_ITEM_LIMIT, albumArtworkSources } from './ArtworkCache';
-import { artworkKey, artworkRequestUrl, publicArtworkUrl } from '../../utils/artworkUrl';
+import { artworkKey, artworkRequestUrl, publicArtworkUrl, isDomesticArtwork } from '../../utils/artworkUrl';
 import type { Album } from '../../types';
 
 export type ResolvedArtwork = { url: string; local: boolean; release: () => void };
@@ -9,6 +9,10 @@ const MAX_DOWNLOAD_BYTES = 3 * 1024 * 1024;
 export class WebArtworkAdapter {
   private cache = new ArtworkCache(vinylDatabase);
   private pending = new Map<string, Promise<Blob>>();
+  private memory = new Map<string, Blob>();
+  private memoryBytes = 0;
+  private urls = new Map<string, { url: string; users: number }>();
+  private failedUntil = new Map<string, number>();
   private active = 0;
   private waiting: Array<() => void> = [];
 
@@ -16,10 +20,16 @@ export class WebArtworkAdapter {
     const key = artworkKey(source);
     if (!key || /^(data:|blob:|\/(?!\/))/.test(key)) return { url: key, local: true, release() {} };
     try {
-      const cached = await this.cache.get(key).catch(() => undefined);
-      const blob = cached || await this.download(key);
-      const url = URL.createObjectURL(blob);
-      return { url, local: true, release: () => URL.revokeObjectURL(url) };
+      const blob = await this.load(key);
+      let shared = this.urls.get(key);
+      if (!shared) { shared = { url: URL.createObjectURL(blob), users: 0 }; this.urls.set(key, shared); }
+      shared.users++;
+      let released = false;
+      return { url: shared.url, local: true, release: () => {
+        if (released) return;
+        released = true;
+        if (--shared.users === 0) { URL.revokeObjectURL(shared.url); this.urls.delete(key); }
+      } };
     } catch {
       // A direct image can still display when CORS/storage is unavailable.
       return { url: key, local: false, release() {} };
@@ -28,16 +38,16 @@ export class WebArtworkAdapter {
 
   async prefetchCollection(albums: Album[]) {
     const queue = albumArtworkSources(albums).filter(source => /^https?:|^\/\//.test(source));
-    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
-      while (queue.length) { const artwork = await this.resolve(queue.shift()!); artwork.release(); }
-    }));
+    // One background worker leaves download slots available to on-screen covers.
+    for (const source of queue) { const artwork = await this.resolve(source); artwork.release(); }
   }
 
   stats() { return this.cache.stats(); }
-  clearBrowsing() { return this.cache.clearBrowsing(); }
+  async clearBrowsing() { this.memory.clear(); this.memoryBytes = 0; await this.cache.clearBrowsing(); }
   onOnline(retry: () => void) {
-    window.addEventListener('online', retry);
-    return () => window.removeEventListener('online', retry);
+    const listener = () => { this.failedUntil.clear(); retry(); };
+    window.addEventListener('online', listener);
+    return () => window.removeEventListener('online', listener);
   }
 
   async importFile(file: Blob): Promise<string> {
@@ -51,10 +61,31 @@ export class WebArtworkAdapter {
     });
   }
 
-  private download(source: string): Promise<Blob> {
+  private load(source: string): Promise<Blob> {
+    const memory = this.memory.get(source);
+    if (memory) {
+      this.memory.delete(source); this.memory.set(source, memory);
+      return Promise.resolve(memory);
+    }
     const existing = this.pending.get(source);
     if (existing) return existing;
-    const work = this.fetchAndStore(source).finally(() => this.pending.delete(source));
+    // Deduplicate the entire DB read/download/encode operation, not just fetch.
+    const work = (async () => {
+      const cached = await this.cache.get(source).catch(() => undefined);
+      if (!cached && (this.failedUntil.get(source) || 0) > Date.now()) throw new Error('封面暂不可用');
+      const blob = cached || await this.fetchAndStore(source);
+      this.failedUntil.delete(source);
+      this.memory.set(source, blob); this.memoryBytes += blob.size;
+      while (this.memoryBytes > 8 * 1024 * 1024 || this.memory.size > 64) {
+        const oldest = this.memory.keys().next().value!;
+        this.memoryBytes -= this.memory.get(oldest)!.size; this.memory.delete(oldest);
+      }
+      return blob;
+    })().catch(error => {
+      this.failedUntil.set(source, Date.now() + 30_000);
+      if (this.failedUntil.size > 100) this.failedUntil.delete(this.failedUntil.keys().next().value!);
+      throw error;
+    }).finally(() => this.pending.delete(source));
     this.pending.set(source, work);
     return work;
   }
@@ -64,22 +95,23 @@ export class WebArtworkAdapter {
     else this.active++;
     try {
       const requestUrl = artworkRequestUrl(source);
+      const domestic = isDomesticArtwork(source);
       let raw: Blob;
-      try { raw = await this.fetchImage(requestUrl); }
+      try { raw = await this.fetchImage(domestic ? source : requestUrl, domestic ? 2500 : 9000); }
       catch (error) {
         if (!publicArtworkUrl(source)) throw error;
-        raw = await this.fetchImage(source);
+        raw = await this.fetchImage(domestic ? requestUrl : source, domestic ? 9000 : 4000);
       }
-      const blob = await this.compress(raw);
+      const blob = await this.compress(raw, true);
       // A quota failure must not stop the current image from displaying.
       await this.cache.put(source, blob).catch(() => undefined);
       return blob;
     } finally { const next = this.waiting.shift(); if (next) next(); else this.active--; }
   }
 
-  private async fetchImage(url: string): Promise<Blob> {
+  private async fetchImage(url: string, timeout: number): Promise<Blob> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 10000);
+    const timer = setTimeout(() => controller.abort(), timeout);
     try {
       const response = await fetch(url, { signal: controller.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
       const type = response.headers.get('content-type')?.split(';')[0] || '';
@@ -104,13 +136,14 @@ export class WebArtworkAdapter {
     } finally { clearTimeout(timer); }
   }
 
-  private async compress(blob: Blob): Promise<Blob> {
+  private async compress(blob: Blob, allowOriginal = false): Promise<Blob> {
     const url = URL.createObjectURL(blob);
     try {
       const image = new Image();
       image.src = url;
       await image.decode();
       if (!image.naturalWidth || !image.naturalHeight) throw new Error('无法读取封面');
+      if (allowOriginal && Math.max(image.naturalWidth, image.naturalHeight) <= 800 && blob.size <= 256 * 1024) return blob;
       const scale = Math.min(1, 800 / Math.max(image.naturalWidth, image.naturalHeight));
       const canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));

@@ -389,7 +389,7 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
 
           {currentScreen === 'collection' && (
-            <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开收藏柜" />}>
+            <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开唱片架" />}>
               <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
             </Suspense>
           )}
@@ -397,6 +397,24 @@ export default function App({ repository = collectionRepository }: { repository?
           {currentScreen === 'discover' && (
             <DiscoverView
               albums={albums}
+              onOpenAlbumDetail={handleOpenAlbumDetail}
+              onOpenArtist={(artistName, artistAlbums) => {
+                const existing = ARTISTS.find(item => item.name === artistName);
+                const artistId = existing?.id ?? `catalogue-${artistName.toLowerCase().trim().replace(/\s+/g, '-')}`;
+                setSelectedArtist({
+                  id: artistId,
+                  name: artistName,
+                  avatarUrl: '',
+                  bannerUrl: artistAlbums[0]?.coverUrl ?? '',
+                  followers: '',
+                  bio: '公开唱片资料来自当前搜索结果。',
+                  albumCount: artistAlbums.length,
+                  albums: artistAlbums,
+                });
+                setCurrentScreen('artist_detail');
+              }}
+              onOpenTrack={handleSelectTrack}
+              onOpenPlayer={() => setCurrentScreen('player')}
               onAddAlbum={handleAddAlbum}
               onPreview={(album, track) => {
                 if (currentPlayingAlbum?.id === album.id && currentTrack?.id === track.id && playbackSource) handleTogglePlay(album);
@@ -507,31 +525,22 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
         </div>
 
-        {/* Playback floats independently so the navigation remains unobstructed. */}
-        {isBottomNavVisible && floatingPlayer.visible && currentPlayingAlbum && currentTrack && (
-          <FloatingPlayer
-            currentAlbum={currentPlayingAlbum}
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            progressPercent={progressPercent}
-            onTogglePlay={() => handleTogglePlay(currentPlayingAlbum)}
-            onOpenPlayer={() => setCurrentScreen('player')}
-          />
-        )}
-
-        {/* Pinned 4-tab navigation. */}
+        {/* Four destinations with the existing player docked in the center. */}
         {isBottomNavVisible && (
           <div
             id="app-bottom-dock"
-            className="w-full flex-shrink-0 bg-[#000000] z-40 border-t border-[#26272D]/70 shadow-[0_-10px_25px_rgba(0,0,0,0.85)]"
+            className="app-bottom-dock"
           >
-            {/* 4-Tab Bottom Navigation: 首页, 收藏, 发现, 我的 */}
             <BottomNav activeTab={activeTab} onChangeTab={handleChangeTab} />
-
-            {/* Hardware Home Indicator Bar */}
-            <div className="w-full pb-1.5 pt-0.5 flex justify-center bg-[#000000]">
-              <div className="w-32 h-1 rounded-full bg-white/25" />
-            </div>
+            {floatingPlayer.visible && <FloatingPlayer
+              mode="dock"
+              currentAlbum={currentPlayingAlbum}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
+              progressPercent={progressPercent}
+              onTogglePlay={() => handleTogglePlay(currentPlayingAlbum ?? undefined)}
+              onOpenPlayer={() => setCurrentScreen('player')}
+            />}
           </div>
         )}
 

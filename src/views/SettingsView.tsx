@@ -47,7 +47,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
     const format = (bytes: number) => bytes < 1024 * 1024 ? `${Math.round(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
     setCacheSize(format(stats.browsingBytes));
     setSavedSize(format(stats.collectionBytes));
-    setCacheMessage(stats.pendingCount ? `${stats.pendingCount} 张收藏图片尚未保存到本机，请联网后重试；空间不足时请先清理浏览缓存。` : '收藏封面已保存在本机。');
+    setCacheMessage(stats.pendingCount ? `${stats.pendingCount} 张唱片架图片尚未保存到本机，请联网后重试；空间不足时请先清理浏览缓存。` : '唱片架封面已保存在本机。');
   };
   useEffect(() => { void refreshCache().catch(() => setCacheMessage('无法读取本地存储，请检查浏览器权限。')); }, []);
 
@@ -79,7 +79,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
       <div className="px-4 py-4 space-y-5">
         <section className="rounded-[6px] bg-[#0F0F0F] border border-[#26272D] p-3.5">
           <div className="flex items-center justify-between gap-4">
-            <div><h2 id="floating-player-setting" className="text-[13.5px] font-medium">显示悬浮播放器</h2><p id="floating-player-setting-help" className="text-[12px] text-[#BBCBB2] mt-1">隐藏悬浮球后，音乐继续播放</p></div>
+            <div><h2 id="floating-player-setting" className="text-[13.5px] font-medium">显示底栏播放器</h2><p id="floating-player-setting-help" className="text-[12px] text-[#BBCBB2] mt-1">隐藏底栏播放按钮后，音乐继续播放</p></div>
             <button type="button" role="switch" aria-checked={floatingPlayerVisible} aria-labelledby="floating-player-setting" aria-describedby="floating-player-setting-help" onClick={() => onFloatingPlayerVisibleChange(!floatingPlayerVisible)} className="w-14 h-11 flex-shrink-0 flex items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-[#2FE92B]">
               <span className={`block w-11 h-6 rounded-full p-0.5 ${floatingPlayerVisible ? 'bg-[#2FE92B]' : 'bg-[#2A2A2C]'}`}><span className={`block w-5 h-5 rounded-full bg-[#0F0F0F] ${floatingPlayerVisible ? 'translate-x-5' : 'translate-x-0'}`} /></span>
             </button>
@@ -273,7 +273,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
             >
               <div>
                 <p className="text-[13.5px] font-medium text-white">{clearing ? '正在清理…' : '清理浏览封面缓存'}</p>
-                <p className="text-[10.5px] text-[#BBCBB2] opacity-70">最多 32 MB，保留收藏封面和本地音乐</p>
+                <p className="text-[10.5px] text-[#BBCBB2] opacity-70">最多 32 MB，保留唱片架封面和本地音乐</p>
               </div>
               <div className="flex items-center gap-1.5 text-white/40 text-[12px] font-mono">
                 <span>{cacheSize}</span>
@@ -281,7 +281,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
               </div>
             </button>
             <div className="p-3.5 border-t border-[#26272D] text-[12px] text-[#BBCBB2] space-y-2">
-              <p>收藏图片占用：{savedSize}</p>
+              <p>唱片架图片占用：{savedSize}</p>
               <p role="status">{cacheMessage}</p>
               <p>馆藏与上传图片仅保存在当前设备，不上传服务器。清除站点数据会丢失本地内容；设备之间不会自动同步。</p>
               {onImportLegacy && <><p>如果此设备升级前的馆藏属于你，可将它归入当前账户。只会在本机复制，不会上传。</p><button type="button" disabled={importing} onClick={importOriginal} className="min-h-11 text-[#2FE92B]">{importing ? '正在导入…' : '将原有本机馆藏归入此账户'}</button><p role="status">{importMessage}</p></>}
