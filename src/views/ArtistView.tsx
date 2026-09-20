@@ -1,7 +1,8 @@
+import { ArtworkImage } from '../components/ArtworkImage';
 import React, { useState } from 'react';
 import { Artist, Album } from '../types';
 import { ChevronLeft, Disc, Check, Plus, Share2 } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface ArtistViewProps {
   artist: Artist;
@@ -23,8 +24,8 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
     >
       {/* Top Banner Image with gradient */}
       <div className="relative w-full h-[230px] overflow-hidden">
-        <img
-          src={artist.bannerUrl}
+        <ArtworkImage
+          src={artist.bannerUrl || artist.albums[0]?.coverUrl || ''}
           alt={artist.name}
           className="w-full h-full object-cover"
         />
@@ -58,9 +59,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
             <h1 className="text-[24px] font-black text-white tracking-tight">
               {artist.name}
             </h1>
-            <p className="text-[11.5px] text-[#BBCBB2] opacity-80 mt-0.5">
-              {artist.followers} · {artist.albumCount} 部黑胶作品
-            </p>
+            <p className="text-[11.5px] text-[#BBCBB2] opacity-80 mt-0.5">{artist.albumCount} 部相关唱片</p>
           </div>
 
           {/* Follow CTA: #2FE92B */}
@@ -68,7 +67,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
             type="button"
             onClick={() => {
               setIsFollowed(!isFollowed);
-              audioEngine.triggerHaptic('medium');
+              hapticsService.triggerHaptic('medium');
             }}
             className={`px-4 py-1.5 rounded-[4px] text-[13px] font-bold tracking-wide flex items-center gap-1.5 transition-all ${
               isFollowed
@@ -119,7 +118,7 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
                 className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer transition-all flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <img
+                  <ArtworkImage
                     src={album.coverUrl}
                     alt={album.title}
                     className="w-12 h-12 rounded-[4px] object-cover"
@@ -141,24 +140,6 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
           </div>
         </section>
 
-        {/* 我收藏的唱片 (My Collected Vinyl from this Artist) */}
-        <section className="space-y-2.5">
-          <h3 className="text-[14px] font-bold text-white tracking-tight">
-            我的收藏柜中的对应版本
-          </h3>
-          <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-black border border-[#2FE92B]/50 flex items-center justify-center">
-                <Disc className="w-5 h-5 text-[#2FE92B]" />
-              </div>
-              <div>
-                <p className="text-[13px] font-medium text-white">已拥有 1 部母带刻录版</p>
-                <p className="text-[11px] text-[#BBCBB2] opacity-75">180g 重磅半速母带限量黑胶</p>
-              </div>
-            </div>
-            <span className="text-[11px] font-mono text-[#2FE92B]">已在柜</span>
-          </div>
-        </section>
       </div>
     </div>
   );

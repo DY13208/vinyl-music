@@ -1,7 +1,8 @@
+import { ArtworkImage } from '../components/ArtworkImage';
 import React from 'react';
 import { WishlistItem, Album } from '../types';
 import { ArrowLeft, Bookmark, Heart, ShoppingBag, Plus, Sparkles } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface WishlistViewProps {
   wishlist: WishlistItem[];
@@ -62,7 +63,7 @@ export const WishlistView: React.FC<WishlistViewProps> = ({
             >
               <div className="flex items-center gap-3.5 overflow-hidden">
                 <div className="relative w-16 h-16 rounded-[4px] overflow-hidden bg-black flex-shrink-0">
-                  <img
+                  <ArtworkImage
                     src={item.album.coverUrl}
                     alt={item.album.title}
                     className="w-full h-full object-cover group-hover:scale-103 transition-transform"
@@ -104,7 +105,7 @@ export const WishlistView: React.FC<WishlistViewProps> = ({
                   type="button"
                   onClick={() => {
                     onRemoveWishlist(item.id);
-                    audioEngine.triggerHaptic('light');
+                    hapticsService.triggerHaptic('light');
                   }}
                   className="p-1 text-white/40 hover:text-white transition-colors"
                   title="移除"

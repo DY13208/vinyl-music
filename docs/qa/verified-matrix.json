@@ -1,0 +1,1654 @@
+[
+  {
+    "requested": [
+      320,
+      568
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 441.0390625,
+            "height": 159.0390625,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 282
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 441.0390625,
+            "height": 38,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 403.0390625
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 441.0390625,
+            "height": 159.0390625,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 282
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 441.0390625,
+            "height": 38,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 403.0390625
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 642.078125,
+            "height": 159.0390625,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 483.0390625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 642.078125,
+            "height": 38,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 604.078125
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 642.078125,
+            "height": 159.0390625,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 483.0390625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 642.078125,
+            "height": 38,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 604.078125
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 843.1171875,
+            "height": 159.0390625,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 684.078125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 843.1171875,
+            "height": 38,
+            "right": 153,
+            "width": 130,
+            "x": 23,
+            "y": 805.1171875
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 843.1171875,
+            "height": 159.0390625,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 684.078125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 843.1171875,
+            "height": 38,
+            "right": 297,
+            "width": 130,
+            "x": 167,
+            "y": 805.1171875
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "130px 130px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "130px 130px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "130px 130px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        320,
+        568
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 374.1171875,
+      "lastMetaBottom": 350.1171875,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 498,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        320,
+        568
+      ],
+      "width": 284
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 485.5,
+        "height": 40,
+        "right": 307,
+        "width": 40,
+        "x": 267,
+        "y": 445.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 498,
+        "height": 66,
+        "right": 319,
+        "width": 318,
+        "x": 1,
+        "y": 432
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 482.7421875,
+        "height": 34.4921875,
+        "right": 257,
+        "width": 194,
+        "x": 63,
+        "y": 448.25
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 485.5,
+        "height": 40,
+        "right": 53,
+        "width": 40,
+        "x": 13,
+        "y": 445.5
+      }
+    }
+  },
+  {
+    "requested": [
+      360,
+      800
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 144.9296875,
+            "height": 176.4296875,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": -31.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 144.9296875,
+            "height": 38,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": 106.9296875
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 144.9296875,
+            "height": 176.4296875,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": -31.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 144.9296875,
+            "height": 38,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": 106.9296875
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 363.359375,
+            "height": 176.4296875,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": 186.9296875
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 363.359375,
+            "height": 38,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": 325.359375
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 363.359375,
+            "height": 176.4296875,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": 186.9296875
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 363.359375,
+            "height": 38,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": 325.359375
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 581.7890625,
+            "height": 176.4296875,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": 405.359375
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 581.7890625,
+            "height": 38,
+            "right": 173,
+            "width": 150,
+            "x": 23,
+            "y": 543.7890625
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 581.7890625,
+            "height": 176.4296875,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": 405.359375
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 581.7890625,
+            "height": 38,
+            "right": 337,
+            "width": 150,
+            "x": 187,
+            "y": 543.7890625
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "150px 150px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "150px 150px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "150px 150px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 605.7890625,
+      "lastMetaBottom": 581.7890625,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 730,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        360,
+        800
+      ],
+      "width": 312
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 717.5,
+        "height": 40,
+        "right": 345,
+        "width": 40,
+        "x": 305,
+        "y": 677.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 730,
+        "height": 66,
+        "right": 359,
+        "width": 358,
+        "x": 1,
+        "y": 664
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 721.59375,
+        "height": 48.1875,
+        "right": 293,
+        "width": 226,
+        "x": 67,
+        "y": 673.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 717.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 677.5
+      }
+    }
+  },
+  {
+    "requested": [
+      375,
+      812
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 226.453125,
+            "height": 182.953125,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 43.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 226.453125,
+            "height": 38,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 188.453125
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 226.453125,
+            "height": 182.953125,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 43.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 226.453125,
+            "height": 38,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 188.453125
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 451.40625,
+            "height": 182.953125,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 268.453125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 451.40625,
+            "height": 38,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 413.40625
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 451.40625,
+            "height": 182.953125,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 268.453125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 451.40625,
+            "height": 38,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 413.40625
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 676.359375,
+            "height": 182.953125,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 493.40625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 676.359375,
+            "height": 38,
+            "right": 180.5,
+            "width": 157.5,
+            "x": 23,
+            "y": 638.359375
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 676.359375,
+            "height": 182.953125,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 493.40625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 676.359375,
+            "height": 38,
+            "right": 352,
+            "width": 157.5,
+            "x": 194.5,
+            "y": 638.359375
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "157.5px 157.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "157.5px 157.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "157.5px 157.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        375,
+        812
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 617.859375,
+      "lastMetaBottom": 593.859375,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 742,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        375,
+        812
+      ],
+      "width": 327
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 729.5,
+        "height": 40,
+        "right": 360,
+        "width": 40,
+        "x": 320,
+        "y": 689.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 742,
+        "height": 66,
+        "right": 374,
+        "width": 373,
+        "x": 1,
+        "y": 676
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 733.59375,
+        "height": 48.1875,
+        "right": 308,
+        "width": 241,
+        "x": 67,
+        "y": 685.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 729.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 689.5
+      }
+    }
+  },
+  {
+    "requested": [
+      390,
+      844
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 238.9765625,
+            "height": 189.4765625,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 49.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 238.9765625,
+            "height": 38,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 200.9765625
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 238.9765625,
+            "height": 189.4765625,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 49.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 238.9765625,
+            "height": 38,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 200.9765625
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 470.453125,
+            "height": 189.4765625,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 280.9765625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 470.453125,
+            "height": 38,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 432.453125
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 470.453125,
+            "height": 189.4765625,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 280.9765625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 470.453125,
+            "height": 38,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 432.453125
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 701.9296875,
+            "height": 189.4765625,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 512.453125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 701.9296875,
+            "height": 38,
+            "right": 188,
+            "width": 165,
+            "x": 23,
+            "y": 663.9296875
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 701.9296875,
+            "height": 189.4765625,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 512.453125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 701.9296875,
+            "height": 38,
+            "right": 367,
+            "width": 165,
+            "x": 202,
+            "y": 663.9296875
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "165px 165px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "165px 165px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "165px 165px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        390,
+        844
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 649.9296875,
+      "lastMetaBottom": 625.9296875,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 774,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        390,
+        844
+      ],
+      "width": 342
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 761.5,
+        "height": 40,
+        "right": 375,
+        "width": 40,
+        "x": 335,
+        "y": 721.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 774,
+        "height": 66,
+        "right": 389,
+        "width": 388,
+        "x": 1,
+        "y": 708
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 765.59375,
+        "height": 48.1875,
+        "right": 323,
+        "width": 256,
+        "x": 67,
+        "y": 717.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 761.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 721.5
+      }
+    }
+  },
+  {
+    "requested": [
+      393,
+      852
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 256.28125,
+            "height": 190.78125,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 65.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 256.28125,
+            "height": 38,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 218.28125
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 256.28125,
+            "height": 190.78125,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 65.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 256.28125,
+            "height": 38,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 218.28125
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 489.0625,
+            "height": 190.78125,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 298.28125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 489.0625,
+            "height": 38,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 451.0625
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 489.0625,
+            "height": 190.78125,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 298.28125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 489.0625,
+            "height": 38,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 451.0625
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 721.84375,
+            "height": 190.78125,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 531.0625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 721.84375,
+            "height": 38,
+            "right": 189.5,
+            "width": 166.5,
+            "x": 23,
+            "y": 683.84375
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 721.84375,
+            "height": 190.78125,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 531.0625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 721.84375,
+            "height": 38,
+            "right": 370,
+            "width": 166.5,
+            "x": 203.5,
+            "y": 683.84375
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "166.5px 166.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "166.5px 166.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "166.5px 166.5px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        393,
+        852
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 657.84375,
+      "lastMetaBottom": 633.84375,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 782,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        393,
+        852
+      ],
+      "width": 345
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 769.5,
+        "height": 40,
+        "right": 378,
+        "width": 40,
+        "x": 338,
+        "y": 729.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 782,
+        "height": 66,
+        "right": 392,
+        "width": 391,
+        "x": 1,
+        "y": 716
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 773.59375,
+        "height": 48.1875,
+        "right": 326,
+        "width": 259,
+        "x": 67,
+        "y": 725.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 769.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 729.5
+      }
+    }
+  },
+  {
+    "requested": [
+      412,
+      915
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 268.5390625,
+            "height": 199.0390625,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 69.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 268.5390625,
+            "height": 38,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 230.5390625
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 268.5390625,
+            "height": 199.0390625,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 69.5
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 268.5390625,
+            "height": 38,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 230.5390625
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 509.578125,
+            "height": 199.0390625,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 310.5390625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 509.578125,
+            "height": 38,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 471.578125
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 509.578125,
+            "height": 199.0390625,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 310.5390625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 509.578125,
+            "height": 38,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 471.578125
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 750.6171875,
+            "height": 199.0390625,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 551.578125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 750.6171875,
+            "height": 38,
+            "right": 199,
+            "width": 176,
+            "x": 23,
+            "y": 712.6171875
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 750.6171875,
+            "height": 199.0390625,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 551.578125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 750.6171875,
+            "height": 38,
+            "right": 389,
+            "width": 176,
+            "x": 213,
+            "y": 712.6171875
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "176px 176px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "176px 176px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "176px 176px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        412,
+        915
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 721.1171875,
+      "lastMetaBottom": 697.1171875,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 845,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        412,
+        915
+      ],
+      "width": 364
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 832.5,
+        "height": 40,
+        "right": 397,
+        "width": 40,
+        "x": 357,
+        "y": 792.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 845,
+        "height": 66,
+        "right": 411,
+        "width": 410,
+        "x": 1,
+        "y": 779
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 836.59375,
+        "height": 48.1875,
+        "right": 345,
+        "width": 278,
+        "x": 67,
+        "y": 788.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 832.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 792.5
+      }
+    }
+  },
+  {
+    "requested": [
+      430,
+      932
+    ],
+    "collection": {
+      "items": [
+        {
+          "artist": "The Beatles",
+          "cell": {
+            "bottom": 308.28125,
+            "height": 207.28125,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 101
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "beatles-abbey-road",
+          "meta": {
+            "bottom": 308.28125,
+            "height": 38.4140625,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 269.8671875
+          },
+          "title": "Abbey Road"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 308.28125,
+            "height": 207.28125,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 101
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-okc",
+          "meta": {
+            "bottom": 308.28125,
+            "height": 38.4140625,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 269.8671875
+          },
+          "title": "OK Computer"
+        },
+        {
+          "artist": "Pink Floyd",
+          "cell": {
+            "bottom": 557.5625,
+            "height": 207.28125,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 350.28125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "pink-floyd-dsotm",
+          "meta": {
+            "bottom": 557.5625,
+            "height": 38.4140625,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 519.1484375
+          },
+          "title": "The Dark Side of the Moon"
+        },
+        {
+          "artist": "Radiohead",
+          "cell": {
+            "bottom": 557.5625,
+            "height": 207.28125,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 350.28125
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "radiohead-in-rainbows",
+          "meta": {
+            "bottom": 557.5625,
+            "height": 38.4140625,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 519.1484375
+          },
+          "title": "In Rainbows"
+        },
+        {
+          "artist": "Daft Punk",
+          "cell": {
+            "bottom": 806.84375,
+            "height": 207.28125,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 599.5625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "daft-punk-ram",
+          "meta": {
+            "bottom": 806.84375,
+            "height": 38.4140625,
+            "right": 208,
+            "width": 185,
+            "x": 23,
+            "y": 768.4296875
+          },
+          "title": "Random Access Memories"
+        },
+        {
+          "artist": "Miles Davis",
+          "cell": {
+            "bottom": 806.84375,
+            "height": 207.28125,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 599.5625
+          },
+          "contained": true,
+          "ellipsis": true,
+          "id": "miles-davis-kob",
+          "meta": {
+            "bottom": 806.84375,
+            "height": 38.4140625,
+            "right": 407,
+            "width": 185,
+            "x": 222,
+            "y": 768.4296875
+          },
+          "title": "Kind of Blue"
+        }
+      ],
+      "mainPadding": "74px",
+      "pageOverflow": false,
+      "rows": [
+        {
+          "columns": "185px 185px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "185px 185px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        },
+        {
+          "columns": "185px 185px",
+          "edgeAfterText": true,
+          "itemsDoNotOverlap": true
+        }
+      ],
+      "viewport": [
+        430,
+        932
+      ]
+    },
+    "bottom": {
+      "edgeBottom": 737.84375,
+      "lastMetaBottom": 713.84375,
+      "lastTitle": "Kind of BlueMiles Davis",
+      "navTop": 862,
+      "safe": true
+    },
+    "detail": {
+      "equalSegments": true,
+      "height": 56,
+      "iconCount": 2,
+      "indicatorAligned": true,
+      "overflow": false,
+      "panel": "Side B · 6 首 · 31:49播放此面B1Get LuckyDaft Punk6:07B2BeyondDaft Punk4:50B3MotherboardDaft Punk5:41B4Fragments of TimeDaft Punk4:39B5Doin' It RightDaft Punk4:11B6ContactDaft Punk6:21",
+      "phase": "idle",
+      "radius": "999px",
+      "side": "B",
+      "texture": "/assets/vinyl-textures/split-01.webp",
+      "viewport": [
+        430,
+        932
+      ],
+      "width": 382
+    },
+    "mini": {
+      "background": "rgb(15, 15, 15)",
+      "borderRadius": "0px",
+      "button": {
+        "bottom": 849.5,
+        "height": 40,
+        "right": 415,
+        "width": 40,
+        "x": 375,
+        "y": 809.5
+      },
+      "ellipses": true,
+      "fits": true,
+      "loaded": true,
+      "rect": {
+        "bottom": 862,
+        "height": 66,
+        "right": 429,
+        "width": 428,
+        "x": 1,
+        "y": 796
+      },
+      "rotation": "paused",
+      "text": {
+        "bottom": 853.59375,
+        "height": 48.1875,
+        "right": 363,
+        "width": 296,
+        "x": 67,
+        "y": 805.40625
+      },
+      "texture": "/assets/vinyl-textures/clear.webp",
+      "vinyl": {
+        "bottom": 849.5,
+        "height": 40,
+        "right": 55,
+        "width": 40,
+        "x": 15,
+        "y": 809.5
+      }
+    }
+  }
+]

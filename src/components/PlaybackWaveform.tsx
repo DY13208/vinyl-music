@@ -1,5 +1,5 @@
 import React from 'react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface PlaybackWaveformProps {
   progressPercent: number; // 0 - 100
@@ -34,7 +34,7 @@ export const PlaybackWaveform: React.FC<PlaybackWaveformProps> = ({
     const clickX = e.clientX - rect.left;
     const pct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
     onSeek(pct);
-    audioEngine.triggerHaptic('light');
+    hapticsService.triggerHaptic('light');
   };
 
   // Format indices: if track number provided, show "01 / 12", else carousel album index "01 / 08"

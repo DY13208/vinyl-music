@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../auth/AuthContext';
+import { ProfileIdentity } from '../components/ProfileIdentity';
 import {
   Heart,
   Clock,
@@ -12,15 +14,24 @@ import {
   ShieldCheck,
   LayoutTemplate,
   RotateCw,
+  Palette,
+  Check,
 } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
+import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
 
 interface ProfileViewProps {
+  collectionCount?: number;
+  artistCount?: number;
+  wishlistCount?: number;
   onOpenSettings: () => void;
   onOpenWishlist: () => void;
   onOpenCollection: () => void;
   onOpenDesignBoard?: () => void;
   onOpenLandscape?: () => void;
+  homeTheme: HomeTheme;
+  onSelectHomeTheme: (theme: HomeTheme) => void;
+  themeMessage: string;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -29,14 +40,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onOpenCollection,
   onOpenDesignBoard,
   onOpenLandscape,
+  homeTheme,
+  onSelectHomeTheme,
+  themeMessage,
+  collectionCount = 0,
+  artistCount = 0,
+  wishlistCount = 0,
 }) => {
+  const auth = useAuth();
+  const [logoutError, setLogoutError] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
+  const logout = async () => {
+    if (!auth) return;
+    setLoggingOut(true); setLogoutError('');
+    try { await auth.logout(); }
+    catch { setLogoutError('退出失败，请检查网络后重试'); setLoggingOut(false); }
+  };
   const menuItems = [
     {
       id: 'collection',
-      label: '我的收藏',
+      label: '我的唱片架',
       icon: <Heart className="w-4 h-4 text-[#2FE92B]" />,
       action: onOpenCollection,
-      badge: '128',
+      badge: String(collectionCount),
     },
     {
       id: 'history',
@@ -49,7 +75,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       label: '愿望单',
       icon: <Bookmark className="w-4 h-4 text-[#FF9821]" />,
       action: onOpenWishlist,
-      badge: '4',
+      badge: String(wishlistCount),
     },
     {
       id: 'playlists',
@@ -62,7 +88,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       label: '下载管理 (离线母带缓存)',
       icon: <Download className="w-4 h-4 text-white/70" />,
       action: () => {},
-      detail: '已缓存 14 张',
+      detail: '本机文件',
     },
     {
       id: 'stats',
@@ -115,38 +141,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
       {/* Profile Bio Card */}
       <div className="px-4 py-3 flex flex-col items-center text-center">
-        {/* Avatar with spinning record rim */}
-        <div className="relative w-20 h-20 rounded-full p-0.5 bg-[#0F0F0F] border border-[#2FE92B]/60 shadow-[0_0_16px_rgba(47,233,43,0.15)] flex items-center justify-center">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80"
-            alt="晓东"
-            className="w-full h-full rounded-full object-cover"
-          />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#1B1B1D] border border-[#2FE92B] flex items-center justify-center">
-            <span className="w-2 h-2 rounded-full bg-[#2FE92B]" />
-          </div>
-        </div>
-
-        <h2 className="text-[19px] font-bold text-white mt-2.5 tracking-tight">
-          晓东
-        </h2>
-        <p className="text-[12px] text-[#BBCBB2] opacity-80 mt-0.5">
-          用音乐，记录生活的另一面
-        </p>
+        <ProfileIdentity email={auth?.user.email || ''} />
 
         {/* Core Stats: 128 张黑胶、36 位艺术家、1,024 小时播放 */}
         <div className="w-full grid grid-cols-3 gap-2 mt-4 p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">
           <div className="flex flex-col items-center">
-            <span className="text-[18px] font-black text-white font-mono">128</span>
+            <span className="text-[18px] font-black text-white font-mono">{collectionCount}</span>
             <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">张黑胶</span>
           </div>
           <div className="flex flex-col items-center border-x border-[#1F2024]">
-            <span className="text-[18px] font-black text-white font-mono">36</span>
+            <span className="text-[18px] font-black text-white font-mono">{artistCount}</span>
             <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">位艺术家</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-[18px] font-black text-[#2FE92B] font-mono">1,024</span>
-            <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">小时播放</span>
+            <span className="text-[18px] font-black text-[#2FE92B] font-mono">{wishlistCount}</span>
+            <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">愿望唱片</span>
           </div>
         </div>
       </div>
@@ -159,7 +168,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             id={`profile-menu-${item.id}`}
             onClick={() => {
               item.action();
-              audioEngine.triggerHaptic('light');
+              hapticsService.triggerHaptic('light');
             }}
             className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#3A3B42] cursor-pointer transition-all flex items-center justify-between group"
           >
@@ -189,6 +198,27 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         ))}
       </div>
 
+      <section className="px-4 mt-5" aria-labelledby="home-theme-heading">
+        <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">
+          <div className="flex items-center gap-2 mb-3">
+            <Palette className="w-4 h-4 text-[#2FE92B]" />
+            <h3 id="home-theme-heading" className="text-[13.5px] font-medium text-white">首页陈列样式</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {HOME_THEMES.map(item => <button key={item.id} type="button" aria-pressed={homeTheme === item.id} onClick={() => onSelectHomeTheme(item.id)} className={`min-h-11 px-3 rounded-[6px] border flex items-center justify-between text-left transition-colors ${homeTheme === item.id ? 'border-[#2FE92B] bg-[#162316] text-white' : 'border-[#26272D] bg-[#1B1B1D] text-white/60'}`}>
+              <span><strong className="block text-[12px] font-medium">{item.name}</strong><small className="block text-[9px] mt-0.5 opacity-60">{item.detail.split(' · ')[0]}</small></span>
+              {homeTheme === item.id && <Check className="w-3.5 h-3.5 text-[#2FE92B]" />}
+            </button>)}
+          </div>
+          {themeMessage && <p className="text-[10px] text-[#FF9821] mt-2" role="status">{themeMessage}</p>}
+        </div>
+      </section>
+
+      {auth && <div className="px-4 mt-5">
+        <button type="button" disabled={loggingOut} onClick={logout} className="w-full min-h-11 rounded-md border border-[#3A3B42] text-[14px] text-white">{loggingOut ? '正在退出…' : '退出登录'}</button>
+        <p className="text-[12px] text-[#BBCBB2] mt-2">退出后隐藏本账户馆藏，本机数据会保留。</p>
+        {logoutError && <p role="alert" className="text-[12px] text-[#ffc6b8] mt-2">{logoutError}</p>}
+      </div>}
       {/* Equipment Badge */}
       <div className="px-4 mt-5">
         <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] flex items-center gap-3">

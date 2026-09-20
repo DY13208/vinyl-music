@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Album, ScreenId, DevicePlatform } from '../types';
 import { Eye, Smartphone, ArrowRight, Disc, Sparkles } from 'lucide-react';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface DesignBoardViewProps {
   albums: Album[];
@@ -60,7 +60,7 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
       id: 's-05',
       screenId: 'collection',
       indexStr: '05',
-      title: '唱片库 (我的黑胶)',
+      title: '唱片架 (我的黑胶)',
       subtitle: 'Grid & Shelf 实体唱片架',
       specs: '实体黑胶层叠排列 · 翻阅手感 · 风格分类过滤器',
     },
@@ -86,13 +86,13 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
       indexStr: '08',
       title: '艺术家页',
       subtitle: 'Pink Floyd',
-      specs: '巨幅乐队影像 · 完整唱片目录 · 已收藏版本标记',
+      specs: '巨幅乐队影像 · 完整唱片目录 · 已入架版本标记',
     },
     {
       id: 's-09',
       screenId: 'collection',
       indexStr: '09',
-      title: '我的收藏 (唱片架)',
+      title: '我的唱片架',
       subtitle: '模拟实体唱片架层叠翻阅',
       specs: '黑胶书脊露边 · 触摸提起预览 · 实体箱槽光影',
     },
@@ -109,7 +109,7 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
       screenId: 'profile',
       indexStr: '11',
       title: '个人主页',
-      subtitle: '晓东 · 128 张黑胶收藏',
+      subtitle: '晓东 · 128 张黑胶唱片',
       specs: '黑胶数量统计 · 1,024 小时播放 · 发烧通行证',
     },
     {
@@ -159,7 +159,7 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
             </span>
           </h1>
           <p className="text-[13px] text-white/50 max-w-2xl mt-1 leading-relaxed">
-            围绕“黑胶收藏、黑胶展示、黑胶播放、专辑文化与实体唱片体验”展开的暗黑编辑风设计系统。严格遵循 #000000 纯黑底色与 #2FE92B 强调色体系，兼容 iOS 与 Android。
+            围绕“唱片架、黑胶展示、黑胶播放、专辑文化与实体唱片体验”展开的暗黑编辑风设计系统。严格遵循 #000000 纯黑底色与 #2FE92B 强调色体系，兼容 iOS 与 Android。
           </p>
         </div>
 
@@ -201,7 +201,7 @@ export const DesignBoardView: React.FC<DesignBoardViewProps> = ({
             id={`board-card-${item.id}`}
             onClick={() => {
               onOpenScreen(item.screenId);
-              audioEngine.triggerHaptic('medium');
+              hapticsService.triggerHaptic('medium');
             }}
             className="group p-4 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] hover:border-[#2FE92B]/60 transition-all cursor-pointer flex flex-col justify-between"
           >

@@ -1,296 +1,249 @@
-import React, { useState } from 'react';
-import { Album } from '../types';
-import { Search, Sparkles, BookOpen, Disc, Play, ChevronRight, Compass } from 'lucide-react';
-import { EDITORIAL_STORIES } from '../data/mockData';
-import { audioEngine } from '../services/audioEngine';
+import React, { useEffect, useRef, useState } from 'react';
+import { Search, Music2, UserRound, Disc3, Barcode, Play, Pause, Plus, Check, ChevronRight, X } from 'lucide-react';
+import type { Album, Track } from '../types';
+import { ArtworkImage } from '../components/ArtworkImage';
+import { CatalogueError, getPublicAlbum, searchVinyl, type VinylSearchResponse } from '../services/collectionApi';
+import { isInCollection } from '../utils/catalogue';
+import { catalogueCache } from '../services/catalogueCache';
+import './DiscoverView.css';
 
+type Match = VinylSearchResponse['results'][number];
 interface DiscoverViewProps {
   albums: Album[];
-  onOpenAlbumDetail: (album: Album) => void;
-  onOpenSearch: () => void;
-  onPlayAlbum?: (album: Album) => void;
+  onAddAlbum: (album: Album) => Promise<void>;
+  onPreview: (album: Album, track: Track) => void;
+  playingAlbumId?: string;
+  playingTrackId?: string;
+  isPlaying: boolean;
+  isLoading: boolean;
+  playbackMessage: string;
+  onOpenPlayer?: () => void;
+  onOpenAlbumDetail?: (album: Album) => void;
+  onOpenArtist?: (artist: string, albums: Album[]) => void;
+  onOpenTrack?: (album: Album, track: Track) => void;
 }
 
-export const DiscoverView: React.FC<DiscoverViewProps> = ({
-  albums,
-  onOpenAlbumDetail,
-  onOpenSearch,
-  onPlayAlbum,
-}) => {
-  const [selectedIssue, setSelectedIssue] = useState<'current' | 'jazz' | 'first_press'>('current');
+const startingArtists = ['周杰伦', '陈奕迅', '宇多田ヒカル', 'The Beatles', 'Miles Davis'];
+const preferredAlbum = (match: Match) => match.vinylRelease ?? match.album;
+const albumsFromMatches = (matches: Match[]) => matches.map(match => preferredAlbum(match));
 
-  const leadAlbum = albums[0]; // Pink Floyd - The Dark Side of the Moon
-  const jazzAlbums = albums.filter((a) => a.genre.includes('摇滚') || a.genre.includes('爵士')).slice(0, 3);
-  const vintageMasters = albums.slice(1, 4);
+export function DiscoverView(props: DiscoverViewProps) {
+  const [query, setQuery] = useState('');
+  const [search, setSearch] = useState({ query: startingArtists[0], retry: 0 });
+  const [results, setResults] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [cacheMessage, setCacheMessage] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [saving, setSaving] = useState<string | null>(null);
+  const savingRef = useRef(false);
+  const [selection, setSelection] = useState<{ match: Match; album: Album } | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState('');
+  const dialog = useRef<HTMLDialogElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
+  const backdropPressed = useRef(false);
+  const details = useRef(new Map<string, Album>());
+  const [vinylOnly, setVinylOnly] = useState(false);
+  const [allArtists, setAllArtists] = useState(false);
+  const [allAlbums, setAllAlbums] = useState(false);
+  const [allTracks, setAllTracks] = useState(false);
+  const pendingArtist = useRef<string | null>(null);
 
-  return (
-    <div
-      id="discover-view"
-      className="w-full min-h-screen bg-[#070709] text-white flex flex-col select-none pb-28 overflow-y-auto no-scrollbar"
-    >
-      {/* Top Header Bar */}
-      <header className="px-5 pt-4 pb-3 z-20 border-b border-[#16161A] bg-[#070709]/90 backdrop-blur-md sticky top-0 flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-[9.5px] font-mono tracking-widest text-white/40 uppercase">
-              ISSUE 09 · EDITORIAL
-            </span>
-          </div>
-          <h1 className="text-[19px] font-bold text-white tracking-tight">
-            黑胶文化志 · 专题策展
-          </h1>
+  useEffect(() => {
+    const controller = new AbortController();
+    setError(''); setNotice(''); setCacheMessage(''); setRefreshing(false);
+    setLoading(true); setResults([]);
+    void (async () => {
+      const cached = await catalogueCache.get('search', search.query);
+      if (controller.signal.aborted) return;
+      if (cached) {
+        setResults(cached.data); setLoading(false);
+        if (pendingArtist.current === search.query) {
+          pendingArtist.current = null;
+          props.onOpenArtist?.(search.query, albumsFromMatches(cached.data));
+          return;
+        }
+        if (!cached.stale && !search.retry) return;
+        setCacheMessage('已显示本机保存的资料，正在更新…');
+        setRefreshing(true);
+      }
+      try {
+        const response = await searchVinyl({ query: search.query, artist: startingArtists.includes(search.query) ? search.query : undefined }, controller.signal);
+        if (controller.signal.aborted) return;
+        setResults(response.results); setCacheMessage('');
+        void catalogueCache.put('search', search.query, response.results);
+        if (pendingArtist.current === search.query) {
+          pendingArtist.current = null;
+          props.onOpenArtist?.(search.query, albumsFromMatches(response.results));
+        }
+      } catch (reason) {
+        if (controller.signal.aborted) return;
+        if (reason instanceof CatalogueError && reason.status === 404) {
+          setResults([]); setCacheMessage('');
+          void catalogueCache.put('search', search.query, []);
+        } else if (cached) setCacheMessage('暂时无法更新，正在显示本机保存的资料。');
+        else setError('暂时无法获取公开唱片资料，请稍后重试。');
+      } finally {
+        if (!controller.signal.aborted) { setLoading(false); setRefreshing(false); }
+      }
+    })();
+    return () => controller.abort();
+  }, [search]);
+
+  const selectionId = selection?.album.id;
+  useEffect(() => {
+    const modal = dialog.current;
+    if (selectionId && modal && !modal.open) {
+      modal.showModal(); closeButton.current?.focus();
+    } else if (!selectionId && modal?.open) modal.close();
+  }, [selectionId]);
+
+  useEffect(() => {
+    setDetailError(''); setDetailLoading(false);
+    if (!selectionId) return;
+    const provider = ['apple-music', 'discogs', 'musicbrainz', 'deezer'].find(source => selectionId.startsWith(`${source}-`));
+    if (!provider || details.current.has(selectionId)) return;
+    const controller = new AbortController();
+    setDetailLoading(true);
+    void (async () => {
+      const cached = await catalogueCache.get('album', selectionId);
+      if (controller.signal.aborted) return;
+      if (cached) {
+        setSelection(current => current?.album.id === selectionId ? { ...current, album: cached.data } : current);
+        setDetailLoading(false);
+        if (!cached.stale) { details.current.set(selectionId, cached.data); return; }
+      }
+      try {
+        const album = await getPublicAlbum(provider, selectionId.slice(provider.length + 1), controller.signal);
+        if (controller.signal.aborted) return;
+        details.current.set(selectionId, album);
+        setSelection(current => current?.album.id === selectionId ? { ...current, album } : current);
+        void catalogueCache.put('album', selectionId, album);
+      } catch {
+        if (!controller.signal.aborted) setDetailError('暂时无法补全曲目，仍可查看已获取的资料。');
+      } finally { if (!controller.signal.aborted) setDetailLoading(false); }
+    })();
+    return () => controller.abort();
+  }, [selectionId]);
+
+  const runSearch = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setQuery(trimmed); setSearch({ query: trimmed, retry: 0 });
+  };
+  const openArtist = (artist: string) => {
+    const albums = search.query === artist ? displayAlbums.map(item => item.album) : [];
+    if (albums.length || search.query === artist) {
+      props.onOpenArtist?.(artist, albums);
+      return;
+    }
+    pendingArtist.current = artist;
+    runSearch(artist);
+  };
+  const open = (match: Match) => {
+    const album = preferredAlbum(match);
+    setNotice(''); setSelection({ match, album: details.current.get(album.id) ?? album });
+  };
+  const close = () => { if (!savingRef.current) setSelection(null); };
+  const add = async (album: Album) => {
+    if (savingRef.current || isInCollection(album, props.albums)) return;
+    savingRef.current = true; setSaving(album.id); setNotice('');
+    try {
+      await props.onAddAlbum({ ...album, isCollected: true, addedAt: new Date().toISOString() });
+      setNotice(`《${album.title}》已加入我的唱片架`);
+    } catch (reason) {
+      setNotice(reason instanceof Error ? reason.message : '本机保存失败，请重试。');
+    } finally { savingRef.current = false; setSaving(null); }
+  };
+  const addButton = (album: Album) => {
+    const collected = isInCollection(album, props.albums);
+    return <button type="button" className="discover-add" disabled={collected || saving !== null} onClick={() => void add(album)} aria-label={`${collected ? '已在唱片架' : '加入唱片架'}：${album.title}`}>
+      {collected ? <Check size={15} /> : <Plus size={15} />}{collected ? '已在唱片架' : saving === album.id ? '正在保存…' : '加入唱片架'}
+    </button>;
+  };
+  const previewButton = (album: Album, track: Track, label = '试听', compact = false) => {
+    const current = props.playingAlbumId === album.id && props.playingTrackId === track.id;
+    return <button type="button" className={`discover-preview${compact ? ' discover-preview--icon' : ''}`} disabled={current && props.isLoading} aria-busy={current && props.isLoading} onClick={() => props.onPreview(album, track)} aria-label={`${current && props.isPlaying ? '暂停试听' : '试听'}：${track.title}`}>
+      {current && props.isPlaying ? <Pause size={compact ? 20 : 17} fill="currentColor" /> : <Play size={compact ? 20 : 17} fill="currentColor" />}{!compact && <span>{current && props.isLoading ? '查找音源…' : current && props.isPlaying ? '暂停' : label}</span>}
+    </button>;
+  };
+  const visibleResults = results.filter(match => !vinylOnly || match.vinylReleaseFound);
+  const selected = selection?.album;
+  const displayAlbums = visibleResults.map(match => {
+    const album = preferredAlbum(match);
+    return { match, album: details.current.get(album.id) ?? album };
+  });
+  const tracks = [...new Map(displayAlbums.flatMap(({ album }) => album.tracks.map(track => ({ album, track })))
+    .map(item => [`${item.album.artist}|${item.album.title}|${item.track.title}`, item] as const)).values()];
+  const leadAlbum = results[0] ? preferredAlbum(results[0]) : undefined;
+  const leadTrack = tracks[0];
+
+  const openAlbum = (match: Match) => {
+    const album = details.current.get(preferredAlbum(match).id) ?? preferredAlbum(match);
+    if (props.onOpenAlbumDetail) props.onOpenAlbumDetail(album);
+    else open(match);
+  };
+
+  return <main id="discover-view" className="discover-page">
+    <div className="discover-atmosphere" aria-hidden="true">{leadAlbum && <ArtworkImage src={leadAlbum.coverUrl} alt="" />}</div>
+    <header className="discover-header"><h1>发现音乐</h1><p>先听听，再选一张放进唱片架。</p></header>
+    <form className="discover-search" role="search" onSubmit={event => { event.preventDefault(); runSearch(query); }}>
+      <Search size={19} aria-hidden="true" /><input aria-label="搜索公开唱片" placeholder="搜索音乐人、专辑或条码" value={query} maxLength={160} onChange={event => setQuery(event.target.value)} />
+      <button type="submit" disabled={!query.trim()} aria-label="搜索"><ChevronRight size={21} /></button>
+    </form>
+    <div className="discover-search-hints" aria-hidden="true"><span><UserRound size={13} />音乐人</span><span><Disc3 size={13} />专辑</span><span><Barcode size={13} />条码</span></div>
+    <section className="discover-artists" aria-labelledby="discover-artists-title"><div className="discover-section-heading"><h2 id="discover-artists-title">热门音乐人</h2><button type="button" aria-expanded={allArtists} aria-controls="discover-artist-list" onClick={() => setAllArtists(value => !value)}>{allArtists ? '收起' : '查看全部'}<ChevronRight size={15} /></button></div>
+      <div id="discover-artist-list" className={`discover-artist-list${allArtists ? ' is-expanded' : ''}`}>{startingArtists.map(artist => <button type="button" key={artist} aria-pressed={search.query === artist} onClick={() => openArtist(artist)}><span className="discover-artist__portrait" aria-hidden="true"><Disc3 size={29} strokeWidth={1} /></span><span>{artist}</span></button>)}</div>
+    </section>
+    {!loading && !error && visibleResults.length > 0 && <section className="discover-hero" aria-label="当前搜索结果">
+      <div className="discover-hero__art" aria-hidden="true">{leadAlbum && <ArtworkImage src={leadAlbum.coverUrl} alt="" />}</div>
+      <div className="discover-hero__copy"><p><Disc3 size={13} />公开发行资料</p><h2>{search.query}</h2><span>已找到 {visibleResults.length} 张相关唱片</span>{leadTrack && previewButton(leadTrack.album, leadTrack.track, '播放热门歌曲')}</div>
+    </section>}
+    <div className="discover-results-heading"><p>探索声音，遇见下一张</p><label><input type="checkbox" checked={vinylOnly} onChange={event => setVinylOnly(event.target.checked)} />仅看已确认黑胶</label></div>
+    {!loading && !error && <button type="button" className="discover-refresh" disabled={refreshing} onClick={() => setSearch(value => ({ ...value, retry: value.retry + 1 }))}>{refreshing ? '正在更新资料…' : '更新唱片资料'}</button>}
+    {cacheMessage && <p className="discover-notice" role="status">{cacheMessage}</p>}
+    {notice && !selection && <p className="discover-notice" role="status">{notice}</p>}
+    {props.playingAlbumId && !selection && props.playbackMessage && <p className="discover-playback" role="status">{props.playbackMessage}</p>}
+    {loading ? <div className="discover-loading" role="status"><span>正在查找公开唱片资料…</span><div aria-hidden="true">{[0, 1, 2, 3].map(index => <div key={index} />)}</div></div>
+      : error ? <div className="discover-empty" role="alert"><p>{error}</p><button type="button" onClick={() => setSearch(value => ({ ...value, retry: value.retry + 1 }))}>重新加载</button></div>
+      : !visibleResults.length ? <div className="discover-empty"><Disc3 size={36} /><h3>{vinylOnly && results.length ? '暂未查到明确的黑胶发行记录' : '没有找到相关唱片'}</h3><p>{vinylOnly && results.length ? '可以先浏览专辑资料，再核对具体版本。' : '换一个音乐人、专辑名称或条码试试。'}</p>{vinylOnly && results.length > 0 && <button type="button" onClick={() => setVinylOnly(false)}>查看专辑资料</button>}</div>
+      : <><section className="discover-albums" aria-labelledby="discover-albums-title"><div className="discover-section-heading"><h2 id="discover-albums-title">{startingArtists.includes(search.query) ? `${search.query}的专辑` : '相关专辑'}</h2><button type="button" aria-expanded={allAlbums} aria-controls="discover-album-list" onClick={() => setAllAlbums(value => !value)}>{allAlbums ? '收起' : '查看全部'}<ChevronRight size={15} /></button></div>
+      <div id="discover-album-list" className={`discover-album-list${allAlbums ? ' is-expanded' : ''}`}>{displayAlbums.map(({ match, album }) => {
+        return <article className="discover-record" key={album.id} aria-label={`${album.title} · ${album.artist}`}>
+          <div className="discover-record__visual"><button type="button" className="discover-record__open" onClick={() => openAlbum(match)} aria-label={`打开专辑：${album.title}`}><span className="discover-record__cover"><ArtworkImage src={album.coverUrl} alt={album.title} loading="lazy" /></span></button>{album.tracks[0] && previewButton(album, album.tracks[0], '试听', true)}</div>
+          <div className="discover-record__copy"><h3><button type="button" className="discover-record__title" onClick={() => openAlbum(match)}>{album.title}</button></h3><button type="button" className="discover-record__artist" onClick={() => openArtist(album.artist)}>{album.artist}{album.year ? ` · ${album.year}` : ''}</button><p className="discover-record__edition">{match.vinylReleaseFound ? '已查到黑胶版本' : '黑胶版本待核实'}</p></div>
+          <div className="discover-record__actions">{!album.tracks[0] && <button type="button" onClick={() => open(match)}><Music2 size={15} />查看曲目</button>}{match.alternatives.length > 1 ? <button type="button" className="discover-add" aria-label={`选择黑胶版本：${album.title}`} onClick={() => open(match)}><Plus size={15} />选择黑胶版本</button> : addButton(album)}</div>
+        </article>;
+      })}</div></section>
+      {tracks.length > 0 && <section className="discover-songs" aria-labelledby="discover-songs-title"><div className="discover-section-heading"><h2 id="discover-songs-title">热门歌曲</h2>{tracks.length > 5 && <button type="button" aria-expanded={allTracks} aria-controls="discover-song-list" onClick={() => setAllTracks(value => !value)}>{allTracks ? '收起' : '查看全部'}<ChevronRight size={15} /></button>}</div><p className="discover-caption">来自当前唱片的可用曲目</p>
+        <ol id="discover-song-list" className="discover-song-list">{(allTracks ? tracks : tracks.slice(0, 5)).map(({ album, track }) => <li key={`${album.id}-${track.id}`}><button type="button" className="discover-song__main" onClick={() => props.onOpenTrack ? props.onOpenTrack(album, track) : props.onPreview(album, track)}><span className="discover-song__cover"><ArtworkImage src={album.coverUrl} alt="" loading="lazy" /></span><span><strong>{track.title}</strong><small>{album.artist} · {album.title}</small></span></button>{previewButton(album, track, '试听', true)}</li>)}</ol>
+      </section>}</>}
+    <dialog ref={dialog} className="discover-dialog" aria-labelledby="discover-detail-title" onCancel={event => { event.preventDefault(); close(); }} onPointerDown={event => { backdropPressed.current = event.target === event.currentTarget; }} onClick={event => {
+      if (backdropPressed.current && event.target === event.currentTarget) close();
+      backdropPressed.current = false;
+    }}>
+      {selection && selected && <div className="discover-detail">
+        <header><h2 id="discover-detail-title">唱片与试听</h2><button ref={closeButton} type="button" disabled={saving !== null} aria-label="关闭唱片详情" onClick={close}><X size={20} /></button></header>
+        <div className="discover-detail__body">
+          <div className="discover-detail__identity"><ArtworkImage src={selected.coverUrl} alt={selected.title} /><div><h3>{selected.title}</h3><p>{selected.artist}</p><p>{[selected.year || '', selected.label === '未知厂牌' ? '' : selected.label].filter(Boolean).join(' · ')}</p></div></div>
+          {selection.match.alternatives.length > 1 && <label className="discover-version">选择黑胶版本<select aria-label="选择黑胶版本" value={selected.id} disabled={saving !== null} onChange={event => {
+            const album = selection.match.alternatives.find(item => item.id === event.target.value);
+            if (album) { setNotice(''); setSelection({ match: selection.match, album: details.current.get(album.id) ?? album }); }
+          }}>{selection.match.alternatives.map(album => <option key={album.id} value={album.id}>{[album.year || '', album.country, album.catalogNumber, album.edition].filter(Boolean).join(' · ')}</option>)}</select></label>}
+          <p className="discover-detail__edition">{selection.match.vinylReleaseFound ? [selected.edition, selected.catalogNumber].filter(Boolean).join(' · ') : '尚未查证实体黑胶版本，可先将专辑资料加入唱片架。'}</p>
+          <div className="discover-track-heading"><h3>可用曲目</h3><span>试听以音源平台提供的片段为准</span></div>
+          {detailLoading && <p role="status">正在获取曲目…</p>}
+          {detailError && <p role="status">{detailError}</p>}
+          {!detailLoading && !selected.tracks.length && <p>暂无曲目资料，暂时无法试听。</p>}
+          <ol className="discover-tracks">{selected.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{track.title}</strong><small>{track.durationSec ? track.duration : '时长待补充'}</small></div>{previewButton(selected, track, '试听', true)}</li>)}</ol>
+          {props.playingAlbumId === selected.id && props.playbackMessage && <p className="discover-playback" role="status">{props.playbackMessage}</p>}
+          {props.playingAlbumId === selected.id && props.playingTrackId && props.onOpenPlayer && <button type="button" className="discover-preview" disabled={saving !== null} onClick={() => { close(); props.onOpenPlayer?.(); }}>播放详情<ChevronRight size={17} /></button>}
+          {notice && <p className="discover-notice" role="status">{notice}</p>}
         </div>
-
-        <button
-          type="button"
-          onClick={onOpenSearch}
-          className="w-8 h-8 rounded-[5px] bg-[#121215] border border-[#202026] text-white/60 hover:text-white flex items-center justify-center transition-colors"
-          title="搜索全部策展"
-        >
-          <Search className="w-4 h-4" />
-        </button>
-      </header>
-
-      {/* Magazine Issue Navigation Tabs */}
-      <div className="px-5 py-2.5 flex items-center gap-2 border-b border-[#141418] overflow-x-auto no-scrollbar">
-        {[
-          { id: 'current', label: '本期主打 · 月之暗面' },
-          { id: 'jazz', label: '深夜爵士墙' },
-          { id: 'first_press', label: '首版模拟母带' },
-        ].map((tab) => {
-          const isActive = selectedIssue === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => {
-                setSelectedIssue(tab.id as any);
-                audioEngine.triggerHaptic('light');
-              }}
-              className={`px-3 py-1 rounded-[4px] text-[11.5px] whitespace-nowrap transition-colors ${
-                isActive
-                  ? 'bg-[#18181E] text-white border border-[#2B2B36]'
-                  : 'text-white/50 hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="px-5 space-y-7 mt-4">
-        {/* ========================================================================= */}
-        {/* EDITORIAL 1: Magazine Lead Cover Feature                                 */}
-        {/* ========================================================================= */}
-        <section
-          onClick={() => onOpenAlbumDetail(leadAlbum)}
-          className="relative w-full rounded-[10px] bg-[#0E0E12] border border-[#1E1E24] hover:border-[#2E2E38] p-5 cursor-pointer transition-all overflow-hidden group shadow-2xl"
-        >
-          {/* Subtle Ambient Color Wash */}
-          <div
-            className="absolute -top-10 -right-10 w-56 h-56 rounded-full filter blur-[70px] opacity-15 pointer-events-none"
-            style={{ backgroundColor: leadAlbum.color || '#2A2A38' }}
-          />
-
-          <div className="relative z-10 flex flex-col justify-between">
-            {/* Lead Tag */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[9.5px] font-mono tracking-widest text-white/50 uppercase border border-white/10 px-2 py-0.5 rounded-[2px] bg-black/40">
-                COVER ESSAY · 封面特写
-              </span>
-              <span className="text-[10px] font-mono text-white/40">
-                {leadAlbum.year} · {leadAlbum.rpm}
-              </span>
-            </div>
-
-            {/* Visual Ensemble: Sleeve + Peeking Wax */}
-            <div className="relative flex items-center justify-center py-2 mb-4">
-              {/* Spinning Vinyl peeking from sleeve */}
-              <div className="absolute left-1/2 -translate-x-12 w-32 h-32 rounded-full bg-[#060608] border border-white/10 overflow-hidden flex items-center justify-center animate-vinyl-spin shadow-2xl">
-                <div className="absolute inset-0 vinyl-grooves opacity-70" />
-                <div className="w-10 h-10 rounded-full bg-[#121215] border border-white/20" />
-              </div>
-
-              {/* Cover Jacket */}
-              <div className="relative z-10 w-36 h-36 rounded-[4px] overflow-hidden shadow-2xl border border-white/10">
-                <img
-                  src={leadAlbum.coverUrl}
-                  alt={leadAlbum.title}
-                  className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
-                />
-              </div>
-            </div>
-
-            {/* Editorial Title and Essay Excerpt */}
-            <div>
-              <h2 className="text-[18px] font-bold text-white tracking-tight leading-snug">
-                棱镜与光束：半个世纪的声音实验
-              </h2>
-              <p className="text-[12.5px] text-[#BBCBB2] opacity-80 mt-1">
-                《{leadAlbum.title}》— {leadAlbum.artist}
-              </p>
-              <p className="text-[11.5px] text-white/50 leading-relaxed mt-2 line-clamp-3">
-                1973年艾比路录音室的模拟调音台前，理查德·赖特的哈蒙德风琴与吉尔摩的吉他泛音被永久烙印在母盘铜板上。50年后，黑胶凹槽依旧完整保留了那声跨越时代的心跳。
-              </p>
-
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#1C1C22]">
-                <span className="text-[11px] font-mono text-white/60 group-hover:text-white flex items-center gap-1">
-                  <span>展开唱片母盘与内页档案</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </span>
-                <span className="text-[10px] font-mono text-white/40">
-                  SHVL 804 · 180g 重磅
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* EDITORIAL 2: 深夜爵士墙 (Midnight Blue Note Jazz Wall)                     */}
-        {/* ========================================================================= */}
-        <section className="space-y-3">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <span className="text-[9.5px] font-mono text-white/40 tracking-widest uppercase">
-                CURATED THEME 01
-              </span>
-              <h3 className="text-[15px] font-bold text-white tracking-tight mt-0.5">
-                深夜爵士墙 · 蓝调音符的声音质感
-              </h3>
-            </div>
-            <span className="text-[11px] text-white/40 font-mono">BLUE NOTE</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {jazzAlbums.map((album) => (
-              <div
-                key={`jazz-${album.id}`}
-                onClick={() => onOpenAlbumDetail(album)}
-                className="p-3 rounded-[8px] bg-[#0E0E12] border border-[#1E1E24] hover:border-[#2D2D36] cursor-pointer transition-all flex flex-col justify-between group"
-              >
-                <div className="relative w-full aspect-square rounded-[3px] overflow-hidden bg-black mb-2.5">
-                  <img
-                    src={album.coverUrl}
-                    alt={album.title}
-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300"
-                  />
-                  <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-[2px] bg-black/85 text-[8.5px] font-mono text-white/80">
-                    {album.rpm.split(' ')[0]}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-[13px] font-bold text-white truncate">
-                    {album.title}
-                  </h4>
-                  <p className="text-[11px] text-[#BBCBB2] truncate opacity-75 mt-0.5">
-                    {album.artist}
-                  </p>
-                  <p className="text-[10px] text-white/40 mt-1 line-clamp-1">
-                    {album.label} · {album.year}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* EDITORIAL 3: 首版经典模拟母带 (Vintage First Pressings)                    */}
-        {/* ========================================================================= */}
-        <section className="space-y-3">
-          <div className="flex items-end justify-between px-1">
-            <div>
-              <span className="text-[9.5px] font-mono text-white/40 tracking-widest uppercase">
-                CURATED THEME 02
-              </span>
-              <h3 className="text-[15px] font-bold text-white tracking-tight mt-0.5">
-                母带考古 · 首版刻片与铜版声学
-              </h3>
-            </div>
-            <span className="text-[11px] text-white/40 font-mono">1ST PRESS</span>
-          </div>
-
-          <div className="space-y-2.5">
-            {vintageMasters.map((album) => (
-              <div
-                key={`master-${album.id}`}
-                onClick={() => onOpenAlbumDetail(album)}
-                className="p-3 rounded-[8px] bg-[#0E0E12] border border-[#1E1E24] hover:border-[#2D2D36] cursor-pointer transition-all flex items-center justify-between gap-3 group"
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <img
-                    src={album.coverUrl}
-                    alt={album.title}
-                    className="w-13 h-13 rounded-[3px] object-cover flex-shrink-0 border border-white/10"
-                  />
-                  <div className="overflow-hidden">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-[13.5px] font-bold text-white truncate">
-                        {album.title}
-                      </h4>
-                    </div>
-                    <p className="text-[11.5px] text-[#BBCBB2] truncate opacity-75 mt-0.5">
-                      {album.artist} · {album.year}
-                    </p>
-                    <p className="text-[10px] text-white/40 font-mono mt-0.5 truncate">
-                      刻片矩阵: {album.matrixCode} · {album.rpm}
-                    </p>
-                  </div>
-                </div>
-
-                <ChevronRight className="w-4 h-4 text-white/40 group-hover:text-white flex-shrink-0 transition-colors" />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* EDITORIAL 4: 黑胶专栏 · 声音考古深度长文                                   */}
-        {/* ========================================================================= */}
-        <section className="space-y-3 pb-6">
-          <div className="flex items-center gap-1.5 px-1">
-            <BookOpen className="w-3.5 h-3.5 text-white/60" />
-            <h3 className="text-[15px] font-bold text-white tracking-tight">
-              唱片史考 · 实体声音的温度
-            </h3>
-          </div>
-
-          <div className="space-y-2.5">
-            {EDITORIAL_STORIES.map((story) => (
-              <div
-                key={story.id}
-                className="p-3.5 rounded-[8px] bg-[#0E0E12] border border-[#1E1E24] hover:border-[#2D2D36] cursor-pointer transition-all flex items-center justify-between gap-3 group"
-              >
-                <div className="space-y-1 overflow-hidden">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-[2px] bg-[#141418] border border-[#222228] text-white/60 font-mono">
-                      {story.tag}
-                    </span>
-                    <span className="text-[10px] text-white/40 font-mono">{story.readTime}</span>
-                  </div>
-                  <h4 className="text-[13px] font-bold text-white leading-snug line-clamp-1 group-hover:text-white">
-                    {story.title}
-                  </h4>
-                  <p className="text-[11px] text-[#BBCBB2] opacity-70 line-clamp-1">
-                    {story.subtitle}
-                  </p>
-                </div>
-
-                <div className="w-14 h-14 rounded-[3px] overflow-hidden flex-shrink-0 border border-[#202026]">
-                  <img
-                    src={story.coverUrl}
-                    alt={story.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-};
+        <footer><span>唱片架仅保存在本机</span>{addButton(selected)}</footer>
+      </div>}
+    </dialog>
+  </main>;
+}

@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+.album-artwork { position: relative; width: 100%; height: 100%; overflow: hidden; background: #171c20; }
+.album-artwork > img { position: relative; display: block; width: 100%; height: 100%; object-fit: cover; }
+.album-artwork__placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #a8b3b9; }
+.album-artwork__placeholder svg { width: 28%; height: 28%; max-width: 56px; max-height: 56px; stroke-width: 1; }
+.album-artwork__placeholder small { font-size: 11px; }
+
 :root {
   --color-bg: #000000;
   --color-card: #0F0F0F;
@@ -34,7 +40,7 @@ body {
   height: 100%;
   min-height: 0;
   display: grid;
-  grid-template-rows: 68px minmax(0, 1fr) 142px;
+  grid-template-rows: 68px minmax(0, 1fr);
   overflow: hidden;
   isolation: isolate;
   background: #070706;
@@ -72,7 +78,7 @@ body {
 .home-gallery__search:focus-visible,
 .vinyl-carousel__item:focus-visible { outline: 2px solid #2fe92b; outline-offset: 3px; }
 
-.home-gallery__stage { position: relative; z-index: 2; min-height: 0; display: grid; place-items: center; transform: translateY(-7%); }
+.home-gallery__stage { position: relative; z-index: 2; min-height: 0; display: grid; place-items: center; transform: translateY(-2%); }
 .home-gallery__stage::before { content: ""; position: absolute; z-index: 0; left: -8%; right: -8%; top: calc(50% + 145px); height: 158px; border-top: 1px solid rgba(221, 170, 124, .6); background: url('/assets/vinyl/shelf-dark-wood.webp') center top / auto 165px repeat-x; filter: brightness(.8) saturate(.68); box-shadow: inset 0 11px 19px rgba(230, 164, 108, .16), 0 -8px 24px rgba(0, 0, 0, .72); transform: perspective(520px) rotateX(8deg); transform-origin: top; -webkit-mask-image: linear-gradient(to bottom, #000 0 42%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0 42%, transparent 100%); }
 .home-gallery__stage::after { content: ""; position: absolute; z-index: 1; left: 12%; right: 8%; top: calc(50% + 133px); height: 38px; border-radius: 50%; background: rgba(0, 0, 0, .75); filter: blur(10px); }
 
@@ -130,20 +136,25 @@ body {
 }
 
 .home-gallery__caption {
-  position: relative;
+  position: absolute;
   z-index: 3;
+  top: calc(50% + 198px);
+  left: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
-  margin-top: -140px;
-  padding: 0 24px 20px;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,.88) 44%, #000 100%);
   text-align: center;
+  pointer-events: none;
 }
 .home-gallery__caption h1 {
   max-width: 100%;
   margin: 0;
   overflow: hidden;
   color: #fff;
-  font-size: 21px;
+  font-size: 19px;
   font-weight: 650;
   line-height: 1.25;
   letter-spacing: -.018em;
@@ -151,34 +162,18 @@ body {
   white-space: nowrap;
 }
 .home-gallery__caption p {
-  margin: 8px 0 0;
+  margin: 0;
   color: #bbcbb2;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 450;
   line-height: 1.35;
 }
-.vinyl-label--minimal { justify-content: center; }
-.vinyl-surface,
-.vinyl-texture-base { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
-.vinyl-surface { overflow: hidden; background: #0a0a0c; }
-.vinyl-texture-base { z-index: 2; object-fit: contain; opacity: .72; mix-blend-mode: screen; }
-.vinyl-surface--colored { background: var(--vinyl-a); }
-.vinyl-surface--clear { background: color-mix(in srgb, var(--vinyl-a) 30%, transparent); opacity: .62; box-shadow: inset 0 0 22px rgba(255,255,255,.25); }
-.vinyl-texture-base--clear { opacity: .38; }
-.vinyl-surface--translucent { background: color-mix(in srgb, var(--vinyl-a) 72%, transparent); opacity: .84; box-shadow: inset 0 0 24px rgba(255,255,255,.16); }
-.vinyl-texture-base--translucent { opacity: .5; }
-.vinyl-surface--marble { background: repeating-radial-gradient(ellipse at 31% 42%, var(--vinyl-a) 0 7%, var(--vinyl-b) 9% 12%, var(--vinyl-c) 15% 22%); filter: contrast(.78) saturate(.68); }
-.vinyl-surface--splatter { background-color: var(--vinyl-a); background-image: radial-gradient(circle at 27% 21%, var(--vinyl-b) 0 2%, transparent 2.4%), radial-gradient(circle at 68% 33%, var(--vinyl-c) 0 3%, transparent 3.5%), radial-gradient(circle at 39% 72%, var(--vinyl-b) 0 4%, transparent 4.5%), radial-gradient(circle at 76% 74%, var(--vinyl-c) 0 2%, transparent 2.6%), radial-gradient(circle at 18% 56%, var(--vinyl-c) 0 2.7%, transparent 3.2%); }
-.vinyl-surface--split { background: linear-gradient(90deg, var(--vinyl-a) 0 49.5%, var(--vinyl-b) 50.5% 100%); }
-.vinyl-surface--liquid { background: radial-gradient(ellipse at 68% 28%, var(--vinyl-b) 0 18%, transparent 19%), radial-gradient(ellipse at 35% 70%, var(--vinyl-c) 0 26%, transparent 27%), var(--vinyl-a); filter: saturate(.72); }
-.vinyl-surface--picture { background: var(--picture-url) center / cover no-repeat; filter: brightness(.7) saturate(.7); }
-.vinyl-texture-base--picture { opacity: .46; }
 
 @media (max-height: 670px) {
-  .home-gallery { grid-template-rows: 66px minmax(0, 1fr) 130px; }
+  .home-gallery { grid-template-rows: 66px minmax(0, 1fr); }
   .vinyl-carousel { min-height: 270px; }
   .vinyl-object { transform: scale(.9); }
-  .home-gallery__caption { padding-bottom: 10px; }
+  .home-gallery__caption { top: calc(50% + 180px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -191,15 +186,16 @@ body {
 }
 
 /* Collection: ThreeUI-inspired WebGL shelf, adapted from the package's real BookshelfScene. */
-.collection-room {
+ .collection-room {
+  --bottom-nav-height: 100px;
   width: 100%;
-  min-height: 1250px;
-  height: auto;
-  min-height: 0;
+  min-width: 0;
+  min-height: 100dvh;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  overflow: visible;
-  background: #080604;
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+  background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat;
   color: #fff;
 }
 .collection-room__header {
@@ -237,6 +233,7 @@ body {
 .collection-room__actions button.is-active { color: #2fe92b; border-color: #375038; }
 .collection-room__actions button:focus-visible,
 .collection-room__search input:focus-visible,
+.collection-room__filters button:focus-visible,
 .collection-sheet button:focus-visible { outline: 2px solid #2fe92b; outline-offset: 2px; }
 
 .collection-room__search {
@@ -261,13 +258,29 @@ body {
   background: #0d0c0a;
   box-shadow: inset 0 -8px 22px rgba(0, 0, 0, .55);
 }
-.collection-room__filters > div { min-width: 0; flex: 1; display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
-.collection-room__filters > div::-webkit-scrollbar { display: none; }
+.collection-room__categories { min-width: 0; flex: 1; display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+.collection-room__categories::-webkit-scrollbar { display: none; }
 .collection-room__filters button { flex: 0 0 auto; min-height: 38px; padding: 0 13px; border: 1px solid transparent; border-radius: 22px; background: transparent; color: #9b9692; font-size: 13px; }
 .collection-room__filters button.is-selected { border-color: #268c3b; background: #102418; color: #fff; }
-.collection-room__filters .collection-room__sort { min-height: 40px; padding: 0 11px; display: flex; align-items: center; gap: 6px; border-color: #26272d; background: #111; color: #fff; }
-.collection-room__sort svg { width: 15px; }
+.collection-room__toolbar-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
+.collection-room__filters .collection-room__add,
+.collection-room__filters .collection-room__sort { min-height: 36px; padding: 0 10px; display: flex; align-items: center; gap: 5px; border: 1px solid #2a2a2c; border-radius: 9px; background: #151517; color: #fff; transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease; }
+.collection-room__filters .collection-room__add:hover,
+.collection-room__filters .collection-room__sort:hover { border-color: rgba(47, 233, 43, .55); }
+.collection-room__filters .collection-room__add:active,
+.collection-room__filters .collection-room__sort:active { transform: scale(.97); border-color: rgba(47, 233, 43, .55); background: #111113; }
+.collection-room__add svg { width: 15px; color: #2fe92b; }
+.collection-room__sort svg { width: 14px; color: #a8a8ae; }
+.collection-room__add-label > span:last-child { display: none; }
 .collection-room__sort span { white-space: nowrap; font-size: 11px; }
+.collection-room__add-label { white-space: nowrap; font-size: 11px; }
+@media (max-width: 374px) {
+  .collection-room__add-label > span:first-child { display: none; }
+  .collection-room__add-label > span:last-child { display: inline; }
+  .collection-room__filters { padding-inline: 10px; gap: 6px; }
+  .collection-room__filters .collection-room__add,
+  .collection-room__filters .collection-room__sort { padding-inline: 8px; }
+}
 .collection-room__search > svg { width: 17px; color: #8a8a92; }
 .collection-room__search input {
   min-width: 0;
@@ -283,7 +296,7 @@ body {
 .collection-room__search input::placeholder { color: #8a8a92; opacity: 1; }
 .collection-room__search button { border: 0; background: transparent; color: #bbcbb2; font-size: 12px; }
 
-.collection-room__shelf { position: relative; flex: none; height: 690px; overflow: hidden; border-bottom: 1px solid #3c2317; background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat; box-shadow: inset 0 15px 32px rgba(255, 159, 86, .06); }
+.collection-room__shelf { position: relative; flex: none; height: auto; overflow: visible; border-bottom: 1px solid #3c2317; background: #100d0b url('/assets/vinyl/shelf-dark-wood.webp') center / 720px auto repeat; box-shadow: inset 0 15px 32px rgba(255, 159, 86, .06); }
 .threeui-vinyl-shelf { position: absolute; inset: 0; animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both; }
 .threeui-vinyl-shelf::before {
   content: "";
@@ -315,28 +328,14 @@ body {
 .collection-room__focus strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; }
 .collection-room__focus span { margin-top: 3px; color: #bbcbb2; font-size: 12px; }
 .collection-room__focus small { margin-top: 8px; color: #8a8a92; font-size: 10px; }
-.collection-room__pages { position: absolute; z-index: 3; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; }
-.collection-room__pages button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; background: #26272d; }
-.collection-room__pages button[aria-current="true"] { background: #2fe92b; }
-.collection-room__empty { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; color: #bbcbb2; font-size: 14px; }
+.collection-room__pages { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; }
+.collection-room__pages button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; background: none; }
+.collection-room__pages button::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #6b6b78; }
+.collection-room__pages button[aria-current="true"]::after { background: #2fe92b; }
+.collection-room__empty { min-height: 240px; display: grid; place-content: center; justify-items: center; gap: 14px; color: #bbcbb2; font-size: 14px; }
 .collection-room__empty button { padding: 10px 14px; border: 1px solid #26272d; border-radius: 5px; background: #0f0f0f; color: #fff; }
 
-.collection-room__labels {
-  position: absolute;
-  z-index: 2;
-  inset: 0 24px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(3, 1fr);
-  column-gap: 24px;
-  pointer-events: none;
-  animation: shelf-content-in 280ms cubic-bezier(.22, 1, .36, 1) both;
-}
-.collection-room__labels > div { min-width: 0; align-self: end; padding: 0 4px 26px; text-shadow: 0 2px 9px #000; }
-.collection-room__labels strong,
-.collection-room__labels span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.collection-room__labels strong { color: #ead1ba; font-size: 12px; font-weight: 600; }
-.collection-room__labels span { margin-top: 4px; color: #aaa19a; font-size: 10px; }
+
 
 @keyframes shelf-content-in { from { opacity: .15; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 

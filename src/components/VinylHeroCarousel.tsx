@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Album } from '../types';
 import { VinylDisc } from './VinylDisc';
-import { audioEngine } from '../services/audioEngine';
+import { hapticsService } from '../platform/platformService';
 
 interface VinylHeroCarouselProps {
   albums: Album[];
@@ -74,10 +74,10 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
 
     if ((delta < -threshold || velocity < -velocityThreshold) && currentIndex < albums.length - 1) {
       onSelectIndex(currentIndex + 1);
-      audioEngine.triggerHaptic('light');
+      hapticsService.triggerHaptic('light');
     } else if ((delta > threshold || velocity > velocityThreshold) && currentIndex > 0) {
       onSelectIndex(currentIndex - 1);
-      audioEngine.triggerHaptic('light');
+      hapticsService.triggerHaptic('light');
     }
 
     setDragOffset(0);
@@ -90,10 +90,10 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' && currentIndex > 0) {
         onSelectIndex(currentIndex - 1);
-        audioEngine.triggerHaptic('light');
+        hapticsService.triggerHaptic('light');
       } else if (e.key === 'ArrowRight' && currentIndex < albums.length - 1) {
         onSelectIndex(currentIndex + 1);
-        audioEngine.triggerHaptic('light');
+        hapticsService.triggerHaptic('light');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -139,7 +139,7 @@ export const VinylHeroCarousel: React.FC<VinylHeroCarouselProps> = ({
             onClick={() => {
               if (!isCenter && !isDragging) {
                 onSelectIndex(index);
-                audioEngine.triggerHaptic('light');
+                hapticsService.triggerHaptic('light');
               } else if (isCenter && !isDragging && onOpenAlbumDetail) {
                 onOpenAlbumDetail(album);
               }

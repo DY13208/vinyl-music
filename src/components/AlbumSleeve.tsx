@@ -1,4 +1,5 @@
 import React from 'react';
+import { AlbumArtwork } from './AlbumArtwork';
 
 interface AlbumSleeveProps {
   coverUrl: string;
@@ -26,13 +27,7 @@ export const AlbumSleeve: React.FC<AlbumSleeveProps> = ({
       }}
     >
       {/* Front Album Jacket Artwork */}
-      <img
-        src={coverUrl}
-        alt={title}
-        className="w-full h-full object-cover block"
-        loading="eager"
-        referrerPolicy="no-referrer"
-      />
+      <AlbumArtwork src={coverUrl} alt={title} loading="eager" />
 
       {/* Realistic Left Spine Fold Shadow */}
       <div className="absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-black/45 via-black/20 to-transparent pointer-events-none" />

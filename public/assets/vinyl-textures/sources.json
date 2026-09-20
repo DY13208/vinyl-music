@@ -1,0 +1,129 @@
+{
+  "assets": {
+    "black": {
+      "file": "black.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "blue": {
+      "file": "blue.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "clear": {
+      "file": "clear.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "red": {
+      "file": "red.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "splatter-01": {
+      "file": "splatter-01.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "translucent": {
+      "file": "translucent.webp",
+      "source": "Reused project image generation output from 2026-09-09",
+      "format": "WebP RGBA"
+    },
+    "picture-base": {
+      "file": "picture-base.webp",
+      "source": "Reflection and groove alpha extracted from the existing black image"
+    },
+    "paper-grain": {
+      "file": "paper-grain.webp",
+      "source": "Blank paper label crop from the existing red image"
+    },
+    "white": {
+      "file": "white.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "green": {
+      "file": "green.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "orange": {
+      "file": "orange.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "marbled-01": {
+      "file": "marbled-01.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "marbled-02": {
+      "file": "marbled-02.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "splatter-02": {
+      "file": "splatter-02.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "split-01": {
+      "file": "split-01.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "liquid-01": {
+      "file": "liquid-01.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "liquid-02": {
+      "file": "liquid-02.webp",
+      "source": "User supplied GPT image, integrated 2026-09-09",
+      "format": "WebP RGBA",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  },
+  "pending": [],
+  "notes": [
+    "No procedural CSS or Canvas material generation",
+    "clear and translucent use spatial alpha derived from source light and rim, not element opacity",
+    "Generated masters have no fixed artwork or text; center label is rendered by VinylDisc"
+  ]
+}
