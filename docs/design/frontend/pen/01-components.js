@@ -1,0 +1,58 @@
+SetVariables({bg:{type:'color',value:'#000000'},surface:{type:'color',value:'#0F0F0F'},raised:{type:'color',value:'#1B1B1D'},border:{type:'color',value:'#26272D'},primary:{type:'color',value:'#2FE92B'},text:{type:'color',value:'#FFFFFF'},secondary:{type:'color',value:'#BBCBB2'},muted:{type:'color',value:'#A5A0A0'},orange:{type:'color',value:'#FF9821'},danger:{type:'color',value:'#FF8585'},body:{type:'string',value:'Noto Sans SC'},display:{type:'string',value:'Noto Serif SC'},utility:{type:'string',value:'IBM Plex Mono'}});
+txt=(p,n,c,s=14,col='$text',o={})=>Insert(p,{type:'text',name:n,content:c,fontFamily:'$body',fontSize:s,fill:col,...o});
+icon=(p,n,i,s=20,col='$text',o={})=>Insert(p,{type:'icon',name:n,library:'lucide',icon:i,width:s,height:s,fill:col,...o});
+frame=(p,n,w,h,o={})=>Insert(p,{type:'frame',name:n,width:w,height:h,layout:'vertical',...o});
+img=(p,n,url,w,h,o={})=>Insert(p,{type:'rectangle',name:n,width:w,height:h,fill:{type:'image',url,mode:'fill'},...o});
+board=frame(document,'C00 · 视觉语言与可复用组件',1700,850,{x:0,y:0,fill:'#080808',padding:40,gap:24,placeholder:true});
+txt(board,'标题','VINYL / 组件与状态',32,'$text',{fontFamily:'$display',fontWeight:'600'});
+txt(board,'说明','沿用现有暗室、木纹、实体封套与绿色操作。页面通过同一组件与状态变体构成。',15,'$secondary');
+swatches=frame(board,'设计令牌', 'fill_container',76,{layout:'horizontal',gap:16});
+for(const [name,color] of [['背景','#000000'],['表面','#0F0F0F'],['边界','#26272D'],['主操作','#2FE92B'],['次级文字','#BBCBB2'],['愿望单','#FF9821']]){
+ const sw=frame(swatches,name,190,76,{gap:6}); Insert(sw,{type:'rectangle',name:name+' 色样',width:'fill_container',height:34,fill:color,stroke:'#343434',strokeWidth:1,cornerRadius:4});txt(sw,name+' 数值',name+'  '+color,12,'$secondary');
+}
+row=frame(board,'基础控制','fill_container',120,{layout:'horizontal',gap:24});
+button=frame(row,'C01 · Button',166,48,{reusable:true,fill:'$primary',cornerRadius:6,layout:'horizontal',justifyContent:'center',alignItems:'center',gap:8});
+buttonLabel=txt(button,'按钮文案','加入收藏',14,'#071007',{fontWeight:'600'});
+iconButton=frame(row,'C02 · IconButton',44,44,{reusable:true,fill:'$surface',stroke:'$border',strokeWidth:1,cornerRadius:22,justifyContent:'center',alignItems:'center'});
+iconGlyph=icon(iconButton,'图标','search');
+field=frame(row,'C03 · FormField',326,92,{reusable:true,gap:8});
+fieldLabel=txt(field,'字段标签','账号',13,'$secondary');
+fieldBox=frame(field,'输入框','fill_container',48,{fill:'$raised',stroke:'$border',strokeWidth:1,cornerRadius:6,layout:'horizontal',padding:12,alignItems:'center'});
+fieldValue=txt(fieldBox,'输入内容','请输入账号',14,'$muted');
+chip=frame(row,'C04 · FilterChip',78,40,{reusable:true,fill:'#102418',stroke:'#268C3B',strokeWidth:1,cornerRadius:20,justifyContent:'center',alignItems:'center'});
+chipLabel=txt(chip,'筛选文案','全部',13);
+badge=frame(row,'C05 · SourceBadge',142,28,{reusable:true,fill:'$raised',stroke:'$border',strokeWidth:1,cornerRadius:4,justifyContent:'center',alignItems:'center'});
+badgeLabel=txt(badge,'来源标签','用户录入 · 待核验',11,'$secondary');
+row2=frame(board,'内容与反馈','fill_container',198,{layout:'horizontal',gap:24});
+albumRow=frame(row2,'C06 · AlbumRow',342,80,{reusable:true,layout:'horizontal',gap:12,alignItems:'center',padding:[8,0]});
+albumRowCover=img(albumRow,'封面','./assets/demo-cover.png',60,60,{cornerRadius:3});
+albumRowText=frame(albumRow,'文字','fill_container','fit_content',{gap:5});
+albumRowTitle=txt(albumRowText,'专辑名','Abbey Road',14,'$text',{fontWeight:'600',textGrowth:'fixed-width',width:'fill_container'});
+albumRowArtist=txt(albumRowText,'艺术家','The Beatles · 1969',12,'$secondary');
+icon(albumRow,'查看详情','chevron-right',18,'$muted');
+state=frame(row2,'C07 · AsyncState',342,184,{reusable:true,gap:12,padding:20,fill:'$surface',stroke:'$border',strokeWidth:1,cornerRadius:8});
+stateTitle=txt(state,'状态标题','尚未收藏唱片',18,'$text',{fontWeight:'600'});
+stateBody=txt(state,'状态说明','从目录选一张，或录入你拥有的唱片。',13,'$secondary',{textGrowth:'fixed-width',width:'fill_container',lineHeight:1.6});
+stateAction=Insert(state,{type:'ref',name:'状态操作',ref:button,width:'fill_container',descendants:{[buttonLabel]:{content:'寻找第一张唱片'}}});
+provider=frame(row2,'C08 · ProviderStatus',342,112,{reusable:true,gap:10,padding:16,fill:'$surface',stroke:'$border',strokeWidth:1,cornerRadius:8});
+providerName=txt(provider,'平台名','音乐平台',15,'$text',{fontWeight:'600'});
+providerStatus=txt(provider,'连接状态','尚未接入 · 暂无可用音源',13,'$secondary');
+txt(provider,'提示','接入后才能提供歌曲播放。',12,'$muted');
+nav=frame(row2,'C09 · BottomNav',390,76,{reusable:true,layout:'horizontal',padding:[12,12],fill:'$bg',stroke:'$border',strokeWidth:{top:1},justifyContent:'space_between',alignItems:'center'});
+navParts=[];
+for(const [i,n,label] of [['house','home','首页'],['heart','collection','收藏'],['compass','discover','发现'],['user-round','profile','我的']]){
+ const item=frame(nav,'导航 '+n,'fill_container','fit_content',{gap:5,alignItems:'center'});const a=icon(item,'导航图标 '+n,i,20,n==='home'?'$primary':'$muted');const b=txt(item,'导航文字 '+n,label,11,n==='home'?'$primary':'$muted');navParts.push({name:n,icon:a,label:b});
+}
+row3=frame(board,'播放器与组件变体','fill_container',170,{layout:'horizontal',gap:24});
+mini=frame(row3,'C10 · MiniPlayer',390,72,{reusable:true,layout:'horizontal',padding:12,gap:12,alignItems:'center',fill:'$surface',stroke:'$border',strokeWidth:{top:1}});
+img(mini,'唱片封面','./assets/demo-cover.png',44,44,{cornerRadius:22});miniText=frame(mini,'当前曲目','fill_container','fit_content',{gap:4});txt(miniText,'曲名','Come Together',13,'$text',{fontWeight:'600'});txt(miniText,'来源状态','暂无可用音源',11,'$secondary');icon(mini,'不可播放','circle-play',24,'$muted');
+variants=frame(row3,'按钮变体',342,'fit_content',{gap:10});
+Insert(variants,{type:'ref',name:'提交中',ref:button,width:'fill_container',fill:'#275D25',descendants:{[buttonLabel]:{content:'正在保存…',fill:'#E3E9E3'}}});
+Insert(variants,{type:'ref',name:'禁用',ref:button,width:'fill_container',fill:'$raised',descendants:{[buttonLabel]:{content:'暂无音源',fill:'$muted'}}});
+Insert(variants,{type:'ref',name:'次级',ref:button,width:'fill_container',fill:'$surface',stroke:'$border',strokeWidth:1,descendants:{[buttonLabel]:{content:'保留草稿',fill:'$text'}}});
+tips=frame(row3,'交互要求','fill_container','fit_content',{gap:10});
+for(const s of ['触控区域至少 44 × 44；清晰的键盘焦点','错误保留输入；确认后才显示保存成功','所有状态均有文字；不能只靠绿色或红色','动画遵守 reduced-motion；3D 提供列表入口'])txt(tips,s,s,14,'$secondary');
+Update(board,{placeholder:false});
+Print('COMPONENTS',board,button,field,albumRow,nav,state);
+TakeScreenshot([board]);
+Export([board],'png','./exports',{scale:1});

@@ -1,0 +1,5609 @@
+{
+  "version": "2.17",
+  "children": [
+    {
+      "type": "frame",
+      "id": "d8ZuRd",
+      "x": 0,
+      "y": 0,
+      "name": "C00 · 视觉语言与可复用组件",
+      "width": 1700,
+      "height": 850,
+      "fill": "#080808",
+      "layout": "vertical",
+      "gap": 24,
+      "padding": 40,
+      "children": [
+        {
+          "type": "text",
+          "id": "Nh3OC",
+          "name": "标题",
+          "fill": "$text",
+          "content": "VINYL / 组件与状态",
+          "fontFamily": "$display",
+          "fontSize": 32,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "Mhex5",
+          "name": "说明",
+          "fill": "$secondary",
+          "content": "沿用现有暗室、木纹、实体封套与绿色操作。页面通过同一组件与状态变体构成。",
+          "fontFamily": "$body",
+          "fontSize": 15,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "U18nJ",
+          "name": "设计令牌",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "wjRUX",
+              "name": "背景",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "Yz6aS",
+                  "name": "背景 色样",
+                  "fill": "#000000",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "eNoKw",
+                  "name": "背景 数值",
+                  "fill": "$secondary",
+                  "content": "背景  #000000",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "k9TNdL",
+              "name": "表面",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "qvUwC",
+                  "name": "表面 色样",
+                  "fill": "#0F0F0F",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "vpZl0",
+                  "name": "表面 数值",
+                  "fill": "$secondary",
+                  "content": "表面  #0F0F0F",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gPGYM",
+              "name": "边界",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "VBwUA",
+                  "name": "边界 色样",
+                  "fill": "#26272D",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "Blxzi",
+                  "name": "边界 数值",
+                  "fill": "$secondary",
+                  "content": "边界  #26272D",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "v8tzxy",
+              "name": "主操作",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "p3mIZX",
+                  "name": "主操作 色样",
+                  "fill": "#2FE92B",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "GY55A",
+                  "name": "主操作 数值",
+                  "fill": "$secondary",
+                  "content": "主操作  #2FE92B",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "te2Ko",
+              "name": "次级文字",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "v4yaRN",
+                  "name": "次级文字 色样",
+                  "fill": "#BBCBB2",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "gulFa",
+                  "name": "次级文字 数值",
+                  "fill": "$secondary",
+                  "content": "次级文字  #BBCBB2",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bzDPc",
+              "name": "愿望单",
+              "width": 190,
+              "height": 76,
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 4,
+                  "id": "tYVLs",
+                  "name": "愿望单 色样",
+                  "fill": "#FF9821",
+                  "width": "fill_container",
+                  "height": 34,
+                  "stroke": "#343434",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "text",
+                  "id": "iA1R5",
+                  "name": "愿望单 数值",
+                  "fill": "$secondary",
+                  "content": "愿望单  #FF9821",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ADmBN",
+          "name": "基础控制",
+          "width": "fill_container",
+          "height": 120,
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "aCU3x",
+              "name": "C01 · Button",
+              "reusable": true,
+              "width": 166,
+              "height": 48,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "gap": 8,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "o3Pj0",
+                  "name": "按钮文案",
+                  "fill": "#071007",
+                  "content": "加入收藏",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "DrRO6",
+              "name": "C02 · IconButton",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": "$surface",
+              "cornerRadius": 22,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "L9jg2q",
+                  "name": "图标",
+                  "width": 20,
+                  "height": 20,
+                  "icon": "search",
+                  "library": "lucide",
+                  "fill": "$text"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "BMcL3",
+              "name": "C03 · FormField",
+              "reusable": true,
+              "width": 326,
+              "height": 92,
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EHfQi",
+                  "name": "字段标签",
+                  "fill": "$secondary",
+                  "content": "账号",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "BRWcE",
+                  "name": "输入框",
+                  "width": "fill_container",
+                  "height": 48,
+                  "fill": "$raised",
+                  "cornerRadius": 6,
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "padding": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "F8mIJ4",
+                      "name": "输入内容",
+                      "fill": "$muted",
+                      "content": "请输入账号",
+                      "fontFamily": "$body",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "tPwjM",
+              "name": "C04 · FilterChip",
+              "reusable": true,
+              "width": 78,
+              "height": 40,
+              "fill": "#102418",
+              "cornerRadius": 20,
+              "stroke": "#268C3B",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "NQTiL",
+                  "name": "筛选文案",
+                  "fill": "$text",
+                  "content": "全部",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "GgIts",
+              "name": "C05 · SourceBadge",
+              "reusable": true,
+              "width": 142,
+              "height": 28,
+              "fill": "$raised",
+              "cornerRadius": 4,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "HTV7l",
+                  "name": "来源标签",
+                  "fill": "$secondary",
+                  "content": "用户录入 · 待核验",
+                  "fontFamily": "$body",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "o89vz",
+          "name": "内容与反馈",
+          "width": "fill_container",
+          "height": 198,
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "Q22jBt",
+              "name": "C06 · AlbumRow",
+              "reusable": true,
+              "width": 342,
+              "height": 80,
+              "gap": 12,
+              "padding": [
+                8,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 3,
+                  "id": "qbsOp",
+                  "name": "封面",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  },
+                  "width": 60,
+                  "height": 60
+                },
+                {
+                  "type": "frame",
+                  "id": "a2951I",
+                  "name": "文字",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 5,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "jItTt",
+                      "name": "专辑名",
+                      "fill": "$text",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Abbey Road",
+                      "fontFamily": "$body",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "bhWxO",
+                      "name": "艺术家",
+                      "fill": "$secondary",
+                      "content": "The Beatles · 1969",
+                      "fontFamily": "$body",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "DUKfM",
+                  "name": "查看详情",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "O5csr9",
+              "name": "C07 · AsyncState",
+              "reusable": true,
+              "width": 342,
+              "height": 184,
+              "fill": "$surface",
+              "cornerRadius": 8,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 20,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "fI6Yz",
+                  "name": "状态标题",
+                  "fill": "$text",
+                  "content": "尚未收藏唱片",
+                  "fontFamily": "$body",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "TYQFr",
+                  "name": "状态说明",
+                  "fill": "$secondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "从目录选一张，或录入你拥有的唱片。",
+                  "lineHeight": 1.6,
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "i80r6",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "状态操作",
+                  "width": "fill_container",
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "寻找第一张唱片"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "im1oW",
+              "name": "C08 · ProviderStatus",
+              "reusable": true,
+              "width": 342,
+              "height": 112,
+              "fill": "$surface",
+              "cornerRadius": 8,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 10,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rIp7l",
+                  "name": "平台名",
+                  "fill": "$text",
+                  "content": "音乐平台",
+                  "fontFamily": "$body",
+                  "fontSize": 15,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "QBJAk",
+                  "name": "连接状态",
+                  "fill": "$secondary",
+                  "content": "尚未接入 · 暂无可用音源",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "VGk7m",
+                  "name": "提示",
+                  "fill": "$muted",
+                  "content": "接入后才能提供歌曲播放。",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "xeCZa",
+              "name": "C09 · BottomNav",
+              "reusable": true,
+              "width": 390,
+              "height": 76,
+              "fill": "$bg",
+              "stroke": "$border",
+              "strokeWidth": {
+                "top": 1
+              },
+              "padding": 12,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "UfVMx",
+                  "name": "导航 home",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 5,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "aNXIV",
+                      "name": "导航图标 home",
+                      "width": 20,
+                      "height": 20,
+                      "icon": "house",
+                      "library": "lucide",
+                      "fill": "$primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "iESx9",
+                      "name": "导航文字 home",
+                      "fill": "$primary",
+                      "content": "首页",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "V4t4W",
+                  "name": "导航 collection",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 5,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "Ezjqs",
+                      "name": "导航图标 collection",
+                      "width": 20,
+                      "height": 20,
+                      "icon": "heart",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "mYRuH",
+                      "name": "导航文字 collection",
+                      "fill": "$muted",
+                      "content": "收藏",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "j3JLl6",
+                  "name": "导航 discover",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 5,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "Xro8v",
+                      "name": "导航图标 discover",
+                      "width": 20,
+                      "height": 20,
+                      "icon": "compass",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "E5rGML",
+                      "name": "导航文字 discover",
+                      "fill": "$muted",
+                      "content": "发现",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kQKLC",
+                  "name": "导航 profile",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 5,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon",
+                      "id": "HXWHB",
+                      "name": "导航图标 profile",
+                      "width": 20,
+                      "height": 20,
+                      "icon": "user-round",
+                      "library": "lucide",
+                      "fill": "$muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "lrNDH",
+                      "name": "导航文字 profile",
+                      "fill": "$muted",
+                      "content": "我的",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nixyR",
+          "name": "播放器与组件变体",
+          "width": "fill_container",
+          "height": 170,
+          "gap": 24,
+          "children": [
+            {
+              "type": "frame",
+              "id": "Xfy7t",
+              "name": "C10 · MiniPlayer",
+              "reusable": true,
+              "width": 390,
+              "height": 72,
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": {
+                "top": 1
+              },
+              "gap": 12,
+              "padding": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 22,
+                  "id": "jO3iC",
+                  "name": "唱片封面",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  },
+                  "width": 44,
+                  "height": 44
+                },
+                {
+                  "type": "frame",
+                  "id": "xW9ZN",
+                  "name": "当前曲目",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "o12ORx",
+                      "name": "曲名",
+                      "fill": "$text",
+                      "content": "Come Together",
+                      "fontFamily": "$body",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "xmfq0",
+                      "name": "来源状态",
+                      "fill": "$secondary",
+                      "content": "暂无可用音源",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "icon",
+                  "id": "RdhsQ",
+                  "name": "不可播放",
+                  "width": 24,
+                  "height": 24,
+                  "icon": "circle-play",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "rcpam",
+              "name": "按钮变体",
+              "width": 342,
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "id": "JKOjW",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "提交中",
+                  "width": "fill_container",
+                  "fill": "#275D25",
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "正在保存…",
+                      "fill": "#E3E9E3"
+                    }
+                  }
+                },
+                {
+                  "id": "w8qwz",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "禁用",
+                  "width": "fill_container",
+                  "fill": "$raised",
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "暂无音源",
+                      "fill": "$muted"
+                    }
+                  }
+                },
+                {
+                  "id": "nUBD0",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "次级",
+                  "width": "fill_container",
+                  "fill": "$surface",
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "保留草稿",
+                      "fill": "$text"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "CqxTw",
+              "name": "交互要求",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 10,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "knm2O",
+                  "name": "触控区域至少 44 × 44；清晰的键盘焦点",
+                  "fill": "$secondary",
+                  "content": "触控区域至少 44 × 44；清晰的键盘焦点",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "Y9p2W",
+                  "name": "错误保留输入；确认后才显示保存成功",
+                  "fill": "$secondary",
+                  "content": "错误保留输入；确认后才显示保存成功",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "jHJA5",
+                  "name": "所有状态均有文字；不能只靠绿色或红色",
+                  "fill": "$secondary",
+                  "content": "所有状态均有文字；不能只靠绿色或红色",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "B288g",
+                  "name": "动画遵守 reduced-motion；3D 提供列表入口",
+                  "fill": "$secondary",
+                  "content": "动画遵守 reduced-motion；3D 提供列表入口",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "xXszA",
+      "x": 0,
+      "y": 950,
+      "name": "P01 · 首页 · 唱片展示",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "R0kUsC",
+          "name": "暗室唱片台",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": [
+            {
+              "type": "image",
+              "enabled": true,
+              "url": "assets/home-room-bg.webp",
+              "mode": "fill"
+            },
+            "#00000075"
+          ],
+          "layout": "none",
+          "children": [
+            {
+              "id": "EQxOq",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "搜索唱片",
+              "x": 322,
+              "y": 22
+            },
+            {
+              "type": "frame",
+              "id": "wdVIo",
+              "x": 24,
+              "y": 177,
+              "name": "唱片陈列",
+              "width": 342,
+              "height": 333,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "rectangle",
+                  "id": "matqB",
+                  "x": 0,
+                  "y": 227,
+                  "name": "木质台面",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/shelf-dark-wood.webp",
+                    "mode": "fill"
+                  },
+                  "width": 342,
+                  "height": 106
+                },
+                {
+                  "type": "ellipse",
+                  "id": "bWTWq",
+                  "x": 70,
+                  "y": 14,
+                  "name": "黑胶材质",
+                  "fill": [
+                    "#121214",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "assets/vinyl-texture.webp",
+                      "mode": "fill"
+                    }
+                  ],
+                  "width": 268,
+                  "height": 268,
+                  "stroke": "#343333",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 3,
+                  "id": "Uc0rM",
+                  "x": 8,
+                  "y": 15,
+                  "name": "主封套",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  },
+                  "width": 245,
+                  "height": 245,
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#000000B0",
+                    "offset": {
+                      "x": 6,
+                      "y": 12
+                    },
+                    "blur": 20
+                  }
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "y73qCo",
+              "x": 24,
+              "y": 539,
+              "name": "唱片信息",
+              "width": 342,
+              "height": 110,
+              "layout": "vertical",
+              "gap": 9,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ANkLs",
+                  "name": "专辑名",
+                  "fill": "$text",
+                  "content": "Abbey Road",
+                  "fontFamily": "$body",
+                  "fontSize": 23,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "Hk888",
+                  "name": "艺术家",
+                  "fill": "$secondary",
+                  "content": "The Beatles",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "fICxa",
+                  "name": "翻阅说明",
+                  "fill": "$muted",
+                  "content": "左右翻阅 · 轻触查看唱片",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "DDolB",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$primary"
+            },
+            "iESx9": {
+              "fill": "$primary"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$muted"
+            },
+            "E5rGML": {
+              "fill": "$muted"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "mTK64",
+      "x": 438,
+      "y": 950,
+      "name": "P02 · 我的收藏 · 木质唱片柜",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "U1Weju",
+          "name": "收藏柜题头",
+          "width": "fill_container",
+          "height": 155,
+          "fill": [
+            {
+              "type": "image",
+              "enabled": true,
+              "url": "assets/collection-header-bg.webp",
+              "mode": "fill"
+            },
+            "#00000066"
+          ],
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 24,
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "text",
+              "id": "k94v1A",
+              "name": "标题",
+              "fill": "$text",
+              "content": "我的收藏",
+              "fontFamily": "$display",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "ZrCjp",
+              "name": "数量",
+              "fill": "$secondary",
+              "content": "6 张唱片 · 黑胶，是时光的收藏。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "IaQGA",
+          "name": "分类与操作",
+          "width": "fill_container",
+          "height": 68,
+          "gap": 8,
+          "padding": [
+            12,
+            18
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "Bowij",
+              "type": "ref",
+              "ref": "tPwjM",
+              "name": "全部",
+              "width": 62,
+              "fill": "#102418",
+              "stroke": "#268C3B",
+              "descendants": {
+                "NQTiL": {
+                  "content": "全部"
+                }
+              }
+            },
+            {
+              "id": "reAEH",
+              "type": "ref",
+              "ref": "tPwjM",
+              "name": "摇滚",
+              "width": 62,
+              "fill": "$surface",
+              "stroke": "$border",
+              "descendants": {
+                "NQTiL": {
+                  "content": "摇滚"
+                }
+              }
+            },
+            {
+              "id": "P2qdsb",
+              "type": "ref",
+              "ref": "tPwjM",
+              "name": "爵士",
+              "width": 62,
+              "fill": "$surface",
+              "stroke": "$border",
+              "descendants": {
+                "NQTiL": {
+                  "content": "爵士"
+                }
+              }
+            },
+            {
+              "id": "cap2q",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "录入唱片",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "plus"
+                }
+              }
+            },
+            {
+              "id": "V1SVi",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "搜索与排序",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "sliders-horizontal"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "QCekc",
+          "name": "木纹唱片柜",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": [
+            {
+              "type": "image",
+              "enabled": true,
+              "url": "assets/shelf-dark-wood.webp",
+              "mode": "fill"
+            },
+            "#00000044"
+          ],
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            12,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "RoATu",
+              "name": "唱片层",
+              "width": "fill_container",
+              "height": 208,
+              "gap": 18,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gsvLc",
+                  "name": "Abbey Road",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "j4jvf",
+                      "name": "实体封套与黑胶",
+                      "width": 159,
+                      "height": 132,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "d9zcm7",
+                          "x": 29.759999999999998,
+                          "y": 3,
+                          "name": "黑胶材质",
+                          "fill": [
+                            "#121214",
+                            {
+                              "type": "image",
+                              "enabled": true,
+                              "url": "assets/vinyl-texture.webp",
+                              "mode": "fill"
+                            }
+                          ],
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#343333",
+                          "strokeWidth": 1
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "PLXpZ",
+                          "x": 0,
+                          "y": 0,
+                          "name": "专辑封套",
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "assets/demo-cover.png",
+                            "mode": "fill"
+                          },
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#35312D",
+                          "strokeWidth": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "pqMn1",
+                      "name": "名称",
+                      "fill": "$text",
+                      "content": "Abbey Road",
+                      "fontFamily": "$body",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "HZ88Q",
+                      "name": "艺人",
+                      "fill": "$secondary",
+                      "content": "The Beatles",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wf9rA",
+                  "name": "OK Computer",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KnS1t",
+                      "name": "实体封套与黑胶",
+                      "width": 159,
+                      "height": 132,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "mfs3Y",
+                          "x": 29.759999999999998,
+                          "y": 3,
+                          "name": "黑胶材质",
+                          "fill": [
+                            "#121214",
+                            {
+                              "type": "image",
+                              "enabled": true,
+                              "url": "assets/vinyl-texture.webp",
+                              "mode": "fill"
+                            }
+                          ],
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#343333",
+                          "strokeWidth": 1
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "qcwhC",
+                          "x": 0,
+                          "y": 0,
+                          "name": "专辑封套",
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "assets/demo-mic.png",
+                            "mode": "fill"
+                          },
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#35312D",
+                          "strokeWidth": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "E6jYHh",
+                      "name": "名称",
+                      "fill": "$text",
+                      "content": "OK Computer",
+                      "fontFamily": "$body",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "JCHuV",
+                      "name": "艺人",
+                      "fill": "$secondary",
+                      "content": "Radiohead",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "NMjMR",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "b43Ss",
+              "name": "唱片层",
+              "width": "fill_container",
+              "height": 208,
+              "gap": 18,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "YTVA9",
+                  "name": "月之暗面",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "A2uNQn",
+                      "name": "实体封套与黑胶",
+                      "width": 159,
+                      "height": 132,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "RgiQQ",
+                          "x": 29.759999999999998,
+                          "y": 3,
+                          "name": "黑胶材质",
+                          "fill": [
+                            "#121214",
+                            {
+                              "type": "image",
+                              "enabled": true,
+                              "url": "assets/vinyl-texture.webp",
+                              "mode": "fill"
+                            }
+                          ],
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#343333",
+                          "strokeWidth": 1
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "uIQzg",
+                          "x": 0,
+                          "y": 0,
+                          "name": "专辑封套",
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "assets/demo-prism.png",
+                            "mode": "fill"
+                          },
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#35312D",
+                          "strokeWidth": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "i4YsL",
+                      "name": "名称",
+                      "fill": "$text",
+                      "content": "月之暗面",
+                      "fontFamily": "$body",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "D91dL",
+                      "name": "艺人",
+                      "fill": "$secondary",
+                      "content": "Pink Floyd",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "JmwuZ",
+                  "name": "Kind of Blue",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 7,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "jcmkk",
+                      "name": "实体封套与黑胶",
+                      "width": 159,
+                      "height": 132,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "jM11w",
+                          "x": 29.759999999999998,
+                          "y": 3,
+                          "name": "黑胶材质",
+                          "fill": [
+                            "#121214",
+                            {
+                              "type": "image",
+                              "enabled": true,
+                              "url": "assets/vinyl-texture.webp",
+                              "mode": "fill"
+                            }
+                          ],
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#343333",
+                          "strokeWidth": 1
+                        },
+                        {
+                          "type": "rectangle",
+                          "cornerRadius": 3,
+                          "id": "mvc6Z",
+                          "x": 0,
+                          "y": 0,
+                          "name": "专辑封套",
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "assets/demo-sax.png",
+                            "mode": "fill"
+                          },
+                          "width": 124,
+                          "height": 124,
+                          "stroke": "#35312D",
+                          "strokeWidth": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "hQ36G",
+                      "name": "名称",
+                      "fill": "$text",
+                      "content": "Kind of Blue",
+                      "fontFamily": "$body",
+                      "fontSize": 13,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "L1DD4",
+                      "name": "艺人",
+                      "fill": "$secondary",
+                      "content": "Miles Davis",
+                      "fontFamily": "$body",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "z4UkZv",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "MXqDV",
+              "name": "分页提示",
+              "fill": "$secondary",
+              "content": "最近添加     1 / 2 层     下一层 →",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "UShne",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$primary"
+            },
+            "mYRuH": {
+              "fill": "$primary"
+            },
+            "Xro8v": {
+              "fill": "$muted"
+            },
+            "E5rGML": {
+              "fill": "$muted"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "o2lyD",
+      "x": 876,
+      "y": 950,
+      "name": "P03 · 发行版详情 · 入藏",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "K5Jkw",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "i76p71",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "Qsj2k",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "唱片档案",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "vXrR3",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "页面操作",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "search"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "R3xRz",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "sW6xC",
+              "name": "实体封套与黑胶",
+              "width": 253,
+              "height": 212,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "qh0Hn",
+                  "x": 48.96,
+                  "y": 3,
+                  "name": "黑胶材质",
+                  "fill": [
+                    "#121214",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "assets/vinyl-texture.webp",
+                      "mode": "fill"
+                    }
+                  ],
+                  "width": 204,
+                  "height": 204,
+                  "stroke": "#343333",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 3,
+                  "id": "OkFkX",
+                  "x": 0,
+                  "y": 0,
+                  "name": "专辑封套",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  },
+                  "width": 204,
+                  "height": 204,
+                  "stroke": "#35312D",
+                  "strokeWidth": 1
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "NMp4c",
+              "name": "专辑名",
+              "fill": "$text",
+              "content": "Abbey Road",
+              "fontFamily": "$body",
+              "fontSize": 26,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "uBLYT",
+              "name": "艺术家",
+              "fill": "$secondary",
+              "content": "The Beatles · 1969",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "AlCA0",
+              "type": "ref",
+              "ref": "GgIts",
+              "name": "示例目录 · 待核验",
+              "descendants": {
+                "HTV7l": {
+                  "content": "示例目录 · 待核验"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "qpMmC",
+              "name": "发行版",
+              "fill": "$secondary",
+              "content": "50 周年版 · 180g · 33⅓ RPM",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "PhF94",
+              "name": "版本信息",
+              "fill": "$muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Apple Records / EMI\n刻字矩阵 PCS 7088",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "xJksr",
+              "name": "收藏操作",
+              "width": "fill_container",
+              "height": 48,
+              "gap": 10,
+              "children": [
+                {
+                  "id": "LdLvy",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "加入收藏",
+                  "width": "fill_container",
+                  "fill": "$primary",
+                  "strokeWidth": 0,
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "加入收藏",
+                      "fill": "#071007"
+                    }
+                  }
+                },
+                {
+                  "id": "sEKtR",
+                  "type": "ref",
+                  "ref": "DrRO6",
+                  "name": "喜欢",
+                  "descendants": {
+                    "L9jg2q": {
+                      "icon": "heart"
+                    }
+                  }
+                },
+                {
+                  "id": "t7SS24",
+                  "type": "ref",
+                  "ref": "DrRO6",
+                  "name": "加入愿望单",
+                  "descendants": {
+                    "L9jg2q": {
+                      "icon": "bookmark-plus"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "iI6Ce",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "sJ1MY",
+              "name": "曲目标题",
+              "fill": "$text",
+              "content": "曲目档案",
+              "fontFamily": "$body",
+              "fontSize": 17,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "GMPAm",
+              "name": "曲目 Come Together",
+              "width": "fill_container",
+              "height": 34,
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ooKsi",
+                  "name": "序号",
+                  "fill": "$muted",
+                  "content": "01",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "cZmul",
+                  "name": "曲名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Come Together",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "pAh77",
+                  "name": "时长",
+                  "fill": "$muted",
+                  "content": "4:20",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Iw5BH",
+              "name": "曲目 Something",
+              "width": "fill_container",
+              "height": 34,
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "EIWgY",
+                  "name": "序号",
+                  "fill": "$muted",
+                  "content": "02",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "fdObu",
+                  "name": "曲名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Something",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "z50tch",
+                  "name": "时长",
+                  "fill": "$muted",
+                  "content": "3:03",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "R6ZFqm",
+              "name": "音源状态",
+              "fill": "$secondary",
+              "content": "暂无可用音源 · 仍可收藏与整理唱片",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "d9WyTw",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$primary"
+            },
+            "E5rGML": {
+              "fill": "$primary"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "o1Yy2d",
+      "x": 1314,
+      "y": 950,
+      "name": "P04 · 播放器 · 平台未接入",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "MJmKS",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "Itni3",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "GYbRS",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "唱机",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "PUcW7",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "页面操作",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "list-music"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Sa5lp",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "f8AOq",
+              "name": "播放模式",
+              "width": "fill_container",
+              "height": 38,
+              "gap": 8,
+              "justifyContent": "center",
+              "children": [
+                {
+                  "id": "PmEmq",
+                  "type": "ref",
+                  "ref": "GgIts",
+                  "name": "唱机",
+                  "descendants": {
+                    "HTV7l": {
+                      "content": "唱机"
+                    }
+                  }
+                },
+                {
+                  "id": "A2eP8D",
+                  "type": "ref",
+                  "ref": "GgIts",
+                  "name": "歌词",
+                  "descendants": {
+                    "HTV7l": {
+                      "content": "歌词"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "t7zS9",
+              "name": "现有拟物唱机参考",
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "assets/turntable-reference.png",
+                "mode": "fill"
+              },
+              "width": "fill_container",
+              "height": 320
+            },
+            {
+              "type": "text",
+              "id": "YWeJq",
+              "name": "曲名",
+              "fill": "$text",
+              "content": "Come Together",
+              "fontFamily": "$body",
+              "fontSize": 23,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "AEQl1",
+              "name": "艺人",
+              "fill": "$secondary",
+              "content": "The Beatles · Abbey Road",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "L31Gc",
+              "name": "进度",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "afg8A",
+                  "name": "当前时间",
+                  "fill": "$muted",
+                  "content": "0:00",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "LrFxe",
+                  "name": "音源不可用",
+                  "fill": "$muted",
+                  "content": "暂无音源",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wDbdt",
+              "name": "播放控制",
+              "width": "fill_container",
+              "height": 56,
+              "gap": 24,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "tWgEx",
+                  "type": "ref",
+                  "ref": "DrRO6",
+                  "name": "上一首",
+                  "descendants": {
+                    "L9jg2q": {
+                      "icon": "skip-back"
+                    }
+                  }
+                },
+                {
+                  "id": "J7F9p",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "暂无音源",
+                  "width": 166,
+                  "fill": "$raised",
+                  "strokeWidth": 0,
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "暂无音源",
+                      "fill": "$muted"
+                    }
+                  }
+                },
+                {
+                  "id": "FxIY4",
+                  "type": "ref",
+                  "ref": "DrRO6",
+                  "name": "下一首",
+                  "descendants": {
+                    "L9jg2q": {
+                      "icon": "skip-forward"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "Bvz8D",
+              "name": "提示",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "音乐平台尚未接入。接入后可开始播放；当前不会模拟歌曲进度。",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "bVXT4",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "查看音乐来源",
+              "width": "fill_container",
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "查看音乐来源",
+                  "fill": "$text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "fa51S",
+      "x": 0,
+      "y": 1894,
+      "name": "P05 · 搜索 · Album First",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Gk2E0",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "hb0Zf",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "J9Fj2H",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "搜索",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gqCI8",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "id": "QOEsR",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "专辑、艺术家或曲目",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "专辑、艺术家或曲目"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "Abbey"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "JXb6R",
+              "name": "结果层级",
+              "fill": "$text",
+              "content": "专辑 / 发行版",
+              "fontFamily": "$body",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "id": "oL1XX",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Abbey Road",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Abbey Road"
+                },
+                "bhWxO": {
+                  "content": "The Beatles · 1969"
+                }
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "RrAo6",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "YYIVk",
+              "name": "艺人标题",
+              "fill": "$text",
+              "content": "艺术家",
+              "fontFamily": "$body",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "id": "aHYZ1",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "The Beatles",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "The Beatles"
+                },
+                "bhWxO": {
+                  "content": "查看已收录作品"
+                }
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "g6Km7",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "EreKG",
+              "name": "曲目标题",
+              "fill": "$text",
+              "content": "曲目",
+              "fontFamily": "$body",
+              "fontSize": 18,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "Nhn5j",
+              "name": "曲目空状态",
+              "fill": "$muted",
+              "content": "未找到匹配曲目",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "F1pr1k",
+              "name": "查询说明",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "搜索公共目录；我的私人唱片请到收藏柜搜索。",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "E8Nhzf",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$primary"
+            },
+            "E5rGML": {
+              "fill": "$primary"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "A5dVf6",
+      "x": 438,
+      "y": 1894,
+      "name": "P06 · 发现 · 黑胶文化志",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "jiI5r",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "C1dOci",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "黑胶文化志",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "SvLCV",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "页面操作",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "search"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "c3YBlL",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 14,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "fsbl3",
+              "name": "刊号",
+              "fill": "$muted",
+              "content": "ISSUE 09 / EDITORIAL",
+              "fontFamily": "$utility",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "g3nWw",
+              "name": "本期策展",
+              "width": "fill_container",
+              "fill": "#111113",
+              "cornerRadius": 8,
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "layout": "vertical",
+              "gap": 14,
+              "padding": 18,
+              "children": [
+                {
+                  "id": "ACPKZ",
+                  "type": "ref",
+                  "ref": "GgIts",
+                  "name": "精选专题 · 示例",
+                  "descendants": {
+                    "HTV7l": {
+                      "content": "精选专题 · 示例"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "jXpHv",
+                  "name": "实体封套与黑胶",
+                  "width": 217,
+                  "height": 183,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "biIDJ",
+                      "x": 42,
+                      "y": 3,
+                      "name": "黑胶材质",
+                      "fill": [
+                        "#121214",
+                        {
+                          "type": "image",
+                          "enabled": true,
+                          "url": "assets/vinyl-texture.webp",
+                          "mode": "fill"
+                        }
+                      ],
+                      "width": 175,
+                      "height": 175,
+                      "stroke": "#343333",
+                      "strokeWidth": 1
+                    },
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 3,
+                      "id": "Jv6xK",
+                      "x": 0,
+                      "y": 0,
+                      "name": "专辑封套",
+                      "fill": {
+                        "type": "image",
+                        "enabled": true,
+                        "url": "assets/demo-prism.png",
+                        "mode": "fill"
+                      },
+                      "width": 175,
+                      "height": 175,
+                      "stroke": "#35312D",
+                      "strokeWidth": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "gsheR",
+                  "name": "策展标题",
+                  "fill": "$text",
+                  "content": "月之暗面",
+                  "fontFamily": "$display",
+                  "fontSize": 27,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "kW57V",
+                  "name": "关联唱片",
+                  "fill": "$secondary",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "Pink Floyd · The Dark Side of the Moon",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "awXii",
+                  "name": "摘要",
+                  "fill": "$secondary",
+                  "content": "走近唱片版本、曲目与内页档案。",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                },
+                {
+                  "id": "qI8pl",
+                  "type": "ref",
+                  "ref": "aCU3x",
+                  "name": "查看本期唱片",
+                  "width": "fill_container",
+                  "fill": "$surface",
+                  "stroke": "$border",
+                  "strokeWidth": 1,
+                  "descendants": {
+                    "o3Pj0": {
+                      "content": "查看本期唱片",
+                      "fill": "$text"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "DM77j",
+              "name": "专题二",
+              "fill": "$text",
+              "content": "深夜爵士墙",
+              "fontFamily": "$display",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "bYiY9",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Kind of Blue",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-sax.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Kind of Blue"
+                },
+                "bhWxO": {
+                  "content": "Miles Davis · 1959"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "aTElI",
+              "name": "文案说明",
+              "fill": "$muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "目录与文章一一关联，来源待核验时保留标识。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "aXnyF",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$primary"
+            },
+            "E5rGML": {
+              "fill": "$primary"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "C0ha9G",
+      "x": 876,
+      "y": 1894,
+      "name": "P07 · 愿望单 · 目标价",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "tNV74",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "XOC3S",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "WW7JJ",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "愿望单",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "sqZKG",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "页面操作",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "plus"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "heDkR",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "Z3Wdp6",
+              "name": "引导",
+              "fill": "$secondary",
+              "content": "下一张，留给喜欢的声音。",
+              "fontFamily": "$body",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "tanMD",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "OK Computer",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-mic.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "OK Computer"
+                },
+                "bhWxO": {
+                  "content": "Radiohead"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "mBf2h",
+              "name": "愿望操作",
+              "width": "fill_container",
+              "height": 36,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "bs6zi",
+                  "name": "目标价",
+                  "fill": "$orange",
+                  "content": "目标 ¥320.00",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "k8jzbM",
+                  "name": "编辑愿望",
+                  "fill": "$secondary",
+                  "content": "编辑   ·   移除",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "j7FF8w",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "id": "Ri2fJ",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Kind of Blue",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-sax.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Kind of Blue"
+                },
+                "bhWxO": {
+                  "content": "Miles Davis"
+                }
+              }
+            },
+            {
+              "type": "frame",
+              "id": "HohB4",
+              "name": "愿望操作",
+              "width": "fill_container",
+              "height": 36,
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "p15DhL",
+                  "name": "目标价",
+                  "fill": "$orange",
+                  "content": "目标价未设置",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "e6cCn",
+                  "name": "编辑愿望",
+                  "fill": "$secondary",
+                  "content": "编辑   ·   移除",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "dkpw8",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "G9rGe",
+              "name": "价格说明",
+              "fill": "$muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "目标价由你填写，不代表市场成交价。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "cpd82",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$muted"
+            },
+            "E5rGML": {
+              "fill": "$muted"
+            },
+            "HXWHB": {
+              "fill": "$primary"
+            },
+            "lrNDH": {
+              "fill": "$primary"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "GQKTG",
+      "x": 1314,
+      "y": 1894,
+      "name": "P08 · 我的 · 真实账户",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "VAWHZ",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "V0YXIc",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "我的",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "veADv",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "页面操作",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "settings"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "WBHha",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 10,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "Q8t8j",
+              "name": "头像文字",
+              "fill": "$primary",
+              "content": "V",
+              "fontFamily": "$display",
+              "fontSize": 42,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "BRsNS",
+              "name": "昵称",
+              "fill": "$text",
+              "content": "唱片收藏者",
+              "fontFamily": "$display",
+              "fontSize": 26,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "K8umGW",
+              "name": "账号",
+              "fill": "$secondary",
+              "content": "@vinyl_listener",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "frame",
+              "id": "A1DimI",
+              "name": "账户内统计",
+              "width": "fill_container",
+              "height": 82,
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "dFDKK",
+                  "name": "收藏",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "w2sKK",
+                      "name": "数量",
+                      "fill": "$text",
+                      "content": "6",
+                      "fontFamily": "$utility",
+                      "fontSize": 30,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "qSjCk",
+                      "name": "标签",
+                      "fill": "$secondary",
+                      "content": "收藏",
+                      "fontFamily": "$body",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "hqky1",
+                  "name": "愿望",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "DUZpX",
+                      "name": "数量",
+                      "fill": "$text",
+                      "content": "2",
+                      "fontFamily": "$utility",
+                      "fontSize": 30,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "fO2qu",
+                      "name": "标签",
+                      "fill": "$secondary",
+                      "content": "愿望",
+                      "fontFamily": "$body",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QdiUC",
+                  "name": "喜欢",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "VWfVi",
+                      "name": "数量",
+                      "fill": "$text",
+                      "content": "3",
+                      "fontFamily": "$utility",
+                      "fontSize": 30,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "UC0fE",
+                      "name": "标签",
+                      "fill": "$secondary",
+                      "content": "喜欢",
+                      "fontFamily": "$body",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hqvtQ",
+              "name": "我的收藏",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "z29uZ",
+                  "name": "我的收藏",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "heart",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "D4lpz",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "我的收藏",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "Kif4M",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "FpJpx",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "uQXjh",
+              "name": "愿望单",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "c2xP7",
+                  "name": "愿望单",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "bookmark",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "G5gNOG",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "愿望单",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "L4F43",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "t36dk",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "GubU8",
+              "name": "导入任务",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "taqzF",
+                  "name": "导入任务",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "upload",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "E2mpbm",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "导入任务",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "EGp83",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "d3fWY",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "Y7SE1c",
+              "name": "音乐来源",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "Nv5kG",
+                  "name": "音乐来源",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "audio-lines",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "DYBjq",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "音乐来源",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "n6Fj8",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "yCFp6",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "yj3QA",
+              "name": "横屏唱片展台",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "FgCMl",
+                  "name": "横屏唱片展台",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "rotate-cw",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "ytDUg",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "横屏唱片展台",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "AsiOk",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "pjl8E",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "frame",
+              "id": "YrSsh",
+              "name": "账号与设置",
+              "width": "fill_container",
+              "height": 44,
+              "gap": 14,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon",
+                  "id": "glhlZ",
+                  "name": "账号与设置",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "settings",
+                  "library": "lucide",
+                  "fill": "$secondary"
+                },
+                {
+                  "type": "text",
+                  "id": "l0BPZq",
+                  "name": "菜单名",
+                  "fill": "$text",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "账号与设置",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "icon",
+                  "id": "p8Pk8m",
+                  "name": "打开",
+                  "width": 18,
+                  "height": 18,
+                  "icon": "chevron-right",
+                  "library": "lucide",
+                  "fill": "$muted"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "IkiCj",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            }
+          ]
+        },
+        {
+          "id": "b3KIG",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$muted"
+            },
+            "E5rGML": {
+              "fill": "$muted"
+            },
+            "HXWHB": {
+              "fill": "$primary"
+            },
+            "lrNDH": {
+              "fill": "$primary"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "DGcUw",
+      "x": 0,
+      "y": 2838,
+      "name": "P09 · 账号密码登录",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Yiet4",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "vmWtu",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "xfzif",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "返回浏览",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "apC0A",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 18,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 8,
+              "id": "kKiGz",
+              "name": "暗室氛围",
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "assets/home-room-bg.webp",
+                "mode": "fill"
+              },
+              "width": "fill_container",
+              "height": 178
+            },
+            {
+              "type": "text",
+              "id": "oNinJ",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "让音乐，\n回到生活的形状",
+              "lineHeight": 1.5,
+              "fontFamily": "$display",
+              "fontSize": 30,
+              "fontWeight": "600"
+            },
+            {
+              "id": "nK8qh",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "账号",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "账号"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "输入你的账号"
+                }
+              }
+            },
+            {
+              "id": "vSxe7",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "密码",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "密码"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "输入密码"
+                }
+              }
+            },
+            {
+              "id": "PvOuW",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "登录",
+              "width": "fill_container",
+              "fill": "$primary",
+              "strokeWidth": 0,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "登录",
+                  "fill": "#071007"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "F3ZTX",
+              "name": "错误示例",
+              "fill": "$danger",
+              "content": "账号或密码不正确，请重新输入。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "sIoap",
+              "name": "注册入口",
+              "fill": "$secondary",
+              "content": "还没有账号？ 创建账号",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "npshp",
+              "name": "隐私提示",
+              "fill": "$muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "密码只用于登录；不收集音乐平台密码。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "b7ApMh",
+      "x": 438,
+      "y": 2838,
+      "name": "P10 · 创建账号",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "f68cT9",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "ayml2",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "oChQk",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "创建账号",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "z5tzH",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "gW4nd",
+              "name": "标题",
+              "fill": "$text",
+              "content": "开始你的黑胶收藏",
+              "fontFamily": "$display",
+              "fontSize": 25,
+              "fontWeight": "600"
+            },
+            {
+              "id": "R2XYw",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "账号",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "账号"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "3–32 位字母、数字或下划线"
+                }
+              }
+            },
+            {
+              "id": "siYRi",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "显示名称",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "显示名称"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "你希望显示的名字"
+                }
+              }
+            },
+            {
+              "id": "ufmao",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "密码",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "密码"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "12–128 个字符"
+                }
+              }
+            },
+            {
+              "id": "z40DjM",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "确认密码",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "确认密码"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "再次输入密码"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "nvzJa",
+              "name": "密码提示",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "支持粘贴与密码管理器。密码不会以明文存储。",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "bYj3h",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "创建账号",
+              "width": "fill_container",
+              "fill": "$primary",
+              "strokeWidth": 0,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "创建账号",
+                  "fill": "#071007"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "FL6lN",
+              "name": "回到登录",
+              "fill": "$secondary",
+              "content": "已有账号？ 返回登录",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "NtTVY",
+      "x": 876,
+      "y": 2838,
+      "name": "P11 · 设置与音乐来源",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "FbFgv",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "ugDAJ",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "yvJNb",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "设置",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "emnEQ",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "H4GDPT",
+              "name": "账号区",
+              "fill": "$text",
+              "content": "账号安全",
+              "fontFamily": "$body",
+              "fontSize": 19,
+              "fontWeight": "600"
+            },
+            {
+              "id": "E49D8K",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "修改密码",
+              "width": "fill_container",
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "修改密码",
+                  "fill": "$text"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "Gkh74",
+              "name": "界面设置",
+              "fill": "$text",
+              "content": "显示与体验",
+              "fontFamily": "$body",
+              "fontSize": 19,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "P9nRS6",
+              "name": "减少动态效果",
+              "width": "fill_container",
+              "height": 38,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zKH2Y",
+                  "name": "设置名",
+                  "fill": "$text",
+                  "content": "减少动态效果",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "d6YHQ",
+                  "name": "设置值",
+                  "fill": "$secondary",
+                  "content": "跟随系统",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "L5x6x",
+              "name": "唱针与底噪音效",
+              "width": "fill_container",
+              "height": 38,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "NpxtB",
+                  "name": "设置名",
+                  "fill": "$text",
+                  "content": "唱针与底噪音效",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "k9u26E",
+                  "name": "设置值",
+                  "fill": "$secondary",
+                  "content": "关闭",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "nCIdz",
+              "name": "触感反馈",
+              "width": "fill_container",
+              "height": 38,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "A8NEa",
+                  "name": "设置名",
+                  "fill": "$text",
+                  "content": "触感反馈",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "hi2Pd",
+                  "name": "设置值",
+                  "fill": "$secondary",
+                  "content": "开启",
+                  "fontFamily": "$body",
+                  "fontSize": 13,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "rectangle",
+              "id": "ZDPW7",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "RgCDC",
+              "name": "音乐来源",
+              "fill": "$text",
+              "content": "音乐来源",
+              "fontFamily": "$body",
+              "fontSize": 19,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "k2MdF",
+              "name": "网易云音乐",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "AyA3L",
+                  "name": "平台",
+                  "fill": "$text",
+                  "content": "网易云音乐",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "H1jPFQ",
+                  "name": "状态",
+                  "fill": "$muted",
+                  "content": "尚未接入",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "c4xoT",
+              "name": "QQ音乐",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "cEWuJ",
+                  "name": "平台",
+                  "fill": "$text",
+                  "content": "QQ音乐",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "C58ZM",
+                  "name": "状态",
+                  "fill": "$muted",
+                  "content": "尚未接入",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lOhbs",
+              "name": "Spotify",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "l4VgR",
+                  "name": "平台",
+                  "fill": "$text",
+                  "content": "Spotify",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "frOYb",
+                  "name": "状态",
+                  "fill": "$muted",
+                  "content": "尚未接入",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "twXV1",
+              "name": "Apple Music",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "Niy61",
+                  "name": "平台",
+                  "fill": "$text",
+                  "content": "Apple Music",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "SwX8X",
+                  "name": "状态",
+                  "fill": "$muted",
+                  "content": "尚未接入",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "uAX1S",
+              "name": "Discogs 目录",
+              "width": "fill_container",
+              "height": 34,
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "aylFy",
+                  "name": "平台",
+                  "fill": "$text",
+                  "content": "Discogs 目录",
+                  "fontFamily": "$body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "eOEOh",
+                  "name": "状态",
+                  "fill": "$muted",
+                  "content": "尚未接入",
+                  "fontFamily": "$body",
+                  "fontSize": 12,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "id": "vwHTV",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "退出登录",
+              "width": "fill_container",
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "退出登录",
+                  "fill": "$text"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "FtY8m",
+              "name": "退出说明",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "退出会清理当前账号缓存，保留服务端收藏。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "vd2J7",
+      "x": 1314,
+      "y": 2838,
+      "name": "P12 · 导入确认与任务",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Q6koQg",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "FSugU",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "x2kwRd",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "导入唱片",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "UaNML",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "ZWdV8",
+              "name": "步骤",
+              "fill": "$secondary",
+              "content": "解析文件  →  确认条目  →  入藏",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "G3SkD1",
+              "name": "结果",
+              "fill": "$text",
+              "content": "3 条记录待确认",
+              "fontFamily": "$display",
+              "fontSize": 25,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "qk4BA",
+              "name": "范围",
+              "fill": "$secondary",
+              "content": "2 条有效 · 1 条需修正",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "gBByc",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Abbey Road",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Abbey Road"
+                },
+                "bhWxO": {
+                  "content": "可导入 · 私人档案"
+                }
+              }
+            },
+            {
+              "id": "g8P9D4",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Kind of Blue",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-sax.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Kind of Blue"
+                },
+                "bhWxO": {
+                  "content": "已在收藏 · 本次跳过"
+                }
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "WAOKi",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "LIyAX",
+              "name": "错误行",
+              "fill": "$danger",
+              "content": "第 3 行：缺少专辑名称",
+              "fontFamily": "$body",
+              "fontSize": 15,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "fhtXP",
+              "name": "恢复",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "修正原文件后重新解析；当前条目不会丢失。",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "F159NA",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "确认导入 1 张",
+              "width": "fill_container",
+              "fill": "$primary",
+              "strokeWidth": 0,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "确认导入 1 张",
+                  "fill": "#071007"
+                }
+              }
+            },
+            {
+              "id": "PwiWI",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "返回修改",
+              "width": "fill_container",
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "返回修改",
+                  "fill": "$text"
+                }
+              }
+            },
+            {
+              "type": "rectangle",
+              "id": "B2XUv",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "Ow5bb",
+              "name": "异步状态",
+              "fill": "$text",
+              "content": "提交后：已受理，等待处理",
+              "fontFamily": "$body",
+              "fontSize": 15,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "VFAF2",
+              "name": "不假报成功",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "可以离开页面。实际入藏数量以任务完成后的回读结果为准。",
+              "lineHeight": 1.7,
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "DaUTu",
+      "x": 0,
+      "y": 3782,
+      "name": "P13 · 艺术家与作品",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "X4SQI",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "dwCVo",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "btWZD",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "艺术家",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "SWpGo",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 18,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 6,
+              "id": "K25tP",
+              "name": "艺人氛围图",
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "assets/demo-mic.png",
+                "mode": "fill"
+              },
+              "width": "fill_container",
+              "height": 230
+            },
+            {
+              "type": "text",
+              "id": "mHaOh",
+              "name": "姓名",
+              "fill": "$text",
+              "content": "The Beatles",
+              "fontFamily": "$display",
+              "fontSize": 28,
+              "fontWeight": "600"
+            },
+            {
+              "id": "jhfbB",
+              "type": "ref",
+              "ref": "GgIts",
+              "name": "示例目录 · 待核验",
+              "descendants": {
+                "HTV7l": {
+                  "content": "示例目录 · 待核验"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "PvcxP",
+              "name": "简介状态",
+              "fill": "$secondary",
+              "content": "简介与作品以已核验目录为准。",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "rectangle",
+              "id": "zIOHO",
+              "name": "分隔线",
+              "fill": "$border",
+              "width": "fill_container",
+              "height": 1
+            },
+            {
+              "type": "text",
+              "id": "v4NmmP",
+              "name": "作品标题",
+              "fill": "$text",
+              "content": "已收录作品",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            },
+            {
+              "id": "a4trh",
+              "type": "ref",
+              "ref": "Q22jBt",
+              "name": "Abbey Road",
+              "width": "fill_container",
+              "descendants": {
+                "qbsOp": {
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  }
+                },
+                "jItTt": {
+                  "content": "Abbey Road"
+                },
+                "bhWxO": {
+                  "content": "1969 · 查看发行版"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "LIKYV",
+              "name": "统计边界",
+              "fill": "$muted",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "只展示已收录作品数量，不显示虚构关注人数。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "id": "m4jHhn",
+          "type": "ref",
+          "ref": "xeCZa",
+          "name": "底部导航",
+          "width": "fill_container",
+          "descendants": {
+            "aNXIV": {
+              "fill": "$muted"
+            },
+            "iESx9": {
+              "fill": "$muted"
+            },
+            "Ezjqs": {
+              "fill": "$muted"
+            },
+            "mYRuH": {
+              "fill": "$muted"
+            },
+            "Xro8v": {
+              "fill": "$primary"
+            },
+            "E5rGML": {
+              "fill": "$primary"
+            },
+            "HXWHB": {
+              "fill": "$muted"
+            },
+            "lrNDH": {
+              "fill": "$muted"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "XiLyX",
+      "x": 438,
+      "y": 3782,
+      "name": "P14 · 歌词不可用",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "zRVpo",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "hhVpx",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "YaMBA",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "歌词",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "kQTQr",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "N8u2P",
+              "name": "曲名",
+              "fill": "$text",
+              "content": "Come Together",
+              "fontFamily": "$body",
+              "fontSize": 25,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "s1m5Cu",
+              "name": "艺人",
+              "fill": "$secondary",
+              "content": "The Beatles",
+              "fontFamily": "$body",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "nrbph",
+              "type": "ref",
+              "ref": "O5csr9",
+              "name": "暂时没有歌词",
+              "width": "fill_container",
+              "descendants": {
+                "fI6Yz": {
+                  "content": "暂时没有歌词"
+                },
+                "TYQFr": {
+                  "content": "当前没有已授权的歌词来源。接入可用来源后在这里查看。"
+                },
+                "i80r6/o3Pj0": {
+                  "content": "返回唱机"
+                }
+              }
+            },
+            {
+              "id": "x56QP",
+              "type": "ref",
+              "ref": "GgIts",
+              "name": "来源未配置",
+              "descendants": {
+                "HTV7l": {
+                  "content": "来源未配置"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "FgHNt",
+      "x": 876,
+      "y": 3782,
+      "name": "P15 · 页面状态规范",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "V8wnC",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "LMzW3",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "cQ4kL",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "加载、空与错误",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Fsfo7",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 18,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "cMVaH",
+              "name": "加载标题",
+              "fill": "$text",
+              "content": "加载中",
+              "fontFamily": "$body",
+              "fontSize": 17,
+              "fontWeight": "600"
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 4,
+              "id": "z7XsCE",
+              "name": "骨架占位",
+              "fill": "$raised",
+              "width": 342,
+              "height": 16
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 4,
+              "id": "P1nYYK",
+              "name": "骨架占位",
+              "fill": "$raised",
+              "width": 220,
+              "height": 16
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 4,
+              "id": "cqAMS",
+              "name": "骨架占位",
+              "fill": "$raised",
+              "width": 290,
+              "height": 16
+            },
+            {
+              "id": "Nq3tf",
+              "type": "ref",
+              "ref": "O5csr9",
+              "name": "尚未收藏唱片",
+              "width": "fill_container",
+              "descendants": {
+                "fI6Yz": {
+                  "content": "尚未收藏唱片"
+                },
+                "TYQFr": {
+                  "content": "从目录选一张，或录入你拥有的唱片。"
+                },
+                "i80r6/o3Pj0": {
+                  "content": "寻找第一张唱片"
+                }
+              }
+            },
+            {
+              "id": "pggxV",
+              "type": "ref",
+              "ref": "O5csr9",
+              "name": "暂时无法加载",
+              "width": "fill_container",
+              "descendants": {
+                "fI6Yz": {
+                  "content": "暂时无法加载"
+                },
+                "TYQFr": {
+                  "content": "已保留上次内容。请检查网络后重试。"
+                },
+                "i80r6/o3Pj0": {
+                  "content": "重试"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "DSW4S",
+              "name": "变更失败",
+              "fill": "$danger",
+              "content": "保存失败：已保留输入，可以重试。",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "k3C7x",
+              "name": "结果未知",
+              "fill": "$secondary",
+              "content": "正在确认结果，请勿重复提交。",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "GZQnA",
+      "x": 1314,
+      "y": 3782,
+      "name": "P16 · 手工录入与品相",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "xalMr",
+          "name": "页面标题",
+          "width": "fill_container",
+          "height": 76,
+          "gap": 12,
+          "padding": [
+            16,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "id": "loq8R",
+              "type": "ref",
+              "ref": "DrRO6",
+              "name": "返回",
+              "descendants": {
+                "L9jg2q": {
+                  "icon": "chevron-left"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "g7BM6",
+              "name": "标题",
+              "fill": "$text",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "录入我的唱片",
+              "fontFamily": "$body",
+              "fontSize": 20,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cAMT5",
+          "name": "内容",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            8,
+            24,
+            24,
+            24
+          ],
+          "children": [
+            {
+              "id": "xdSoJ",
+              "type": "ref",
+              "ref": "GgIts",
+              "name": "私人档案 · 用户录入",
+              "descendants": {
+                "HTV7l": {
+                  "content": "私人档案 · 用户录入"
+                }
+              }
+            },
+            {
+              "id": "kuY6S",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "专辑名称",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "专辑名称"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "Abbey Road"
+                }
+              }
+            },
+            {
+              "id": "WfKWF",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "艺术家",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "艺术家"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "The Beatles"
+                }
+              }
+            },
+            {
+              "id": "OoL68",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "发行年份 / 版本",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "发行年份 / 版本"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "1969 / 50 周年版"
+                }
+              }
+            },
+            {
+              "id": "XuWDe",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "品相",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "品相"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "Near Mint · 近乎全新"
+                }
+              }
+            },
+            {
+              "id": "QAiTK",
+              "type": "ref",
+              "ref": "BMcL3",
+              "name": "购入价格（可选）",
+              "width": "fill_container",
+              "descendants": {
+                "EHfQi": {
+                  "content": "购入价格（可选）"
+                },
+                "BRWcE": {
+                  "stroke": "$border"
+                },
+                "F8mIJ4": {
+                  "content": "¥ 320.00"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "id": "ARwl4",
+              "name": "来源说明",
+              "fill": "$secondary",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "仅保存到你的收藏，不修改公共音乐目录。",
+              "fontFamily": "$body",
+              "fontSize": 12,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "rDcNL",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "保存并加入收藏",
+              "width": "fill_container",
+              "fill": "$primary",
+              "strokeWidth": 0,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "保存并加入收藏",
+                  "fill": "#071007"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "DPl8s",
+      "x": 0,
+      "y": 4726,
+      "name": "P17 · 横屏唱片展台",
+      "clip": true,
+      "width": 828,
+      "height": 440,
+      "fill": [
+        {
+          "type": "image",
+          "enabled": true,
+          "url": "assets/home-room-bg.webp",
+          "mode": "fill"
+        },
+        "#00000080"
+      ],
+      "gap": 28,
+      "padding": 28,
+      "children": [
+        {
+          "type": "frame",
+          "id": "NnaTd",
+          "name": "实体唱片",
+          "width": 350,
+          "height": "fill_container",
+          "layout": "vertical",
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "wVVjj",
+              "name": "实体封套与黑胶",
+              "width": 340,
+              "height": 282,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "Xw5AI",
+                  "x": 65.75999999999999,
+                  "y": 3,
+                  "name": "黑胶材质",
+                  "fill": [
+                    "#121214",
+                    {
+                      "type": "image",
+                      "enabled": true,
+                      "url": "assets/vinyl-texture.webp",
+                      "mode": "fill"
+                    }
+                  ],
+                  "width": 274,
+                  "height": 274,
+                  "stroke": "#343333",
+                  "strokeWidth": 1
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 3,
+                  "id": "J7nayH",
+                  "x": 0,
+                  "y": 0,
+                  "name": "专辑封套",
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "assets/demo-cover.png",
+                    "mode": "fill"
+                  },
+                  "width": 274,
+                  "height": 274,
+                  "stroke": "#35312D",
+                  "strokeWidth": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "twJaB",
+          "name": "唱片信息",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "gap": 18,
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "slT06",
+              "name": "模式",
+              "fill": "$secondary",
+              "content": "横屏唱片展台",
+              "fontFamily": "$body",
+              "fontSize": 13,
+              "fontWeight": "normal"
+            },
+            {
+              "type": "text",
+              "id": "feGyd",
+              "name": "专辑名",
+              "fill": "$text",
+              "content": "Abbey Road",
+              "fontFamily": "$body",
+              "fontSize": 32,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "Atcsb",
+              "name": "艺术家",
+              "fill": "$secondary",
+              "content": "The Beatles",
+              "fontFamily": "$body",
+              "fontSize": 17,
+              "fontWeight": "normal"
+            },
+            {
+              "id": "LB0sb",
+              "type": "ref",
+              "ref": "GgIts",
+              "name": "示例目录 · 待核验",
+              "descendants": {
+                "HTV7l": {
+                  "content": "示例目录 · 待核验"
+                }
+              }
+            },
+            {
+              "id": "GDgVW",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "查看唱片档案",
+              "width": "fill_container",
+              "fill": "$primary",
+              "strokeWidth": 0,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "查看唱片档案",
+                  "fill": "#071007"
+                }
+              }
+            },
+            {
+              "id": "w3F9IY",
+              "type": "ref",
+              "ref": "aCU3x",
+              "name": "退出横屏",
+              "width": "fill_container",
+              "fill": "$surface",
+              "stroke": "$border",
+              "strokeWidth": 1,
+              "descendants": {
+                "o3Pj0": {
+                  "content": "退出横屏",
+                  "fill": "$text"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "JPbmy",
+      "x": 876,
+      "y": 4726,
+      "name": "P18 · 启动与访客进入",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "$bg",
+      "layout": "vertical",
+      "gap": 22,
+      "padding": 32,
+      "justifyContent": "center",
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "cv1fv",
+          "name": "实体封套与黑胶",
+          "width": 298,
+          "height": 248,
+          "layout": "none",
+          "children": [
+            {
+              "type": "ellipse",
+              "id": "Xczqn",
+              "x": 57.599999999999994,
+              "y": 3,
+              "name": "黑胶材质",
+              "fill": [
+                "#121214",
+                {
+                  "type": "image",
+                  "enabled": true,
+                  "url": "assets/vinyl-texture.webp",
+                  "mode": "fill"
+                }
+              ],
+              "width": 240,
+              "height": 240,
+              "stroke": "#343333",
+              "strokeWidth": 1
+            },
+            {
+              "type": "rectangle",
+              "cornerRadius": 3,
+              "id": "obg5n",
+              "x": 0,
+              "y": 0,
+              "name": "专辑封套",
+              "fill": {
+                "type": "image",
+                "enabled": true,
+                "url": "assets/demo-prism.png",
+                "mode": "fill"
+              },
+              "width": 240,
+              "height": 240,
+              "stroke": "#35312D",
+              "strokeWidth": 1
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "t7hDBe",
+          "name": "名称",
+          "fill": "$text",
+          "content": "VINYL",
+          "fontFamily": "$display",
+          "fontSize": 44,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "K5R7IS",
+          "name": "标语",
+          "fill": "$secondary",
+          "content": "让音乐，回到生活的形状。",
+          "fontFamily": "$body",
+          "fontSize": 18,
+          "fontWeight": "normal"
+        },
+        {
+          "id": "M0Nv2",
+          "type": "ref",
+          "ref": "aCU3x",
+          "name": "开始浏览",
+          "width": "fill_container",
+          "fill": "$primary",
+          "strokeWidth": 0,
+          "descendants": {
+            "o3Pj0": {
+              "content": "开始浏览",
+              "fill": "#071007"
+            }
+          }
+        },
+        {
+          "id": "jqTZz",
+          "type": "ref",
+          "ref": "aCU3x",
+          "name": "登录我的收藏",
+          "width": "fill_container",
+          "fill": "$surface",
+          "stroke": "$border",
+          "strokeWidth": 1,
+          "descendants": {
+            "o3Pj0": {
+              "content": "登录我的收藏",
+              "fill": "$text"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "bg": {
+      "type": "color",
+      "value": "#000000"
+    },
+    "surface": {
+      "type": "color",
+      "value": "#0F0F0F"
+    },
+    "raised": {
+      "type": "color",
+      "value": "#1B1B1D"
+    },
+    "border": {
+      "type": "color",
+      "value": "#26272D"
+    },
+    "primary": {
+      "type": "color",
+      "value": "#2FE92B"
+    },
+    "text": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "secondary": {
+      "type": "color",
+      "value": "#BBCBB2"
+    },
+    "muted": {
+      "type": "color",
+      "value": "#A5A0A0"
+    },
+    "orange": {
+      "type": "color",
+      "value": "#FF9821"
+    },
+    "danger": {
+      "type": "color",
+      "value": "#FF8585"
+    },
+    "body": {
+      "type": "string",
+      "value": "Noto Sans SC"
+    },
+    "display": {
+      "type": "string",
+      "value": "Noto Serif SC"
+    },
+    "utility": {
+      "type": "string",
+      "value": "IBM Plex Mono"
+    }
+  },
+  "fileToken": "1d2742c2-bfc5-4586-b311-a1b3a3eecbb7"
+}

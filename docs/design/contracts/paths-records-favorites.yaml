@@ -1,0 +1,203 @@
+/me/records:
+  post:
+    tags:
+      - library
+    operationId: createRecord
+    summary: 私人档案与首次入藏
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+      - $ref: ./common.yaml#/parameters/Idempotency
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./models.yaml#/PrivateRecordInput
+    responses:
+      "201":
+        description: 私人档案与首次入藏
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+          Location:
+            $ref: ./common.yaml#/headers/Location
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/PrivateRecordCreated
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me/records/{recordId}:
+  get:
+    tags:
+      - library
+    operationId: getRecord
+    summary: 当前账号私人档案
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 当前账号私人档案
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/PrivateRecord
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+  patch:
+    tags:
+      - library
+    operationId: updateRecord
+    summary: 编辑私人唱片档案
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+      - $ref: ./common.yaml#/parameters/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./models.yaml#/PrivateRecordPatch
+    responses:
+      "200":
+        description: 编辑私人唱片档案
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/PrivateRecord
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me/favorites:
+  get:
+    tags:
+      - library
+    operationId: listFavorites
+    summary: 当前账号喜欢的发行版
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+      - name: releaseId
+        in: query
+        required: false
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 当前账号喜欢的发行版
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/ReleasePage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me/favorites/{releaseId}:
+  put:
+    tags:
+      - library
+    operationId: setFavorite
+    summary: 设为喜欢
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: releaseId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+    responses:
+      "204":
+        description: 操作完成，无响应体。
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+  delete:
+    tags:
+      - library
+    operationId: unsetFavorite
+    summary: 取消喜欢
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: releaseId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+    responses:
+      "204":
+        description: 操作完成，无响应体。
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error

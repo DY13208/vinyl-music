@@ -1,0 +1,156 @@
+ImportInput:
+  type: object
+  additionalProperties: false
+  required: [format, content]
+  properties:
+    format: {type: string, const: vinyl-v1}
+    content: {type: string, minLength: 2, maxLength: 524288, description: '编码后请求整体不超过1MiB；解码JSON数组最多200条，逐条PrivateRecordInput或CollectionInput'}
+ImportCommit:
+  type: object
+  additionalProperties: false
+  required: [rowNumbers]
+  properties:
+    rowNumbers: {type: array, minItems: 1, maxItems: 200, uniqueItems: true, items: {type: integer, minimum: 1, maximum: 200}}
+ImportItem:
+  type: object
+  additionalProperties: false
+  required: [rowNumber, title, status, errors, collectionEntryId]
+  properties:
+    rowNumber: {type: integer, minimum: 1, maximum: 200}
+    title: {type: [string, 'null']}
+    status: {type: string, enum: [valid, invalid, duplicate, inserted, skipped]}
+    errors: {type: array, maxItems: 20, items: {$ref: '#/FieldError'}}
+    collectionEntryId: {type: [string, 'null'], format: uuid}
+ImportJob:
+  type: object
+  additionalProperties: false
+  required: [id, phase, status, version, items, insertedCount, skippedCount, errorCode, createdAt, updatedAt]
+  properties:
+    id: {$ref: './models.yaml#/Uuid'}
+    phase: {type: string, enum: [prepare, commit]}
+    status: {type: string, enum: [queued, running, awaiting_confirmation, retry_wait, succeeded, failed]}
+    version: {$ref: './models.yaml#/Version'}
+    items: {type: array, maxItems: 200, items: {$ref: '#/ImportItem'}}
+    insertedCount: {type: integer, minimum: 0, maximum: 200}
+    skippedCount: {type: integer, minimum: 0, maximum: 200}
+    errorCode: {type: [string, 'null']}
+    createdAt: {$ref: './models.yaml#/Timestamp'}
+    updatedAt: {$ref: './models.yaml#/Timestamp'}
+ImportPage:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items: {type: array, maxItems: 50, items: {$ref: '#/ImportJob'}}
+    nextCursor: {type: [string, 'null']}
+ProviderId: {type: string, enum: [netease, qqmusic, spotify, apple_music, discogs]}
+Provider:
+  type: object
+  additionalProperties: false
+  required: [id, name, status, capabilities]
+  properties:
+    id: {$ref: '#/ProviderId'}
+    name: {type: string}
+    status: {type: string, enum: [not_configured, ready, unavailable]}
+    capabilities:
+      type: object
+      additionalProperties: false
+      required: [catalogSearch, barcodeLookup, playback, lyrics]
+      properties:
+        catalogSearch: {type: boolean}
+        barcodeLookup: {type: boolean}
+        playback: {type: boolean}
+        lyrics: {type: boolean}
+ProviderList:
+  type: object
+  additionalProperties: false
+  required: [items]
+  properties:
+    items: {type: array, maxItems: 20, items: {$ref: '#/Provider'}}
+UnavailableReason: {type: string, enum: [PROVIDER_NOT_CONFIGURED, UNSUPPORTED_CAPABILITY, NOT_LINKED, NO_RIGHTS, REGION_BLOCKED, NOT_FOUND]}
+PlaybackSource:
+  type: object
+  additionalProperties: false
+  required: [url, mimeType, durationMs, expiresAt, seekable, attribution]
+  properties:
+    url: {type: string, format: uri, pattern: '^https://', maxLength: 4096}
+    mimeType: {type: string, enum: [audio/mpeg, audio/mp4, audio/ogg, audio/flac, application/vnd.apple.mpegurl]}
+    durationMs: {type: [integer, 'null'], minimum: 0}
+    expiresAt: {type: [string, 'null'], format: date-time}
+    seekable: {type: boolean}
+    attribution: {$ref: './models.yaml#/Source'}
+PlaybackAvailability:
+  oneOf:
+    - type: object
+      additionalProperties: false
+      required: [availability, reason, providerId, source]
+      properties:
+        availability: {const: unavailable}
+        reason: {$ref: '#/UnavailableReason'}
+        providerId: {$ref: '#/ProviderId'}
+        source: {type: 'null'}
+    - type: object
+      additionalProperties: false
+      required: [availability, reason, providerId, source]
+      properties:
+        availability: {const: available}
+        reason: {type: 'null'}
+        providerId: {$ref: '#/ProviderId'}
+        source: {$ref: '#/PlaybackSource'}
+LyricLine:
+  type: object
+  additionalProperties: false
+  required: [startMs, text]
+  properties:
+    startMs: {type: integer, minimum: 0}
+    text: {type: string, maxLength: 1000}
+LyricsAvailability:
+  type: object
+  additionalProperties: false
+  required: [availability, reason, providerId, language, attribution, lines]
+  properties:
+    availability: {type: string, enum: [available, unavailable]}
+    reason: {oneOf: [{$ref: '#/UnavailableReason'}, {type: 'null'}]}
+    providerId: {$ref: '#/ProviderId'}
+    language: {type: [string, 'null'], maxLength: 40}
+    attribution: {oneOf: [{$ref: './models.yaml#/Source'}, {type: 'null'}]}
+    lines: {type: array, maxItems: 1000, items: {$ref: '#/LyricLine'}}
+  oneOf:
+    - required: [availability, reason, attribution]
+      properties: {availability: {const: unavailable}, reason: {$ref: '#/UnavailableReason'}, attribution: {type: 'null'}, lines: {maxItems: 0}}
+    - required: [availability, reason, attribution]
+      properties: {availability: {const: available}, reason: {type: 'null'}, attribution: {$ref: './models.yaml#/Source'}, lines: {minItems: 1}}
+FieldError:
+  type: object
+  additionalProperties: false
+  required: [path, message]
+  properties:
+    path: {type: string}
+    message: {type: string}
+Error:
+  type: object
+  additionalProperties: false
+  required: [error]
+  properties:
+    error:
+      type: object
+      additionalProperties: false
+      required: [code, message, requestId, fields]
+      properties:
+        code: {type: string}
+        message: {type: string}
+        requestId: {type: string, minLength: 1, maxLength: 128}
+        fields: {type: array, items: {$ref: '#/FieldError'}}
+Health:
+  type: object
+  additionalProperties: false
+  required: [status, dependencies]
+  properties:
+    status: {type: string, enum: [ok, degraded]}
+    dependencies:
+      type: object
+      additionalProperties: false
+      properties:
+        postgres: {type: string, enum: [ok, unavailable]}
+        redis: {type: string, enum: [ok, unavailable]}
+        rabbitmq: {type: string, enum: [ok, unavailable]}

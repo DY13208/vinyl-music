@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-09-10",
+  "scope": "Design schema compilation and examples; no business HTTP or database execution",
+  "schemas": 55,
+  "paths": 31,
+  "operations": 40,
+  "boundariesCompiled": 283,
+  "cases": 33,
+  "passed": 33,
+  "failed": []
+}

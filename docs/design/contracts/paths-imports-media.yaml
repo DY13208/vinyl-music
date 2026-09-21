@@ -1,0 +1,288 @@
+/me/imports:
+  get:
+    tags:
+      - imports-media
+    operationId: listImports
+    summary: 当前账号导入任务
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+    responses:
+      "200":
+        description: 当前账号导入任务
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/ImportPage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+  post:
+    tags:
+      - imports-media
+    operationId: prepareImport
+    summary: 受理导入预处理
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+      - $ref: ./common.yaml#/parameters/Idempotency
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./jobs-and-media.yaml#/ImportInput
+    responses:
+      "202":
+        description: 受理导入预处理
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+          Location:
+            $ref: ./common.yaml#/headers/Location
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/ImportJob
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me/imports/{jobId}:
+  get:
+    tags:
+      - imports-media
+    operationId: getImport
+    summary: 查询导入预览与状态
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 查询导入预览与状态
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/ImportJob
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me/imports/{jobId}/commit:
+  post:
+    tags:
+      - imports-media
+    operationId: commitImport
+    summary: 确认选定条目并受理入藏
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: jobId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+      - $ref: ./common.yaml#/parameters/Idempotency
+      - $ref: ./common.yaml#/parameters/IfMatch
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./jobs-and-media.yaml#/ImportCommit
+    responses:
+      "202":
+        description: 确认选定条目并受理入藏
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          ETag:
+            $ref: ./common.yaml#/headers/ETag
+          Location:
+            $ref: ./common.yaml#/headers/Location
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/ImportJob
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/music/providers:
+  get:
+    tags:
+      - imports-media
+    operationId: listProviders
+    summary: 各平台配置与能力状态
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: 各平台配置与能力状态
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/ProviderList
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/tracks/{trackId}/playback:
+  get:
+    tags:
+      - imports-media
+    operationId: resolvePlayback
+    summary: 查询可用播放来源
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: trackId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - name: providerId
+        in: query
+        required: true
+        schema:
+          $ref: ./jobs-and-media.yaml#/ProviderId
+    responses:
+      "200":
+        description: 查询可用播放来源
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/PlaybackAvailability
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/tracks/{trackId}/lyrics:
+  get:
+    tags:
+      - imports-media
+    operationId: resolveLyrics
+    summary: 查询歌词可用性
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: trackId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - name: providerId
+        in: query
+        required: true
+        schema:
+          $ref: ./jobs-and-media.yaml#/ProviderId
+    responses:
+      "200":
+        description: 查询歌词可用性
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/LyricsAvailability
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/health/live:
+  get:
+    tags:
+      - imports-media
+    operationId: live
+    summary: 进程存活状态
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: 进程存活状态
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/Health
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/health/ready:
+  get:
+    tags:
+      - imports-media
+    operationId: ready
+    summary: PG Redis MQ 就绪状态
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: PG Redis MQ 就绪状态
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/Health
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "503":
+        description: 依赖未就绪。
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./jobs-and-media.yaml#/Health
+      default:
+        $ref: ./common.yaml#/responses/Error

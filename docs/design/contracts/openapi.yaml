@@ -1,0 +1,204 @@
+openapi: 3.1.0
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+info:
+  title: Vinyl Music API
+  version: 0.1.0-design
+  description: 仅设计的前后端共享契约。尚无业务HTTP服务。所有个人资源按Cookie会话隔离；写操作带Origin和CSRF。
+  license:
+    name: Private project
+    identifier: LicenseRef-Proprietary
+servers:
+  - url: /api/v1
+    description: 浏览器同源；开发由Vite代理到4000。
+tags:
+  - name: auth
+    description: 账号会话
+  - name: catalog
+    description: 公共目录
+  - name: library
+    description: 私人唱片资料与关系
+  - name: imports-media
+    description: 导入任务和平台适配
+security:
+  - cookieAuth: []
+paths:
+  /auth/register:
+    $ref: ./paths-auth.yaml#/~1auth~1register
+  /auth/login:
+    $ref: ./paths-auth.yaml#/~1auth~1login
+  /auth/session:
+    $ref: ./paths-auth.yaml#/~1auth~1session
+  /auth/logout:
+    $ref: ./paths-auth.yaml#/~1auth~1logout
+  /auth/password:
+    $ref: ./paths-auth.yaml#/~1auth~1password
+  /me:
+    $ref: ./paths-auth.yaml#/~1me
+  /genres:
+    $ref: ./paths-catalog.yaml#/~1genres
+  /releases:
+    $ref: ./paths-catalog.yaml#/~1releases
+  /albums/{albumId}:
+    $ref: ./paths-catalog.yaml#/~1albums~1{albumId}
+  /releases/{releaseId}:
+    $ref: ./paths-catalog.yaml#/~1releases~1{releaseId}
+  /artists/{artistId}:
+    $ref: ./paths-catalog.yaml#/~1artists~1{artistId}
+  /search:
+    $ref: ./paths-catalog.yaml#/~1search
+  /editorial/issues:
+    $ref: ./paths-catalog.yaml#/~1editorial~1issues
+  /editorial/issues/{issueId}:
+    $ref: ./paths-catalog.yaml#/~1editorial~1issues~1{issueId}
+  /catalog/barcodes/{barcode}:
+    $ref: ./paths-catalog.yaml#/~1catalog~1barcodes~1{barcode}
+  /me/collection:
+    $ref: ./paths-collection.yaml#/~1me~1collection
+  /me/collection/{entryId}:
+    $ref: ./paths-collection.yaml#/~1me~1collection~1{entryId}
+  /me/records:
+    $ref: ./paths-records-favorites.yaml#/~1me~1records
+  /me/records/{recordId}:
+    $ref: ./paths-records-favorites.yaml#/~1me~1records~1{recordId}
+  /me/favorites:
+    $ref: ./paths-records-favorites.yaml#/~1me~1favorites
+  /me/favorites/{releaseId}:
+    $ref: ./paths-records-favorites.yaml#/~1me~1favorites~1{releaseId}
+  /me/wishlist:
+    $ref: ./paths-wishlist.yaml#/~1me~1wishlist
+  /me/wishlist/{entryId}:
+    $ref: ./paths-wishlist.yaml#/~1me~1wishlist~1{entryId}
+  /me/imports:
+    $ref: ./paths-imports-media.yaml#/~1me~1imports
+  /me/imports/{jobId}:
+    $ref: ./paths-imports-media.yaml#/~1me~1imports~1{jobId}
+  /me/imports/{jobId}/commit:
+    $ref: ./paths-imports-media.yaml#/~1me~1imports~1{jobId}~1commit
+  /music/providers:
+    $ref: ./paths-imports-media.yaml#/~1music~1providers
+  /tracks/{trackId}/playback:
+    $ref: ./paths-imports-media.yaml#/~1tracks~1{trackId}~1playback
+  /tracks/{trackId}/lyrics:
+    $ref: ./paths-imports-media.yaml#/~1tracks~1{trackId}~1lyrics
+  /health/live:
+    $ref: ./paths-imports-media.yaml#/~1health~1live
+  /health/ready:
+    $ref: ./paths-imports-media.yaml#/~1health~1ready
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: vinyl_session
+      description: 本地Cookie名称；生产使用__Host-vinyl_session，行为一致。
+  schemas:
+    Uuid:
+      $ref: ./models.yaml#/Uuid
+    Timestamp:
+      $ref: ./models.yaml#/Timestamp
+    Version:
+      $ref: ./models.yaml#/Version
+    Money:
+      $ref: ./models.yaml#/Money
+    Condition:
+      $ref: ./models.yaml#/Condition
+    Source:
+      $ref: ./models.yaml#/Source
+    User:
+      $ref: ./models.yaml#/User
+    Session:
+      $ref: ./models.yaml#/Session
+    Profile:
+      $ref: ./models.yaml#/Profile
+    RegisterInput:
+      $ref: ./models.yaml#/RegisterInput
+    LoginInput:
+      $ref: ./models.yaml#/LoginInput
+    PasswordInput:
+      $ref: ./models.yaml#/PasswordInput
+    ReleaseSummary:
+      $ref: ./models.yaml#/ReleaseSummary
+    Track:
+      $ref: ./models.yaml#/Track
+    ReleaseDetail:
+      $ref: ./models.yaml#/ReleaseDetail
+    ReleasePage:
+      $ref: ./models.yaml#/ReleasePage
+    AlbumDetail:
+      $ref: ./models.yaml#/AlbumDetail
+    ArtistSummary:
+      $ref: ./models.yaml#/ArtistSummary
+    ArtistDetail:
+      $ref: ./models.yaml#/ArtistDetail
+    SearchPage:
+      $ref: ./models.yaml#/SearchPage
+    IssueSummary:
+      $ref: ./models.yaml#/IssueSummary
+    IssuePage:
+      $ref: ./models.yaml#/IssuePage
+    IssueDetail:
+      $ref: ./models.yaml#/IssueDetail
+    CollectionEntry:
+      $ref: ./models.yaml#/CollectionEntry
+    CollectionInput:
+      $ref: ./models.yaml#/CollectionInput
+    CollectionPatch:
+      $ref: ./models.yaml#/CollectionPatch
+    CollectionPage:
+      $ref: ./models.yaml#/CollectionPage
+    WishlistEntry:
+      $ref: ./models.yaml#/WishlistEntry
+    WishlistInput:
+      $ref: ./models.yaml#/WishlistInput
+    WishlistPatch:
+      $ref: ./models.yaml#/WishlistPatch
+    WishlistPage:
+      $ref: ./models.yaml#/WishlistPage
+    PrivateRecordInput:
+      $ref: ./models.yaml#/PrivateRecordInput
+    PrivateTrackInput:
+      $ref: ./models.yaml#/PrivateTrackInput
+    PrivateRecord:
+      $ref: ./models.yaml#/PrivateRecord
+    PrivateRecordCreated:
+      $ref: ./models.yaml#/PrivateRecordCreated
+    PrivateRecordPatch:
+      $ref: ./models.yaml#/PrivateRecordPatch
+    PrivateRecordBase:
+      $ref: ./models.yaml#/PrivateRecordBase
+    PrivateRecordFields:
+      $ref: ./models.yaml#/PrivateRecordFields
+    GenreList:
+      $ref: ./models.yaml#/GenreList
+    ImportInput:
+      $ref: ./jobs-and-media.yaml#/ImportInput
+    ImportCommit:
+      $ref: ./jobs-and-media.yaml#/ImportCommit
+    ImportItem:
+      $ref: ./jobs-and-media.yaml#/ImportItem
+    ImportJob:
+      $ref: ./jobs-and-media.yaml#/ImportJob
+    ImportPage:
+      $ref: ./jobs-and-media.yaml#/ImportPage
+    ProviderId:
+      $ref: ./jobs-and-media.yaml#/ProviderId
+    Provider:
+      $ref: ./jobs-and-media.yaml#/Provider
+    ProviderList:
+      $ref: ./jobs-and-media.yaml#/ProviderList
+    UnavailableReason:
+      $ref: ./jobs-and-media.yaml#/UnavailableReason
+    PlaybackSource:
+      $ref: ./jobs-and-media.yaml#/PlaybackSource
+    PlaybackAvailability:
+      $ref: ./jobs-and-media.yaml#/PlaybackAvailability
+    LyricLine:
+      $ref: ./jobs-and-media.yaml#/LyricLine
+    LyricsAvailability:
+      $ref: ./jobs-and-media.yaml#/LyricsAvailability
+    FieldError:
+      $ref: ./jobs-and-media.yaml#/FieldError
+    Error:
+      $ref: ./jobs-and-media.yaml#/Error
+    Health:
+      $ref: ./jobs-and-media.yaml#/Health

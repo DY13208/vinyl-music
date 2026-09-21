@@ -1,0 +1,19 @@
+import type { components, paths } from './generated';
+type Schema = components['schemas'];
+const id = '019f0000-0000-7000-8000-000000000001';
+const input: Schema['CollectionInput'] = { recordId: id, condition: 'NM' };
+const record: Schema['PrivateRecordInput'] = { title: '测试', artistName: '艺人', collection: { notes: '初次入藏' } };
+const unavailable: Schema['PlaybackAvailability'] = {
+  availability: 'unavailable', reason: 'PROVIDER_NOT_CONFIGURED', providerId: 'netease', source: null,
+};
+function consume(value: Schema['PlaybackAvailability']) {
+  if (value.availability === 'available') return value.source.url;
+  return value.reason;
+}
+type Login = paths['/auth/login']['post']['requestBody']['content']['application/json'];
+const login: Login = { username: 'vinyl_user', password: 'test-passphrase-123' };
+// @ts-expect-error price must be an integer-number DTO, never a UI decimal string.
+const price: Schema['Money'] = { amountMinor: '320.00', currency: 'CNY' };
+// @ts-expect-error an unavailable source must not carry playable media.
+const bad: Schema['PlaybackAvailability'] = { availability: 'unavailable', reason: 'PROVIDER_NOT_CONFIGURED', providerId: 'netease', source: { url: 'https://example.com/music.mp3' } };
+void [input, record, consume(unavailable), login, price, bad];

@@ -1,0 +1,107 @@
+parameters:
+  RequestId:
+    name: X-Request-Id
+    in: header
+    required: false
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: ^[A-Za-z0-9_.:-]+$
+  Origin:
+    name: Origin
+    in: header
+    required: true
+    schema:
+      type: string
+      format: uri
+    description: 浏览器自动发送；服务端精确匹配允许的源。
+  CSRF:
+    name: X-CSRF-Token
+    in: header
+    required: true
+    schema:
+      type: string
+      minLength: 32
+      maxLength: 128
+  Idempotency:
+    name: Idempotency-Key
+    in: header
+    required: true
+    schema:
+      $ref: ./models.yaml#/Uuid
+  IfMatch:
+    name: If-Match
+    in: header
+    required: true
+    schema:
+      type: string
+      pattern: ^"v[1-9][0-9]*"$
+    description: 已不存在的删除对象先返回204；存在时再检查版本。
+  Limit:
+    name: limit
+    in: query
+    schema:
+      type: integer
+      minimum: 1
+      maximum: 50
+      default: 20
+  Cursor:
+    name: cursor
+    in: query
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 2048
+  Q:
+    name: q
+    in: query
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 100
+  Genre:
+    name: genre
+    in: query
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 100
+headers:
+  RequestId:
+    description: 服务端最终使用的关联ID。
+    schema:
+      type: string
+      minLength: 1
+      maxLength: 128
+  ETag:
+    description: 资源版本；私人档案创建响应使用record.version。
+    schema:
+      type: string
+      pattern: ^"v[1-9][0-9]*"$
+  SetCookie:
+    description: HttpOnly 会话 Cookie；生产额外 Secure，Path=/，SameSite=Lax，无Domain。
+    schema:
+      type: string
+  RetryAfter:
+    description: 429或临时依赖故障建议等待秒数。
+    schema:
+      type: integer
+      minimum: 1
+  Location:
+    description: 可回读的资源或任务相对路径。
+    schema:
+      type: string
+      format: uri-reference
+responses:
+  Error:
+    description: 400参数错误；401身份失效；403Origin/CSRF；404不可见；409冲突；412版本过期；413体积超限；422业务字段错误；428缺少版本；429限流；500内部错误；503依赖失败。具体error.code见api-contract.md。
+    headers:
+      X-Request-Id:
+        $ref: "#/headers/RequestId"
+      Retry-After:
+        $ref: "#/headers/RetryAfter"
+    content:
+      application/json:
+        schema:
+          $ref: ./jobs-and-media.yaml#/Error

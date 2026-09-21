@@ -1,0 +1,172 @@
+/auth/register:
+  post:
+    tags:
+      - auth
+    operationId: register
+    summary: 创建账号
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./models.yaml#/RegisterInput
+    responses:
+      "201":
+        description: 创建账号
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/User
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/auth/login:
+  post:
+    tags:
+      - auth
+    operationId: login
+    summary: 账号密码登录
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./models.yaml#/LoginInput
+    responses:
+      "200":
+        description: 账号密码登录
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          Set-Cookie:
+            $ref: ./common.yaml#/headers/SetCookie
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/Session
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/auth/session:
+  get:
+    tags:
+      - auth
+    operationId: getSession
+    summary: 恢复登录会话
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: 恢复登录会话
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/Session
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/auth/logout:
+  post:
+    tags:
+      - auth
+    operationId: logout
+    summary: 退出当前会话
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+    responses:
+      "204":
+        description: 操作完成，无响应体。
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          Set-Cookie:
+            $ref: ./common.yaml#/headers/SetCookie
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/auth/password:
+  put:
+    tags:
+      - auth
+    operationId: changePassword
+    summary: 验证旧密码并修改密码
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Origin
+      - $ref: ./common.yaml#/parameters/CSRF
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: ./models.yaml#/PasswordInput
+    responses:
+      "204":
+        description: 操作完成，无响应体。
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+          Set-Cookie:
+            $ref: ./common.yaml#/headers/SetCookie
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/me:
+  get:
+    tags:
+      - auth
+    operationId: getProfile
+    summary: 我的账号与实际统计
+    security:
+      - cookieAuth: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: 我的账号与实际统计
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/Profile
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      "401":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error

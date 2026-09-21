@@ -1,0 +1,269 @@
+/genres:
+  get:
+    tags:
+      - catalog
+    operationId: listGenres
+    summary: 目录分类
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+    responses:
+      "200":
+        description: 目录分类
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/GenreList
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/releases:
+  get:
+    tags:
+      - catalog
+    operationId: listReleases
+    summary: 查询发行版
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+      - $ref: ./common.yaml#/parameters/Q
+      - $ref: ./common.yaml#/parameters/Genre
+      - name: albumId
+        in: query
+        required: false
+        schema:
+          $ref: ./models.yaml#/Uuid
+      - name: artistId
+        in: query
+        required: false
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 查询发行版
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/ReleasePage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/albums/{albumId}:
+  get:
+    tags:
+      - catalog
+    operationId: getAlbum
+    summary: 作品详情
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: albumId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 作品详情
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/AlbumDetail
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/releases/{releaseId}:
+  get:
+    tags:
+      - catalog
+    operationId: getRelease
+    summary: 发行版详情与曲目
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: releaseId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 发行版详情与曲目
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/ReleaseDetail
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/artists/{artistId}:
+  get:
+    tags:
+      - catalog
+    operationId: getArtist
+    summary: 艺术家与作品
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: artistId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 艺术家与作品
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/ArtistDetail
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/search:
+  get:
+    tags:
+      - catalog
+    operationId: searchCatalog
+    summary: 按类型搜索公共目录
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 100
+      - name: type
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+            - releases
+            - artists
+            - tracks
+    responses:
+      "200":
+        description: 按类型搜索公共目录
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/SearchPage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/editorial/issues:
+  get:
+    tags:
+      - catalog
+    operationId: listIssues
+    summary: 已发布策展目录
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+    responses:
+      "200":
+        description: 已发布策展目录
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/IssuePage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/editorial/issues/{issueId}:
+  get:
+    tags:
+      - catalog
+    operationId: getIssue
+    summary: 策展关联唱片
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: issueId
+        in: path
+        required: true
+        schema:
+          $ref: ./models.yaml#/Uuid
+    responses:
+      "200":
+        description: 策展关联唱片
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/IssueDetail
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error
+/catalog/barcodes/{barcode}:
+  get:
+    tags:
+      - catalog
+    operationId: lookupBarcode
+    summary: 条码匹配的发行版候选
+    security: []
+    parameters:
+      - $ref: ./common.yaml#/parameters/RequestId
+      - name: barcode
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^(\d{12}|\d{13})$
+      - $ref: ./common.yaml#/parameters/Limit
+      - $ref: ./common.yaml#/parameters/Cursor
+    responses:
+      "200":
+        description: 条码匹配的发行版候选
+        headers:
+          X-Request-Id:
+            $ref: ./common.yaml#/headers/RequestId
+        content:
+          application/json:
+            schema:
+              $ref: ./models.yaml#/ReleasePage
+      "400":
+        $ref: ./common.yaml#/responses/Error
+      default:
+        $ref: ./common.yaml#/responses/Error

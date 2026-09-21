@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-09-10",
+  "tool": "pen interactive 0.3.7",
+  "roots": [
+    {
+      "id": "xXszA",
+      "name": "P01 · 首页 · 唱片展示",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "mTK64",
+      "name": "P02 · 我的收藏 · 木质唱片柜",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "o2lyD",
+      "name": "P03 · 发行版详情 · 入藏",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "o1Yy2d",
+      "name": "P04 · 播放器 · 平台未接入",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "fa51S",
+      "name": "P05 · 搜索 · Album First",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "A5dVf6",
+      "name": "P06 · 发现 · 黑胶文化志",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "C0ha9G",
+      "name": "P07 · 愿望单 · 目标价",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "GQKTG",
+      "name": "P08 · 我的 · 真实账户",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "DGcUw",
+      "name": "P09 · 账号密码登录",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "b7ApMh",
+      "name": "P10 · 创建账号",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "NtTVY",
+      "name": "P11 · 设置与音乐来源",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "vd2J7",
+      "name": "P12 · 导入确认与任务",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "DaUTu",
+      "name": "P13 · 艺术家与作品",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "XiLyX",
+      "name": "P14 · 歌词不可用",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "FgHNt",
+      "name": "P15 · 页面状态规范",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "GZQnA",
+      "name": "P16 · 手工录入与品相",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "DPl8s",
+      "name": "P17 · 横屏唱片展台",
+      "width": 828,
+      "height": 440
+    },
+    {
+      "id": "JPbmy",
+      "name": "P18 · 启动与访客进入",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "problems": [],
+  "refs": 85,
+  "reusables": 10
+}

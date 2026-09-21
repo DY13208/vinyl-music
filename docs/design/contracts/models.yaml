@@ -1,0 +1,460 @@
+Uuid: {type: string, format: uuid}
+Timestamp: {type: string, format: date-time}
+Version: {type: integer, minimum: 1}
+Money:
+  type: object
+  additionalProperties: false
+  required: [amountMinor, currency]
+  properties:
+    amountMinor: {type: integer, minimum: 0, maximum: 2000000000}
+    currency: {type: string, pattern: '^[A-Z]{3}$'}
+Condition: {type: string, enum: [M, NM, VG_PLUS, VG, G, P, UNKNOWN]}
+Source:
+  type: object
+  additionalProperties: false
+  required: [kind, providerId, sourceUrl, licenseStatus, reviewStatus]
+  properties:
+    kind: {type: string, enum: [fixture, provider, user]}
+    providerId: {type: [string, 'null']}
+    sourceUrl: {type: [string, 'null'], format: uri}
+    licenseStatus: {type: string, enum: [unknown, licensed, user_provided, restricted]}
+    reviewStatus: {type: string, enum: [unverified, reviewed, rejected]}
+User:
+  type: object
+  additionalProperties: false
+  required: [id, username, displayName]
+  properties:
+    id: {$ref: '#/Uuid'}
+    username: {type: string, pattern: '^[a-z0-9_]{3,32}$'}
+    displayName: {type: string, minLength: 2, maxLength: 40}
+Session:
+  type: object
+  additionalProperties: false
+  required: [user, csrfToken, expiresAt]
+  properties:
+    user: {$ref: '#/User'}
+    csrfToken: {type: string, minLength: 32, maxLength: 128}
+    expiresAt: {$ref: '#/Timestamp'}
+Profile:
+  type: object
+  additionalProperties: false
+  required: [user, collectionCount, favoriteCount, wishlistCount]
+  properties:
+    user: {$ref: '#/User'}
+    collectionCount: {type: integer, minimum: 0}
+    favoriteCount: {type: integer, minimum: 0}
+    wishlistCount: {type: integer, minimum: 0}
+RegisterInput:
+  type: object
+  additionalProperties: false
+  required: [username, displayName, password]
+  properties:
+    username: {type: string, minLength: 3, maxLength: 64, description: 'trim/lowercase后满足账号规则'}
+    displayName: {type: string, minLength: 2, maxLength: 40}
+    password: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+LoginInput:
+  type: object
+  additionalProperties: false
+  required: [username, password]
+  properties:
+    username: {type: string, minLength: 1, maxLength: 64}
+    password: {type: string, minLength: 1, maxLength: 128, writeOnly: true}
+PasswordInput:
+  type: object
+  additionalProperties: false
+  required: [currentPassword, newPassword]
+  properties:
+    currentPassword: {type: string, minLength: 1, maxLength: 128, writeOnly: true}
+    newPassword: {type: string, minLength: 12, maxLength: 128, writeOnly: true}
+ReleaseSummary:
+  type: object
+  additionalProperties: false
+  required: [id, albumId, title, artistName, artistIds, releaseYear, coverUrl, edition, source]
+  properties:
+    id: {$ref: '#/Uuid'}
+    albumId: {$ref: '#/Uuid'}
+    title: {type: string, minLength: 1, maxLength: 200}
+    artistName: {type: string, minLength: 1, maxLength: 200}
+    artistIds: {type: array, maxItems: 40, uniqueItems: true, items: {$ref: '#/Uuid'}}
+    releaseYear: {type: [integer, 'null'], minimum: 1850, maximum: 2100}
+    coverUrl: {type: [string, 'null'], format: uri-reference}
+    edition: {type: [string, 'null'], maxLength: 200}
+    source: {$ref: '#/Source'}
+Track:
+  type: object
+  additionalProperties: false
+  required: [id, releaseId, discNumber, position, title, durationMs]
+  properties:
+    id: {$ref: '#/Uuid'}
+    releaseId: {$ref: '#/Uuid'}
+    discNumber: {type: integer, minimum: 1, maximum: 20}
+    position: {type: integer, minimum: 1, maximum: 200}
+    title: {type: string, minLength: 1, maxLength: 200}
+    durationMs: {type: [integer, 'null'], minimum: 0, maximum: 86400000}
+ReleaseDetail:
+  type: object
+  additionalProperties: false
+  required: [release, label, matrixCode, barcode, rpm, weightGrams, vinylVariant, vinylColors, declaredTrackCount, tracks]
+  properties:
+    release: {$ref: '#/ReleaseSummary'}
+    label: {type: [string, 'null'], maxLength: 200}
+    matrixCode: {type: [string, 'null'], maxLength: 200}
+    barcode: {type: [string, 'null'], pattern: '^(\d{12}|\d{13})$'}
+    rpm: {type: string, enum: [33_1_3, '45', '78', unknown]}
+    weightGrams: {type: [integer, 'null'], minimum: 1, maximum: 500}
+    vinylVariant: {type: string, enum: [black, colored, clear, translucent, marble, splatter, split, liquid, picture]}
+    vinylColors: {type: array, maxItems: 3, items: {type: string, pattern: '^#[a-fA-F0-9]{6}$'}}
+    declaredTrackCount: {type: [integer, 'null'], minimum: 0, maximum: 200}
+    tracks: {type: array, maxItems: 200, items: {$ref: '#/Track'}}
+ReleasePage:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items: {type: array, maxItems: 50, items: {$ref: '#/ReleaseSummary'}}
+    nextCursor: {type: [string, 'null']}
+AlbumDetail:
+  type: object
+  additionalProperties: false
+  required: [id, title, originalYear, artistIds, description, source, releases]
+  properties:
+    id: {$ref: '#/Uuid'}
+    title: {type: string}
+    originalYear: {type: [integer, 'null']}
+    artistIds: {type: array, items: {$ref: '#/Uuid'}}
+    description: {type: [string, 'null'], maxLength: 10000}
+    source: {$ref: '#/Source'}
+    releases: {$ref: '#/ReleasePage'}
+ArtistSummary:
+  type: object
+  additionalProperties: false
+  required: [id, name, imageUrl]
+  properties:
+    id: {$ref: '#/Uuid'}
+    name: {type: string}
+    imageUrl: {type: [string, 'null'], format: uri-reference}
+ArtistDetail:
+  type: object
+  additionalProperties: false
+  required: [artist, bio, source, releases]
+  properties:
+    artist: {$ref: '#/ArtistSummary'}
+    bio: {type: [string, 'null'], maxLength: 10000}
+    source: {$ref: '#/Source'}
+    releases: {$ref: '#/ReleasePage'}
+SearchPage:
+  type: object
+  additionalProperties: false
+  required: [type, items, nextCursor]
+  properties:
+    type: {type: string, enum: [releases, artists, tracks]}
+    items: {type: array, maxItems: 50, items: {oneOf: [{$ref: '#/ReleaseSummary'}, {$ref: '#/ArtistSummary'}, {$ref: '#/Track'}]}}
+    nextCursor: {type: [string, 'null']}
+  allOf:
+    - if: {properties: {type: {const: releases}}}
+      then: {properties: {items: {items: {$ref: '#/ReleaseSummary'}}}}
+    - if: {properties: {type: {const: artists}}}
+      then: {properties: {items: {items: {$ref: '#/ArtistSummary'}}}}
+    - if: {properties: {type: {const: tracks}}}
+      then: {properties: {items: {items: {$ref: '#/Track'}}}}
+IssueSummary:
+  type: object
+  additionalProperties: false
+  required: [id, title, publishedAt, source]
+  properties:
+    id: {$ref: '#/Uuid'}
+    title: {type: string}
+    publishedAt: {$ref: '#/Timestamp'}
+    source: {$ref: '#/Source'}
+IssuePage:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items: {type: array, maxItems: 50, items: {$ref: '#/IssueSummary'}}
+    nextCursor: {type: [string, 'null']}
+IssueDetail:
+  type: object
+  additionalProperties: false
+  required: [issue, items]
+  properties:
+    issue: {$ref: '#/IssueSummary'}
+    items: {type: array, maxItems: 50, items: {$ref: '#/ReleaseSummary'}}
+CollectionEntry:
+  type: object
+  additionalProperties: false
+  required: [id, releaseId, recordId, title, artistName, coverUrl, condition, purchasePrice, notes, acquiredOn, version, createdAt, updatedAt]
+  properties:
+    id: {$ref: '#/Uuid'}
+    releaseId: {type: [string, 'null'], format: uuid}
+    recordId: {type: [string, 'null'], format: uuid}
+    title: {type: string}
+    artistName: {type: string}
+    coverUrl: {type: [string, 'null'], format: uri-reference}
+    condition: {$ref: '#/Condition'}
+    purchasePrice: {oneOf: [{$ref: '#/Money'}, {type: 'null'}]}
+    notes: {type: string, maxLength: 2000}
+    acquiredOn: {type: [string, 'null'], format: date}
+    version: {$ref: '#/Version'}
+    createdAt: {$ref: '#/Timestamp'}
+    updatedAt: {$ref: '#/Timestamp'}
+  oneOf:
+    - required: [releaseId, recordId]
+      properties: {releaseId: {$ref: '#/Uuid'}, recordId: {type: 'null'}}
+    - required: [releaseId, recordId]
+      properties: {recordId: {$ref: '#/Uuid'}, releaseId: {type: 'null'}}
+CollectionInput:
+  type: object
+  additionalProperties: false
+  properties:
+    releaseId:
+      $ref: "#/Uuid"
+    condition:
+      $ref: "#/Condition"
+    purchasePrice:
+      oneOf:
+        - $ref: "#/Money"
+        - type: "null"
+    notes:
+      type: string
+      maxLength: 2000
+    acquiredOn:
+      type:
+        - string
+        - "null"
+      format: date
+    recordId:
+      $ref: "#/Uuid"
+  oneOf:
+    - required:
+        - releaseId
+      properties:
+        releaseId: {$ref: '#/Uuid'}
+        recordId: false
+    - required:
+        - recordId
+      properties:
+        recordId: {$ref: '#/Uuid'}
+        releaseId: false
+CollectionPatch:
+  type: object
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    condition: {$ref: '#/Condition'}
+    purchasePrice: {oneOf: [{$ref: '#/Money'}, {type: 'null'}]}
+    notes: {type: string, maxLength: 2000}
+    acquiredOn: {type: [string, 'null'], format: date}
+CollectionPage:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items: {type: array, maxItems: 50, items: {$ref: '#/CollectionEntry'}}
+    nextCursor: {type: [string, 'null']}
+WishlistEntry:
+  type: object
+  additionalProperties: false
+  required: [id, release, targetPrice, desiredCondition, notes, version, createdAt, updatedAt]
+  properties:
+    id: {$ref: '#/Uuid'}
+    release: {$ref: '#/ReleaseSummary'}
+    targetPrice: {oneOf: [{$ref: '#/Money'}, {type: 'null'}]}
+    desiredCondition: {oneOf: [{$ref: '#/Condition'}, {type: 'null'}]}
+    notes: {type: string, maxLength: 2000}
+    version: {$ref: '#/Version'}
+    createdAt: {$ref: '#/Timestamp'}
+    updatedAt: {$ref: '#/Timestamp'}
+WishlistInput:
+  type: object
+  additionalProperties: false
+  required: [releaseId]
+  properties:
+    releaseId: {$ref: '#/Uuid'}
+    targetPrice: {oneOf: [{$ref: '#/Money'}, {type: 'null'}]}
+    desiredCondition: {oneOf: [{$ref: '#/Condition'}, {type: 'null'}]}
+    notes: {type: string, maxLength: 2000}
+WishlistPatch:
+  type: object
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    targetPrice: {oneOf: [{$ref: '#/Money'}, {type: 'null'}]}
+    desiredCondition: {oneOf: [{$ref: '#/Condition'}, {type: 'null'}]}
+    notes: {type: string, maxLength: 2000}
+WishlistPage:
+  type: object
+  additionalProperties: false
+  required: [items, nextCursor]
+  properties:
+    items: {type: array, maxItems: 50, items: {$ref: '#/WishlistEntry'}}
+    nextCursor: {type: [string, 'null']}
+PrivateRecordInput:
+  allOf:
+    - $ref: "#/PrivateRecordBase"
+  type: object
+  properties:
+    collection:
+      $ref: "#/CollectionPatch"
+  unevaluatedProperties: false
+PrivateTrackInput:
+  type: object
+  additionalProperties: false
+  required: [position, title, durationMs]
+  properties:
+    position: {type: integer, minimum: 1, maximum: 200}
+    title: {type: string, minLength: 1, maxLength: 200}
+    durationMs: {type: [integer, 'null'], minimum: 0, maximum: 86400000}
+PrivateRecord:
+  type: object
+  additionalProperties: false
+  required:
+    - id
+    - fields
+    - version
+    - createdAt
+    - updatedAt
+  properties:
+    id:
+      $ref: "#/Uuid"
+    fields:
+      $ref: "#/PrivateRecordFields"
+    version:
+      $ref: "#/Version"
+    createdAt:
+      $ref: "#/Timestamp"
+    updatedAt:
+      $ref: "#/Timestamp"
+PrivateRecordCreated:
+  type: object
+  additionalProperties: false
+  required: [record, collectionEntry]
+  properties:
+    record: {$ref: '#/PrivateRecord'}
+    collectionEntry: {$ref: '#/CollectionEntry'}
+PrivateRecordPatch:
+  type: object
+  additionalProperties: false
+  minProperties: 1
+  properties:
+    title: {type: string, minLength: 1, maxLength: 200}
+    artistName: {type: string, minLength: 1, maxLength: 200}
+    releaseYear: {type: [integer, 'null'], minimum: 1850, maximum: 2100}
+    label: {type: [string, 'null'], maxLength: 200}
+    edition: {type: [string, 'null'], maxLength: 200}
+    genre: {type: [string, 'null'], maxLength: 100}
+    matrixCode: {type: [string, 'null'], maxLength: 200}
+    barcode: {type: [string, 'null'], pattern: '^(\d{12}|\d{13})$'}
+    rpm: {type: string, enum: [33_1_3, '45', '78', unknown]}
+    weightGrams: {type: [integer, 'null'], minimum: 1, maximum: 500}
+    coverUrl: {type: [string, 'null'], format: uri, pattern: '^https://', maxLength: 2048}
+    vinylVariant: {type: string, enum: [black, colored, clear, translucent, marble, splatter, split, liquid, picture]}
+    vinylColors: {type: array, maxItems: 3, items: {type: string, pattern: '^#[a-fA-F0-9]{6}$'}}
+    tracks: {type: array, maxItems: 200, items: {$ref: '#/PrivateTrackInput'}}
+PrivateRecordBase:
+  type: object
+  required:
+    - title
+    - artistName
+  properties:
+    title:
+      type: string
+      minLength: 1
+      maxLength: 200
+    artistName:
+      type: string
+      minLength: 1
+      maxLength: 200
+    releaseYear:
+      type:
+        - integer
+        - "null"
+      minimum: 1850
+      maximum: 2100
+    label:
+      type:
+        - string
+        - "null"
+      maxLength: 200
+    edition:
+      type:
+        - string
+        - "null"
+      maxLength: 200
+    genre:
+      type:
+        - string
+        - "null"
+      maxLength: 100
+    matrixCode:
+      type:
+        - string
+        - "null"
+      maxLength: 200
+    barcode:
+      type:
+        - string
+        - "null"
+      pattern: ^(\d{12}|\d{13})$
+    rpm:
+      type: string
+      enum:
+        - 33_1_3
+        - "45"
+        - "78"
+        - unknown
+      default: unknown
+    weightGrams:
+      type:
+        - integer
+        - "null"
+      minimum: 1
+      maximum: 500
+    coverUrl:
+      type:
+        - string
+        - "null"
+      format: uri
+      pattern: ^https://
+      maxLength: 2048
+    vinylVariant:
+      type: string
+      enum:
+        - black
+        - colored
+        - clear
+        - translucent
+        - marble
+        - splatter
+        - split
+        - liquid
+        - picture
+      default: black
+    vinylColors:
+      type: array
+      maxItems: 3
+      items:
+        type: string
+        pattern: ^#[a-fA-F0-9]{6}$
+    tracks:
+      type: array
+      maxItems: 200
+      items:
+        $ref: "#/PrivateTrackInput"
+PrivateRecordFields:
+  allOf:
+    - $ref: "#/PrivateRecordBase"
+  unevaluatedProperties: false
+GenreList:
+  type: object
+  additionalProperties: false
+  required:
+    - items
+  properties:
+    items:
+      type: array
+      maxItems: 200
+      items:
+        type: string
+        minLength: 1
+        maxLength: 100

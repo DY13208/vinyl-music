@@ -1,0 +1,14 @@
+[
+  {
+    "title": "我的第一张唱片",
+    "artistName": "示例艺术家",
+    "releaseYear": 2020,
+    "rpm": "33_1_3",
+    "vinylVariant": "black",
+    "collection": {
+      "condition": "NM",
+      "purchasePrice": { "amountMinor": 32000, "currency": "CNY" },
+      "notes": "这是格式示例，请替换为你自己的唱片资料。"
+    }
+  }
+]
