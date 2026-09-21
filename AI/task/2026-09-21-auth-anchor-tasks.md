@@ -37,7 +37,7 @@ BC-AUTH-00 → BC-AUTH-01 → BC-AUTH-02 → BC-AUTH-03 → BC-AUTH-04 → BC-AU
 | --- | --- | --- | --- |
 | [BC-AUTH-00](#bc-auth-00) | 范围与基线 | [目标与边界](../plan/2026-09-21-login-logout-minimal-plan.md#1-目标与边界) | DONE / PASS / MET |
 | [BC-AUTH-01](#bc-auth-01) | 数据与依赖 | [PostgreSQL](../plan/2026-09-21-login-logout-minimal-plan.md#postgresql) | DONE / FAIL / NOT_MET |
-| [BC-AUTH-02](#bc-auth-02) | 会话、改密与邮件找回 API | [后端设计](../plan/2026-09-21-login-logout-minimal-plan.md#3-最小后端设计) | TODO / NOT_RUN / NOT_MET |
+| [BC-AUTH-02](#bc-auth-02) | 会话、改密与邮件找回 API | [后端设计](../plan/2026-09-21-login-logout-minimal-plan.md#3-最小后端设计) | DONE / FAIL / NOT_MET |
 | [BC-AUTH-03](#bc-auth-03) | 前端认证表单 | [前端接入](../plan/2026-09-21-login-logout-minimal-plan.md#4-最小前端接入) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-04](#bc-auth-04) | 旧认证清理 | [实施步骤](../plan/2026-09-21-login-logout-minimal-plan.md#5-文件级实施步骤与验证) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-05](#bc-auth-05) | 闭环验收 | [完成标准](../plan/2026-09-21-login-logout-minimal-plan.md#7-完成标准与风险) | TODO / NOT_RUN / NOT_MET |
@@ -142,7 +142,7 @@ npm run test:db
 ## BC-AUTH-02：Argon2id、Redis Session 与认证 HTTP 接口
 
 **依赖**：BC-AUTH-01
-**状态**：`TODO / NOT_RUN / NOT_MET`
+**状态**：`DONE / FAIL / NOT_MET`
 
 ### 目标
 
@@ -333,7 +333,7 @@ npm run test:e2e -- tests/e2e/auth.spec.ts
 | --- | --- | --- | --- | --- | --- |
 | BC-AUTH-00 | `src/server/auth.ts`、`api/auth.ts`、`server.ts`、`src/platform/auth/WebAuthAdapter.ts`、`src/auth/*`（范围核对）；本任务文档 | `git status --short`（0）、`npm run lint`（0）、`npm test`（0）、`npm run build`（0） | 基线工作区干净；类型检查、现有单测、Vite 构建均通过。仅确认现状，不代表自建认证已实现 | 认证仍为 Supabase；后续 BC 待实现 | 2026-09-21 13:35 UTC |
 | BC-AUTH-01 | `migrations/001_auth.sql`、`scripts/db-migrate.mjs`、`scripts/test-db.mjs`、`.env.example`、`package.json`/`package-lock.json` | `git diff --check`（0）；`npm run db:migrate`（1）；`npm run test:db`（1） | Migration、约束和脚本已实现；本机未提供 `DATABASE_URL`，PG18 空库前滚与约束测试按脚本明确失败，不能记为通过 | 需要隔离 PG18 实例后重跑两个 DB 命令 | 2026-09-21 13:55 UTC |
-| BC-AUTH-02 | 未开始 | NOT_RUN | NOT_MET | 七接口尚未实现 | — |
+| BC-AUTH-02 | `src/server/auth.ts`、`server.ts`、`tests/integration/auth-http.test.ts`、`package.json`（`test:auth`） | `npm run test:auth`（0）；`npm run lint`（0）；`npm test`（0）；`npm run build`（0） | 新接口、opaque Cookie、CSRF/Origin、session_version、Argon2id/Redis/SMTP 适配和 fake HTTP 测试通过；真实 PG18/Redis7/SMTP 运行环境未提供，未达到集成验收 | 需要隔离 PG18/Redis7 与 SMTP fake/配置重跑 `npm run test:auth` | 2026-09-21 13:58 UTC |
 | BC-AUTH-03 | 未开始 | NOT_RUN | NOT_MET | 前端尚未接入 | — |
 | BC-AUTH-04 | 未开始 | NOT_RUN | NOT_MET | 旧认证尚未切换 | — |
 | BC-AUTH-05 | 未开始 | NOT_RUN | NOT_MET | HTTP/E2E/真实收信均未验证 | — |

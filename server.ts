@@ -34,7 +34,8 @@ app.use('/api', (req, res, next) => {
 app.use('/api/collection', (_req, res) => res.status(410).json({ error: '个人馆藏仅保存在当前设备，不提供服务器存取接口' }));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.all('/api/artwork', artworkHandler);
-app.all('/api/auth', authHandler);
+app.all('/api/v1/auth/*', authHandler);
+app.all('/api/v1/auth', authHandler);
 
 // Register the provider-backed lookup before the static app fallback.
 registerVinylSearchRoutes(app);
