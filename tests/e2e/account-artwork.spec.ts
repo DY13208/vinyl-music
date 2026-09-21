@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-async function login(page: Page, username = 'a', password = 'test-password-123') {
+async function login(page: Page, username = 'user_a', password = 'test-password-123') {
   await page.getByLabel('用户名', { exact: true }).fill(username);
   await page.locator('#auth-password').fill(password);
   await page.getByRole('button', { name: '登录', exact: true }).click();
@@ -43,7 +43,7 @@ test('profile editor saves a local avatar and nickname, supports cancel/removal 
   await expect(page.getByRole('heading', { name: '我的黑胶小屋' })).toBeVisible();
   await expect(page.getByRole('img', { name: '我的头像' })).toBeVisible();
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
-  await login(page, 'b'); await profile(page);
+  await login(page, 'user_b'); await profile(page);
   await expect(page.getByRole('heading', { name: 'b', exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: '我的头像' })).toHaveCount(0);
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
@@ -88,13 +88,13 @@ test('login layout, validation and account lifecycle work at mobile width', asyn
   await expect(page.getByRole('heading', { name: '回到你的唱片架' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/login-mobile.png', fullPage: true });
-  await page.getByLabel('用户名', { exact: true }).fill('a');
+  await page.getByLabel('用户名', { exact: true }).fill('user_a');
   await page.locator('#auth-password').fill('wrong-password');
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('无效');
   await login(page);
   await profile(page);
-  await expect(page.getByText('a', { exact: true })).toBeVisible();
+  await expect(page.getByText('user_a', { exact: true })).toBeVisible();
   await page.reload();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
   await profile(page);
@@ -158,7 +158,7 @@ test('private collection and cached cover survive reload, remain local and are i
   await expect(otherTab.locator('#bottom-navigation-bar')).toBeVisible();
   await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await expect(otherTab.getByRole('heading', { name: '回到你的唱片架' })).toBeVisible();
-  await login(page, 'b');
+  await login(page, 'user_b');
   await expect(page.getByRole('heading', { name: '你的第一张唱片' })).toBeVisible();
   await profile(page); await page.getByRole('button', { name: '退出登录', exact: true }).click();
   await login(page);

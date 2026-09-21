@@ -13,7 +13,7 @@ const physicalMatch = { ...identityMatch, album: { ...identity, id: 'public-phys
 async function login(page: Page) {
   await page.goto('/');
   // Keep UI checks separate from the account lifecycle suite's sign-in rate budget.
-  await page.getByLabel('用户名', { exact: true }).fill('b');
+  await page.getByLabel('用户名', { exact: true }).fill('user_b');
   await page.getByLabel('密码', { exact: true }).fill('test-password-123');
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
