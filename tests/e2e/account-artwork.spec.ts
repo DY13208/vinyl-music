@@ -2,7 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 
 async function login(page: Page, username = 'a', password = 'test-password-123') {
   await page.getByLabel('用户名', { exact: true }).fill(username);
-  await page.getByLabel('密码', { exact: true }).fill(password);
+  await page.locator('#auth-password').fill(password);
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
 }
@@ -89,7 +89,7 @@ test('login layout, validation and account lifecycle work at mobile width', asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/login-mobile.png', fullPage: true });
   await page.getByLabel('用户名', { exact: true }).fill('a');
-  await page.getByLabel('密码', { exact: true }).fill('wrong-password');
+  await page.locator('#auth-password').fill('wrong-password');
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('无效');
   await login(page);
@@ -106,7 +106,7 @@ test('registration and password recovery use the backend contract', async ({ pag
   const username = `new_${Date.now().toString(36)}`;
   await page.goto('/'); await page.getByRole('button', { name: '注册' }).click();
   await page.getByLabel('用户名').fill(username); await page.getByLabel('邮箱').fill(`${username}@example.test`); await page.getByLabel('显示名称').fill('New User');
-  await page.getByLabel('密码').fill('new-password-123'); await page.getByLabel('确认密码').fill('new-password-123'); await page.getByRole('button', { name: '创建账户' }).click(); await expect(page.getByRole('status')).toContainText('账户已创建');
+  await page.locator('#auth-password').fill('new-password-123'); await page.getByLabel('确认密码').fill('new-password-123'); await page.getByRole('button', { name: '创建账户' }).click(); await expect(page.getByRole('status')).toContainText('账户已创建');
   await login(page, username, 'new-password-123'); await page.getByRole('button', { name: '我的' }).click(); await page.getByRole('button', { name: '退出登录' }).click();
   await page.getByRole('button', { name: '忘记密码？' }).click(); await page.getByLabel('注册邮箱').fill(`${username}@example.test`); await page.getByRole('button', { name: '发送重置邮件' }).click();
   const link = (await (await request.get('/api/test/recovery-link')).json()).link; await page.goto(link); await page.getByLabel('新密码').fill('changed-password-123'); await page.getByLabel('确认密码').fill('changed-password-123'); await page.getByRole('button', { name: '保存新密码' }).click();

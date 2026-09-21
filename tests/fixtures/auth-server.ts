@@ -17,7 +17,7 @@ const db = { query: async (sql: string, values: any[] = []) => {
   if (lower.includes('from users where email')) { const row = [...users.values()].find(item => item.email === values[0]); return { rows: row ? [row] : [], rowCount: row ? 1 : 0 }; }
   if (lower.includes('join user_credentials')) { const row = users.get(values[0]); return { rows: row ? [{ ...row, password_hash: credentials.get(row.id) }] : [], rowCount: row ? 1 : 0 }; }
   if (lower.startsWith('select password_hash')) { return { rows: [{ password_hash: credentials.get(values[0]) }], rowCount: 1 }; }
-  if (lower.startsWith('select id, username')) { const row = users.get(values[0]); return { rows: row ? [row] : [], rowCount: row ? 1 : 0 }; }
+  if (lower.startsWith('select id, username')) { const row = [...users.values()].find(item => item.id === values[0]); return { rows: row ? [row] : [], rowCount: row ? 1 : 0 }; }
   if (lower.startsWith('insert into password_reset_tokens')) { resets.set(values[0], { id: randomUUID(), user_id: values[0], token_hash: values[1], expires_at: Date.now() + 900000, used_at: null }); return { rows: [], rowCount: 1 }; }
   if (lower.startsWith('select t.id')) { const row = [...resets.values()].find(item => item.token_hash === values[0] && !item.used_at && item.expires_at > Date.now()); return { rows: row ? [{ ...row, session_version: users.get(row.user_id)?.session_version }] : [], rowCount: row ? 1 : 0 }; }
   if (lower.startsWith('update password_reset_tokens set used_at')) { const row = [...resets.values()].find(item => item.id === values[0] || item.user_id === values[0]); if (row) row.used_at = Date.now(); return { rows: row && lower.includes('returning') ? [row] : [], rowCount: row ? 1 : 0 }; }

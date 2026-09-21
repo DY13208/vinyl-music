@@ -21,8 +21,8 @@ export class WebAuthAdapter {
     finally { window.clearTimeout(timer); }
   }
   consumeRecoveryToken(): string | null {
-    const hash = window.location.hash;
-    const match = hash.match(/^#reset-password=([^&]+)$/);
+    const source = `${window.location.hash}${window.location.search}`;
+    const match = source.match(/(?:#|\?)reset-password=([^&]+)/);
     if (!match) return null;
     const token = decodeURIComponent(match[1]);
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
