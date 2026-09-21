@@ -1,7 +1,7 @@
 # Vinyl Music 自建认证 BC 锚点任务
 
 日期：2026-09-21
-状态：**全部待实现**。
+状态：**BC-AUTH-00 已完成，其余待实现**。
 主计划：[自建认证最小实施计划（含改密与找回）](../plan/2026-09-21-login-logout-minimal-plan.md)
 
 ## 1. 任务范围
@@ -25,7 +25,7 @@
 | 已实现 | 当前源码仍是 Supabase 邮箱认证、加密 access/refresh token Cookie、邮箱链接和 recovery 流程。 |
 | 已验证 | 当前仓库既有认证单测、类型检查和构建曾有通过记录；本任务文档不把历史结果当作新实现证据。 |
 | 仅设计 | 自建 username/email、Argon2id、PostgreSQL、Redis opaque session、CSRF、SMTP recovery。 |
-| 待实现 | BC-AUTH-00 至 BC-AUTH-05 全部任务。 |
+| 待实现 | BC-AUTH-01 至 BC-AUTH-05。 |
 
 ## 3. 依赖顺序
 
@@ -35,14 +35,14 @@ BC-AUTH-00 → BC-AUTH-01 → BC-AUTH-02 → BC-AUTH-03 → BC-AUTH-04 → BC-AU
 
 | 锚点 | 分区 | 主计划参考 | 状态 |
 | --- | --- | --- | --- |
-| [BC-AUTH-00](#bc-auth-00) | 范围与基线 | [目标与边界](../plan/2026-09-21-login-logout-minimal-plan.md#1-目标与边界) | TODO / NOT_RUN / NOT_MET |
+| [BC-AUTH-00](#bc-auth-00) | 范围与基线 | [目标与边界](../plan/2026-09-21-login-logout-minimal-plan.md#1-目标与边界) | DONE / PASS / MET |
 | [BC-AUTH-01](#bc-auth-01) | 数据与依赖 | [PostgreSQL](../plan/2026-09-21-login-logout-minimal-plan.md#postgresql) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-02](#bc-auth-02) | 会话、改密与邮件找回 API | [后端设计](../plan/2026-09-21-login-logout-minimal-plan.md#3-最小后端设计) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-03](#bc-auth-03) | 前端认证表单 | [前端接入](../plan/2026-09-21-login-logout-minimal-plan.md#4-最小前端接入) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-04](#bc-auth-04) | 旧认证清理 | [实施步骤](../plan/2026-09-21-login-logout-minimal-plan.md#5-文件级实施步骤与验证) | TODO / NOT_RUN / NOT_MET |
 | [BC-AUTH-05](#bc-auth-05) | 闭环验收 | [完成标准](../plan/2026-09-21-login-logout-minimal-plan.md#7-完成标准与风险) | TODO / NOT_RUN / NOT_MET |
 
-共 6 个锚点，已达标 0；实现/验证/验收分别记录为 TODO 或 DONE、NOT_RUN 或 PASS/FAIL、NOT_MET 或 MET。正文状态、总表和末尾证据记录一起更新。
+共 6 个锚点，已达标 1；实现/验证/验收分别记录为 TODO 或 DONE、NOT_RUN 或 PASS/FAIL、NOT_MET 或 MET。正文状态、总表和末尾证据记录一起更新。
 
 - 每个 BC 完成后记录文件、命令、退出码、实际结果、遗留限制和更新时间。
 - 未达到验收标准时保持 `NOT_MET`，不得只因代码已写入就改为完成。
@@ -53,7 +53,7 @@ BC-AUTH-00 → BC-AUTH-01 → BC-AUTH-02 → BC-AUTH-03 → BC-AUTH-04 → BC-AU
 ## BC-AUTH-00：认证范围与基线锚点
 
 **依赖**：无
-**状态**：`TODO / NOT_RUN / NOT_MET`
+**状态**：`DONE / PASS / MET`
 
 ### 目标
 
@@ -331,7 +331,7 @@ npm run test:e2e -- tests/e2e/auth.spec.ts
 
 | BC | 实现文件/变更 | 验证命令与退出码 | 结果/证据 | 遗留限制 | 更新时间 |
 | --- | --- | --- | --- | --- | --- |
-| BC-AUTH-00 | 未开始 | NOT_RUN | NOT_MET | 尚未建立本轮基线 | — |
+| BC-AUTH-00 | `src/server/auth.ts`、`api/auth.ts`、`server.ts`、`src/platform/auth/WebAuthAdapter.ts`、`src/auth/*`（范围核对）；本任务文档 | `git status --short`（0）、`npm run lint`（0）、`npm test`（0）、`npm run build`（0） | 基线工作区干净；类型检查、现有单测、Vite 构建均通过。仅确认现状，不代表自建认证已实现 | 认证仍为 Supabase；后续 BC 待实现 | 2026-09-21 13:35 UTC |
 | BC-AUTH-01 | 未开始 | NOT_RUN | NOT_MET | 尚未执行 PG Migration | — |
 | BC-AUTH-02 | 未开始 | NOT_RUN | NOT_MET | 七接口尚未实现 | — |
 | BC-AUTH-03 | 未开始 | NOT_RUN | NOT_MET | 前端尚未接入 | — |
