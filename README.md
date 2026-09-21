@@ -179,3 +179,7 @@ npm run lint
 
 **最后更新**: 2026-09-09  
 **项目语言**: TypeScript (94.2%) | CSS (5.6%) | HTML (0.2%)
+
+## 认证配置
+
+自建认证需要服务端配置 `DATABASE_URL`、`REDIS_URL`、`AUTH_ORIGIN` 及 SMTP 变量（见 [`docs/ACCOUNT_SETUP.md`](docs/ACCOUNT_SETUP.md)）。浏览器只调用 `/api/v1/auth/*`，不会接触数据库、Redis 或 SMTP 密钥。

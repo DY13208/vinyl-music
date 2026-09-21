@@ -13,7 +13,7 @@ const physicalMatch = { ...identityMatch, album: { ...identity, id: 'public-phys
 async function login(page: Page) {
   await page.goto('/');
   // Keep UI checks separate from the account lifecycle suite's sign-in rate budget.
-  await page.getByLabel('邮箱', { exact: true }).fill('b@example.test');
+  await page.getByLabel('用户名', { exact: true }).fill('b');
   await page.getByLabel('密码', { exact: true }).fill('test-password-123');
   await page.getByRole('button', { name: '登录', exact: true }).click();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
@@ -38,7 +38,7 @@ function audioFixture() {
 
 test('empty collection leads to a public catalogue; preview does not collect, explicit add persists locally', async ({ page }) => {
   const writes: string[] = [];
-  page.on('request', request => { if (request.method() !== 'GET' && !request.url().includes('/api/auth')) writes.push(request.url()); });
+  page.on('request', request => { if (request.method() !== 'GET' && !request.url().includes('/api/v1/auth')) writes.push(request.url()); });
   await mockCatalogue(page);
   await page.route('https://api.audius.co/**', route => route.fulfill({ json: { data: [] } }));
   await page.route('https://itunes.apple.com/**', route => route.fulfill({ json: { results: [{ trackId: 1, trackName: track.title, artistName: identity.artist, collectionName: identity.title, trackTimeMillis: 299000, previewUrl: 'http://127.0.0.1:43180/api/test-preview.wav' }] } }));

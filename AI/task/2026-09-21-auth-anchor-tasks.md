@@ -39,7 +39,7 @@ BC-AUTH-00 → BC-AUTH-01 → BC-AUTH-02 → BC-AUTH-03 → BC-AUTH-04 → BC-AU
 | [BC-AUTH-01](#bc-auth-01) | 数据与依赖 | [PostgreSQL](../plan/2026-09-21-login-logout-minimal-plan.md#postgresql) | DONE / FAIL / NOT_MET |
 | [BC-AUTH-02](#bc-auth-02) | 会话、改密与邮件找回 API | [后端设计](../plan/2026-09-21-login-logout-minimal-plan.md#3-最小后端设计) | DONE / FAIL / NOT_MET |
 | [BC-AUTH-03](#bc-auth-03) | 前端认证表单 | [前端接入](../plan/2026-09-21-login-logout-minimal-plan.md#4-最小前端接入) | DONE / PASS / MET |
-| [BC-AUTH-04](#bc-auth-04) | 旧认证清理 | [实施步骤](../plan/2026-09-21-login-logout-minimal-plan.md#5-文件级实施步骤与验证) | TODO / NOT_RUN / NOT_MET |
+| [BC-AUTH-04](#bc-auth-04) | 旧认证清理 | [实施步骤](../plan/2026-09-21-login-logout-minimal-plan.md#5-文件级实施步骤与验证) | DONE / PASS / MET |
 | [BC-AUTH-05](#bc-auth-05) | 闭环验收 | [完成标准](../plan/2026-09-21-login-logout-minimal-plan.md#7-完成标准与风险) | TODO / NOT_RUN / NOT_MET |
 
 共 6 个锚点，已达标 1；实现/验证/验收分别记录为 TODO 或 DONE、NOT_RUN 或 PASS/FAIL、NOT_MET 或 MET。正文状态、总表和末尾证据记录一起更新。
@@ -245,7 +245,7 @@ npm run build
 ## BC-AUTH-04：Supabase 认证切换与文档清理
 
 **依赖**：BC-AUTH-03
-**状态**：`TODO / NOT_RUN / NOT_MET`
+**状态**：`DONE / PASS / MET`
 
 ### 目标
 
@@ -335,5 +335,5 @@ npm run test:e2e -- tests/e2e/auth.spec.ts
 | BC-AUTH-01 | `migrations/001_auth.sql`、`scripts/db-migrate.mjs`、`scripts/test-db.mjs`、`.env.example`、`package.json`/`package-lock.json` | `git diff --check`（0）；`npm run db:migrate`（1）；`npm run test:db`（1） | Migration、约束和脚本已实现；本机未提供 `DATABASE_URL`，PG18 空库前滚与约束测试按脚本明确失败，不能记为通过 | 需要隔离 PG18 实例后重跑两个 DB 命令 | 2026-09-21 13:55 UTC |
 | BC-AUTH-02 | `src/server/auth.ts`、`server.ts`、`tests/integration/auth-http.test.ts`、`package.json`（`test:auth`） | `npm run test:auth`（0）；`npm run lint`（0）；`npm test`（0）；`npm run build`（0） | 新接口、opaque Cookie、CSRF/Origin、session_version、Argon2id/Redis/SMTP 适配和 fake HTTP 测试通过；真实 PG18/Redis7/SMTP 运行环境未提供，未达到集成验收 | 需要隔离 PG18/Redis7 与 SMTP fake/配置重跑 `npm run test:auth` | 2026-09-21 13:58 UTC |
 | BC-AUTH-03 | `src/platform/auth/WebAuthAdapter.ts`、`src/auth/AuthContext.tsx`、`src/auth/AuthGate.tsx`、`src/auth/LoginView.tsx`、`src/views/SettingsView.tsx`、`src/views/ProfileView.tsx` | `npm run lint`（0）；`npm test`（0）；`npm run build`（0） | 七接口路径、四态门禁、内存 CSRF/找回 token、注册/登录/改密/找回表单和 username 身份展示已接入；针对性前端静态/构建验证通过 | Playwright 主流程留给 BC-AUTH-05；真实后端依赖未在本 BC 重复验证 | 2026-09-21 14:02 UTC |
-| BC-AUTH-04 | 未开始 | NOT_RUN | NOT_MET | 旧认证尚未切换 | — |
+| BC-AUTH-04 | `api/auth.ts`、`server.ts`、`tests/fixtures/auth-server.ts`、`tests/e2e/*` 认证 helper、`README.md`、`docs/ACCOUNT_SETUP.md`、`docs/ARCHITECTURE.md`、`.env.example` | `rg -n 'SUPABASE|/api/auth\\?action=|refresh_token|access_token' src api tests server.ts README.md docs/ACCOUNT_SETUP.md docs/ARCHITECTURE.md`（0 个活动认证命中；Provider 脱敏正则中的 `access_token` 保留）; `npm run lint`（0）；`npm test`（0）；`npm run build`（0） | `/api/auth` Vercel 路由返回 410，Express 只挂载 `/api/v1/auth`；文档和测试 fixture 已切换自建认证 | 旧 Supabase 账户与会话不兼容；旧 E2E 全量尚未重跑 | 2026-09-21 14:12 UTC |
 | BC-AUTH-05 | 未开始 | NOT_RUN | NOT_MET | HTTP/E2E/真实收信均未验证 | — |

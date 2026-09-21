@@ -115,3 +115,7 @@ api/            # 必要的轻量 Vercel Functions；不是常驻后端或数据
 ## 演进原则
 
 优先围绕真实变更建立抽象：当现有浏览器能力需要复用、测试或替换时抽出接口；不要预先创建没有调用者的通用框架。每次演进应保持现有 Web 行为和视觉回归可验证，并给未来 Capacitor 适配留下单一替换点。
+
+## 自建认证边界
+
+认证请求统一使用 `/api/v1/auth`：注册、登录、会话恢复、当前会话登出、修改密码和邮箱找回密码。React 只维护用户 DTO 与内存 CSRF token，不读取 HttpOnly Cookie；PostgreSQL 是账户与密码凭据事实源，Redis 是 opaque session 存储。旧 Supabase Auth 协议和 access/refresh token Cookie 已停用。
