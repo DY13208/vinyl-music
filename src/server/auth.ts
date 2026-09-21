@@ -8,7 +8,7 @@ import nodemailer from 'nodemailer';
 type AuthRequest = IncomingMessage & { body?: unknown };
 type User = { id: string; username: string; displayName: string };
 type Session = { userId: string; csrfToken: string; sessionVersion: number; absoluteExpiresAt: number };
-type AuthConfig = { databaseUrl?: string; redisUrl?: string; origin: string; secure: boolean; smtp?: { host: string; port: number; secure: boolean; user?: string; password?: string; from: string } };
+export type AuthConfig = { databaseUrl?: string; redisUrl?: string; origin: string; secure: boolean; smtp?: { host: string; port: number; secure: boolean; user?: string; password?: string; from: string } };
 export type AuthErrorCode = 'INVALID_INPUT'|'INVALID_CREDENTIALS'|'SESSION_REQUIRED'|'ORIGIN_NOT_ALLOWED'|'CSRF_INVALID'|'USERNAME_TAKEN'|'EMAIL_TAKEN'|'INVALID_RESET_TOKEN'|'SERVICE_UNAVAILABLE';
 class AuthError extends Error { constructor(public status: number, public code: AuthErrorCode, message: string) { super(message); } }
 
@@ -37,7 +37,7 @@ export function authConfig(env = process.env): AuthConfig {
   return { databaseUrl: env.DATABASE_URL, redisUrl: env.REDIS_URL, origin: parsed.origin, secure, smtp };
 }
 
-function productionDependencies(config: AuthConfig): AuthDependencies {
+export function createAuthDependencies(config: AuthConfig): AuthDependencies {
   if (!config.databaseUrl || !config.redisUrl) throw new AuthError(503, 'SERVICE_UNAVAILABLE', '账户服务尚未配置，请联系站点管理员');
   const pool = new Pool({ connectionString: config.databaseUrl });
   const redis = createClient({ url: config.redisUrl }) as RedisClientType;
@@ -65,7 +65,7 @@ export function createAuthHandler(getConfig = () => authConfig(), injected?: Aut
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff');
     const send = (status: number, value?: unknown) => { if (status === 204) { res.writeHead(status).end(); return; } res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }).end(JSON.stringify(value)); };
     let config: AuthConfig; let deps: AuthDependencies;
-    try { config = getConfig(); deps = injected || productionDependencies(config); } catch (error) { const e = error instanceof AuthError ? error : new AuthError(503, 'SERVICE_UNAVAILABLE', '账户服务尚未配置，请联系站点管理员'); send(e.status, { error: { code: e.code, message: e.message } }); return; }
+    try { config = getConfig(); deps = injected || createAuthDependencies(config); } catch (error) { const e = error instanceof AuthError ? error : new AuthError(503, 'SERVICE_UNAVAILABLE', '账户服务尚未配置，请联系站点管理员'); send(e.status, { error: { code: e.code, message: e.message } }); return; }
     const now = deps.now || (() => Date.now()); const hash = deps.hash || ((password: string) => argon2.hash(password, { type: argon2.argon2id })); const verify = deps.verify || ((encoded: string, password: string) => argon2.verify(encoded, password));
     let sid = '';
     try {
