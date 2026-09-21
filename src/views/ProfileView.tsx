@@ -141,7 +141,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
       {/* Profile Bio Card */}
       <div className="px-4 py-3 flex flex-col items-center text-center">
-        <ProfileIdentity email={auth?.user.email || ''} />
+        <ProfileIdentity email={auth?.user.username || ''} />
 
         {/* Core Stats: 128 张黑胶、36 位艺术家、1,024 小时播放 */}
         <div className="w-full grid grid-cols-3 gap-2 mt-4 p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">

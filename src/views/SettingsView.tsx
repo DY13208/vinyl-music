@@ -9,6 +9,7 @@ import { CollectionThemeState } from '../features/collection/themes/useCollectio
 import { PlayerThemeSelector } from '../features/player/themes/settings/PlayerThemeSelector';
 import type { PlayerThemePreference } from '../features/player/themes/usePlayerTheme';
 import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
+import { useAuth } from '../auth/AuthContext';
 
 interface SettingsViewProps {
   onImportLegacy?: (albums: Album[]) => Promise<void>;
@@ -24,6 +25,12 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlayerVisible, onFloatingPlayerVisibleChange, preferenceMessage, collectionTheme, playerTheme, homeTheme, onSelectHomeTheme, homeThemeMessage, onImportLegacy }) => {
+  const auth = useAuth();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordBusy, setPasswordBusy] = useState(false);
   const [importMessage, setImportMessage] = useState('');
   const [importing, setImporting] = useState(false);
   const importOriginal = async () => {
@@ -77,6 +84,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onBack, floatingPlay
       </header>
 
       <div className="px-4 py-4 space-y-5">
+        <section aria-label="修改密码" className="rounded-[6px] bg-[#0F0F0F] border border-[#26272D] p-3.5 space-y-3">
+          <h2 className="text-[16px] font-medium">修改密码</h2>
+          <input aria-label="当前密码" type="password" placeholder="当前密码" value={currentPassword} onChange={event => setCurrentPassword(event.target.value)} className="w-full min-h-11 rounded border border-[#343d34] bg-black px-3" />
+          <input aria-label="新密码" type="password" placeholder="新密码（至少 12 个字符）" value={newPassword} onChange={event => setNewPassword(event.target.value)} className="w-full min-h-11 rounded border border-[#343d34] bg-black px-3" />
+          <input aria-label="确认新密码" type="password" placeholder="确认新密码" value={confirmPassword} onChange={event => setConfirmPassword(event.target.value)} className="w-full min-h-11 rounded border border-[#343d34] bg-black px-3" />
+          <button type="button" disabled={passwordBusy} onClick={async () => { if (!auth || newPassword !== confirmPassword) { setPasswordMessage('两次输入的新密码不一致'); return; } setPasswordBusy(true); setPasswordMessage(''); try { await auth.changePassword(currentPassword, newPassword); setPasswordMessage('密码已更新，请重新登录'); } catch (error) { setPasswordMessage(error instanceof Error ? error.message : '修改密码失败'); } finally { setPasswordBusy(false); } }} className="min-h-11 px-4 rounded bg-[#2FE92B] text-black font-medium">{passwordBusy ? '正在保存…' : '保存密码'}</button>
+          {passwordMessage && <p role="status" className="text-[12px] text-[#BBCBB2]">{passwordMessage}</p>}
+        </section>
         <section className="rounded-[6px] bg-[#0F0F0F] border border-[#26272D] p-3.5">
           <div className="flex items-center justify-between gap-4">
             <div><h2 id="floating-player-setting" className="text-[13.5px] font-medium">显示底栏播放器</h2><p id="floating-player-setting-help" className="text-[12px] text-[#BBCBB2] mt-1">隐藏底栏播放按钮后，音乐继续播放</p></div>

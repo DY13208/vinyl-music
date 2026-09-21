@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
 import type { AuthUser } from '../platform/auth/WebAuthAdapter';
-
-export const AuthContext = createContext<{ user: AuthUser; logout: () => Promise<void> } | null>(null);
+export type AuthContextValue = { user: AuthUser; logout: () => Promise<void>; changePassword: (currentPassword: string, newPassword: string) => Promise<void> };
+export const AuthContext = createContext<AuthContextValue | null>(null);
 export const useAuth = () => useContext(AuthContext);
