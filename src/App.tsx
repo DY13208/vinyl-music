@@ -40,6 +40,7 @@ import { LandscapeView } from './views/LandscapeView';
 import { DesignBoardView } from './views/DesignBoardView';
 import { FloatingPlayer } from './components/FloatingPlayer';
 import { BottomNav } from './components/BottomNav';
+import { getQueueIndex } from './music/playback/queueNavigation';
 
 const CollectionView = lazy(() => import('./views/CollectionView').then((module) => ({ default: module.CollectionView })));
 const ImportVinylModal = lazy(() => import('./components/ImportVinylModal').then((module) => ({ default: module.ImportVinylModal })));
@@ -82,6 +83,7 @@ export default function App({ repository = collectionRepository }: { repository?
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [pendingLocalFile, setPendingLocalFile] = useState<LocalAudioSelection | null>(null);
   const previewRequestRef = useRef(0);
+  const onTrackEndedRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     let active = true;
@@ -141,6 +143,7 @@ export default function App({ repository = collectionRepository }: { repository?
             if (previewRequestRef.current !== requestId) return;
             setIsPlaying(false);
             setProgressPercent(100);
+            onTrackEndedRef.current();
           },
           onError: (message) => {
             if (previewRequestRef.current !== requestId) return;
@@ -193,21 +196,31 @@ export default function App({ repository = collectionRepository }: { repository?
     void startTrackPreview(album, track);
   };
 
-  const handlePrevTrack = () => {
-    if (!currentPlayingAlbum) return;
+  const playAdjacentTrack = (direction: 'next' | 'previous', automatic = false) => {
+    if (!currentPlayingAlbum || !currentTrack) return;
     const tracks = currentPlayingAlbum.tracks;
     const currentIdx = tracks.findIndex((t) => t.id === currentTrack?.id);
-    const prevIdx = (currentIdx - 1 + tracks.length) % tracks.length;
-    handleSelectTrack(currentPlayingAlbum, tracks[prevIdx]);
+    const targetIndex = getQueueIndex({ length: tracks.length, currentIndex: currentIdx, direction, shuffle: isShuffle, repeatMode, automatic });
+    if (targetIndex < 0) {
+      setIsPlaying(false);
+      setPlaybackMessage('本张唱片已播放完毕');
+      return;
+    }
+    void startTrackPreview(currentPlayingAlbum, tracks[targetIndex]);
   };
 
-  const handleNextTrack = () => {
-    if (!currentPlayingAlbum) return;
-    const tracks = currentPlayingAlbum.tracks;
-    const currentIdx = tracks.findIndex((t) => t.id === currentTrack?.id);
-    const nextIdx = (currentIdx + 1) % tracks.length;
-    handleSelectTrack(currentPlayingAlbum, tracks[nextIdx]);
+  const handlePrevTrack = () => {
+    if (currentTimeSec > 3) {
+      void audioEngine.seek(0);
+      setCurrentTimeSec(0);
+      setProgressPercent(0);
+      return;
+    }
+    playAdjacentTrack('previous');
   };
+
+  const handleNextTrack = () => playAdjacentTrack('next');
+  onTrackEndedRef.current = () => playAdjacentTrack('next', true);
 
   const handleSeek = (percent: number) => {
     void audioEngine.seek((percent / 100) * durationSec);

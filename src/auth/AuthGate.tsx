@@ -3,6 +3,7 @@ import { authService, type AuthResult } from '../platform/auth/WebAuthAdapter';
 import { activateAccountStorage } from '../platform/storage/accountScope';
 import { AuthContext } from './AuthContext';
 import { LoginView } from './LoginView';
+import { VinylLoadingScreen } from '../components/VinylLoadingScreen';
 
 // Import only after the server has verified the account and storage is scoped.
 const PrivateApp = lazy(() => import('../App'));
@@ -28,7 +29,7 @@ export function AuthGate() {
     });
     return () => { alive = false; unsubscribe(); };
   }, []);
-  if (!session || locked) return <main className="auth-screen"><p role="status">正在载入你的唱片空间…</p></main>;
+  if (!session || locked) return <VinylLoadingScreen />;
   if (!session.user || session.recovery) return <LoginView initialError={error} recovery={!!session.recovery} onAuthenticated={value => {
     setError(''); setSession(value); authService.notifySessionChanged();
   }} />;
@@ -39,5 +40,5 @@ export function AuthGate() {
     authService.notifySessionChanged();
     authService.reload();
   };
-  return <AuthContext.Provider value={{ user: session.user, logout }}><Suspense fallback={<main className="auth-screen"><p role="status">正在打开本机馆藏…</p></main>}><PrivateApp /></Suspense></AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user: session.user, logout }}><Suspense fallback={<VinylLoadingScreen message="正在打开本机馆藏" />}><PrivateApp /></Suspense></AuthContext.Provider>;
 }
