@@ -2,6 +2,7 @@ import { CrescentPlayer } from './themes/crescent/CrescentPlayer';
 import { HaloOrbitPlayer } from './themes/halo/HaloOrbitPlayer';
 import { NocturnePlayer } from './themes/nocturne/NocturnePlayer';
 import { ClassicPlayer } from './themes/ClassicPlayer';
+import { LuminousCardPlayer } from './themes/luminous-card/LuminousCardPlayer';
 import type { PlayerThemeDefinition, PlayerThemeId, PlayerTokens } from './PlayerTheme';
 const base:PlayerTokens={
   '--player-bg':'#101110','--player-surface':'#1a1d1a','--player-text':'#eeeade','--player-muted':'#a6afa4',
@@ -13,4 +14,5 @@ export const playerThemeRegistry:Record<PlayerThemeId,PlayerThemeDefinition>={
   halo:{id:'halo',name:'苔绿轨道',description:'深绿唱盘 · 柔和状态光',tokens:{...base,'--player-bg':'#050706','--player-accent':'#b8d6a4','--player-glow':'#85b56d2b','--player-control-bg':'#f2f3ee','--player-control-border':'#30362f','--player-vinyl':'#213329','--player-waveform':'#81b79b'},Stage:HaloOrbitPlayer},
   nocturne:{id:'nocturne',name:'午夜轨道',description:'黑胶唱盘 · 冷蓝声纹',tokens:{...base,'--player-bg':'#040506','--player-accent':'#dce6ff','--player-control-bg':'#f4f5f7','--player-control-border':'#292d35','--player-vinyl':'#050608','--player-waveform':'#4f8dff','--player-glow':'#397cff2b'},Stage:NocturnePlayer},
   classic:{id:'classic',name:'经典实体唱机',description:'原始唱盘 · 实体唱臂',tokens:{...base,'--player-bg':'#070706','--player-accent':'#f0eee5','--player-control-bg':'#f0eee8','--player-vinyl':'#090909','--player-waveform':'#bbb593'},Stage:ClassicPlayer},
+  'luminous-card':{id:'luminous-card',name:'流光卡片',description:'封面聚焦 · 清晰进度',tokens:{...base,'--player-bg':'#07110a','--player-surface':'#102217','--player-text':'#f4f7f2','--player-muted':'#a9b8ac','--player-accent':'#9fe58e','--player-glow':'#72d7652e','--player-control-bg':'#eff5ec','--player-control-border':'#33463a','--player-vinyl':'#14251a','--player-waveform':'#9fe58e'},Stage:LuminousCardPlayer},
 };

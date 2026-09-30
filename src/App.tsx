@@ -37,12 +37,11 @@ import { ProfileView } from './views/ProfileView';
 import { SettingsView } from './views/SettingsView';
 import { SplashView } from './views/SplashView';
 import { LandscapeView } from './views/LandscapeView';
-import { DesignBoardView } from './views/DesignBoardView';
+import { CollectionView } from './views/CollectionView';
 import { FloatingPlayer } from './components/FloatingPlayer';
 import { BottomNav } from './components/BottomNav';
 import { getQueueIndex } from './music/playback/queueNavigation';
 
-const CollectionView = lazy(() => import('./views/CollectionView').then((module) => ({ default: module.CollectionView })));
 const ImportVinylModal = lazy(() => import('./components/ImportVinylModal').then((module) => ({ default: module.ImportVinylModal })));
 
 export default function App({ repository = collectionRepository }: { repository?: CollectionRepository } = {}) {
@@ -176,7 +175,7 @@ export default function App({ repository = collectionRepository }: { repository?
     if (!track) { setPlaybackMessage('这张专辑没有曲目，请先补充曲目或导入本地音频'); return; }
     if (isPreviewLoading) return;
 
-    if (isPlaying) {
+    if (isPlaying && currentPlayingAlbum?.id === alb.id) {
       setIsPlaying(false);
       void audioEngine.pause();
     } else {
@@ -202,6 +201,7 @@ export default function App({ repository = collectionRepository }: { repository?
     const currentIdx = tracks.findIndex((t) => t.id === currentTrack?.id);
     const targetIndex = getQueueIndex({ length: tracks.length, currentIndex: currentIdx, direction, shuffle: isShuffle, repeatMode, automatic });
     if (targetIndex < 0) {
+      void audioEngine.pause();
       setIsPlaying(false);
       setPlaybackMessage('本张唱片已播放完毕');
       return;
@@ -332,34 +332,6 @@ export default function App({ repository = collectionRepository }: { repository?
     );
   }
 
-  // Check if Design Board Mode is active
-  if (currentScreen === 'design_board') {
-    return (
-      <div className="w-full min-h-screen bg-[#050507]">
-        {/* Top Floating Control Bar */}
-        <div className="sticky top-0 z-50 bg-[#0F0F0F]/90 backdrop-blur-md border-b border-[#26272D] px-4 py-2.5 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setCurrentScreen('home')}
-            className="px-3 py-1 rounded-[4px] bg-[#2FE92B] text-[#0F0F0F] font-bold text-[12px] flex items-center gap-1.5"
-          >
-            <span>返回交互界面</span>
-          </button>
-          <span className="text-[12px] font-mono text-white/50">
-            全套 14 张设计稿画板总览
-          </span>
-        </div>
-
-        <DesignBoardView
-          albums={ALBUMS}
-          onOpenScreen={(screen) => setCurrentScreen(screen)}
-          platform="ios"
-          onTogglePlatform={() => {}}
-        />
-      </div>
-    );
-  }
-
   // Bottom Nav is permanently visible on all standard screens (except full-screen player and splash)
   const isBottomNavVisible = currentScreen !== 'player' && currentScreen !== 'splash';
 
@@ -402,9 +374,7 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
 
           {currentScreen === 'collection' && (
-            <Suspense fallback={<div className="flex-1 bg-black" aria-label="正在打开唱片架" />}>
-              <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
-            </Suspense>
+            <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
           )}
 
           {currentScreen === 'discover' && (
@@ -490,22 +460,17 @@ export default function App({ repository = collectionRepository }: { repository?
               collectionCount={albums.length}
               artistCount={new Set(albums.map(album => album.artist)).size}
               wishlistCount={wishlist.length}
-              homeTheme={theme}
-              onSelectHomeTheme={selectTheme}
-              themeMessage={themeMessage}
               onOpenSettings={() => setCurrentScreen('settings')}
               onOpenWishlist={() => setCurrentScreen('wishlist')}
               onOpenCollection={() => {
                 setActiveTab('collection');
                 setCurrentScreen('collection');
               }}
-              onOpenDesignBoard={() => setCurrentScreen('design_board')}
-              onOpenLandscape={() => setCurrentScreen('landscape')}
             />
           )}
 
           {currentScreen === 'settings' && (
-            <SettingsView onImportLegacy={handleImportMultiple} onBack={() => setCurrentScreen('profile')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
+            <SettingsView onImportLegacy={handleImportMultiple} onBack={() => setCurrentScreen('profile')} onOpenLandscape={() => setCurrentScreen('landscape')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
           )}
 
           {currentScreen === 'player' && currentPlayingAlbum && currentTrack && (

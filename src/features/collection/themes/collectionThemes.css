@@ -151,7 +151,7 @@
   #mobile-viewport[data-collection-theme] .ct-heading { flex-basis: 46px; height: 46px; }
   #mobile-viewport[data-collection-theme] .collection-room__actions { gap: 7px; }
   #mobile-viewport[data-collection-theme] .collection-room__filters { padding: 0; }
-  [data-collection-theme] .browse-modes button { gap: 5px; padding-inline: 10px; }
+  [data-collection-theme] .browse-mode-switch .rare-gooey-nav button { gap: 5px; padding-inline: 10px; }
   [data-collection-theme] .browse-total { display: none; }
   .ct-card__open { padding-top: 6px; }
   .ct-default { container-type: size; padding: 6px 4px 8px; }

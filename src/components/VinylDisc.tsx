@@ -23,6 +23,7 @@ interface VinylDiscProps {
   type?: VinylType;
   texture?: string;
   side?: string;
+  showSideLabel?: boolean;
   rpm?: string;
   transitionPhase?: SideTransitionPhase;
 }
@@ -31,7 +32,7 @@ export const VinylDisc: React.FC<VinylDiscProps> = ({
   coverUrl, albumTitle, artistName, isPlaying = false, rotating, size = 256,
   className = '', showAmbientGlow = false, labelColor = '#e4decf', labelImage, labelText,
   vinylVariant = 'black', vinylColors = [], type = vinylVariant, texture,
-  side = 'A', rpm = '33 ⅓ RPM', transitionPhase = 'idle',
+  side = 'A', showSideLabel = true, rpm = '33 ⅓ RPM', transitionPhase = 'idle',
 }) => {
   const material = resolveTexture(type, texture, vinylColors[0]);
 
@@ -46,7 +47,7 @@ export const VinylDisc: React.FC<VinylDiscProps> = ({
         <div className="vinyl-disc__label" style={{ backgroundColor: labelColor }} translate="no">
           {labelImage && <ArtworkImage src={labelImage} alt="" draggable={false} className="vinyl-disc__label-image" />}
           <span className="vinyl-disc__label-title">{labelText || albumTitle}</span>
-          <strong className="vinyl-disc__side">{side}</strong>
+          {showSideLabel && <strong className="vinyl-disc__side">{side}</strong>}
           <span className="vinyl-disc__rpm">{rpm} · STEREO</span>
           <span className="vinyl-disc__artist">{artistName}</span>
         </div>

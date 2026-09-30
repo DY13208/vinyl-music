@@ -111,7 +111,6 @@ export type ScreenId =
   | 'wishlist'
   | 'settings'
   | 'splash'
-  | 'landscape'
-  | 'design_board';
+  | 'landscape';
 
 export type DevicePlatform = 'ios' | 'android';

@@ -1,24 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { ProfileIdentity } from '../components/ProfileIdentity';
 import {
   Heart,
-  Clock,
   Bookmark,
-  ListMusic,
-  Download,
-  BarChart3,
   Settings as SettingsIcon,
   ChevronRight,
   Disc,
-  ShieldCheck,
-  LayoutTemplate,
-  RotateCw,
-  Palette,
-  Check,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
-import { HOME_THEMES, HomeTheme } from '../hooks/useHomeTheme';
+import { AnimatedCounter } from '../components/rare-ui/AnimatedCounter';
 
 interface ProfileViewProps {
   collectionCount?: number;
@@ -27,35 +18,17 @@ interface ProfileViewProps {
   onOpenSettings: () => void;
   onOpenWishlist: () => void;
   onOpenCollection: () => void;
-  onOpenDesignBoard?: () => void;
-  onOpenLandscape?: () => void;
-  homeTheme: HomeTheme;
-  onSelectHomeTheme: (theme: HomeTheme) => void;
-  themeMessage: string;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   onOpenSettings,
   onOpenWishlist,
   onOpenCollection,
-  onOpenDesignBoard,
-  onOpenLandscape,
-  homeTheme,
-  onSelectHomeTheme,
-  themeMessage,
   collectionCount = 0,
   artistCount = 0,
   wishlistCount = 0,
 }) => {
   const auth = useAuth();
-  const [logoutError, setLogoutError] = useState('');
-  const [loggingOut, setLoggingOut] = useState(false);
-  const logout = async () => {
-    if (!auth) return;
-    setLoggingOut(true); setLogoutError('');
-    try { await auth.logout(); }
-    catch { setLogoutError('退出失败，请检查网络后重试'); setLoggingOut(false); }
-  };
   const menuItems = [
     {
       id: 'collection',
@@ -65,56 +38,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       badge: String(collectionCount),
     },
     {
-      id: 'history',
-      label: '最近播放',
-      icon: <Clock className="w-4 h-4 text-white/70" />,
-      action: onOpenCollection,
-    },
-    {
       id: 'wishlist',
       label: '愿望单',
       icon: <Bookmark className="w-4 h-4 text-[#FF9821]" />,
       action: onOpenWishlist,
       badge: String(wishlistCount),
-    },
-    {
-      id: 'playlists',
-      label: '播放列表',
-      icon: <ListMusic className="w-4 h-4 text-white/70" />,
-      action: () => {},
-    },
-    {
-      id: 'downloads',
-      label: '下载管理 (离线母带缓存)',
-      icon: <Download className="w-4 h-4 text-white/70" />,
-      action: () => {},
-      detail: '本机文件',
-    },
-    {
-      id: 'stats',
-      label: '播放统计 · 声音年鉴',
-      icon: <BarChart3 className="w-4 h-4 text-[#2FE92B]" />,
-      action: () => {},
-    },
-    {
-      id: 'landscape',
-      label: '唱片展台横屏模式',
-      icon: <RotateCw className="w-4 h-4 text-[#2FE92B]" />,
-      action: () => onOpenLandscape && onOpenLandscape(),
-      detail: '展台视角',
-    },
-    {
-      id: 'design_board',
-      label: '全套 14 界面设计稿画板',
-      icon: <LayoutTemplate className="w-4 h-4 text-[#2FE92B]" />,
-      action: () => onOpenDesignBoard && onOpenDesignBoard(),
-      detail: '设计规范',
-    },
-    {
-      id: 'settings',
-      label: '设置',
-      icon: <SettingsIcon className="w-4 h-4 text-white/70" />,
-      action: onOpenSettings,
     },
   ];
 
@@ -146,15 +74,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         {/* Core Stats: 128 张黑胶、36 位艺术家、1,024 小时播放 */}
         <div className="w-full grid grid-cols-3 gap-2 mt-4 p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">
           <div className="flex flex-col items-center">
-            <span className="text-[18px] font-black text-white font-mono">{collectionCount}</span>
+            <AnimatedCounter value={collectionCount} className="text-[18px] font-black text-white font-mono" />
             <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">张黑胶</span>
           </div>
           <div className="flex flex-col items-center border-x border-[#1F2024]">
-            <span className="text-[18px] font-black text-white font-mono">{artistCount}</span>
+            <AnimatedCounter value={artistCount} className="text-[18px] font-black text-white font-mono" />
             <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">位艺术家</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-[18px] font-black text-[#2FE92B] font-mono">{wishlistCount}</span>
+            <AnimatedCounter value={wishlistCount} className="text-[18px] font-black text-[#2FE92B] font-mono" />
             <span className="text-[10.5px] text-[#BBCBB2] opacity-75 mt-0.5">愿望唱片</span>
           </div>
         </div>
@@ -187,48 +115,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   {item.badge}
                 </span>
               )}
-              {item.detail && (
-                <span className="text-[11px] text-white/40 font-mono">
-                  {item.detail}
-                </span>
-              )}
               <ChevronRight className="w-4 h-4 text-white/30 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </div>
         ))}
       </div>
 
-      <section className="px-4 mt-5" aria-labelledby="home-theme-heading">
-        <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D]">
-          <div className="flex items-center gap-2 mb-3">
-            <Palette className="w-4 h-4 text-[#2FE92B]" />
-            <h3 id="home-theme-heading" className="text-[13.5px] font-medium text-white">首页陈列样式</h3>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {HOME_THEMES.map(item => <button key={item.id} type="button" aria-pressed={homeTheme === item.id} onClick={() => onSelectHomeTheme(item.id)} className={`min-h-11 px-3 rounded-[6px] border flex items-center justify-between text-left transition-colors ${homeTheme === item.id ? 'border-[#2FE92B] bg-[#162316] text-white' : 'border-[#26272D] bg-[#1B1B1D] text-white/60'}`}>
-              <span><strong className="block text-[12px] font-medium">{item.name}</strong><small className="block text-[9px] mt-0.5 opacity-60">{item.detail.split(' · ')[0]}</small></span>
-              {homeTheme === item.id && <Check className="w-3.5 h-3.5 text-[#2FE92B]" />}
-            </button>)}
-          </div>
-          {themeMessage && <p className="text-[10px] text-[#FF9821] mt-2" role="status">{themeMessage}</p>}
-        </div>
-      </section>
-
-      {auth && <div className="px-4 mt-5">
-        <button type="button" disabled={loggingOut} onClick={logout} className="w-full min-h-11 rounded-md border border-[#3A3B42] text-[14px] text-white">{loggingOut ? '正在退出…' : '退出登录'}</button>
-        <p className="text-[12px] text-[#BBCBB2] mt-2">退出后隐藏本账户馆藏，本机数据会保留。</p>
-        {logoutError && <p role="alert" className="text-[12px] text-[#ffc6b8] mt-2">{logoutError}</p>}
-      </div>}
-      {/* Equipment Badge */}
-      <div className="px-4 mt-5">
-        <div className="p-3 rounded-[6px] bg-[#0F0F0F] border border-[#26272D] flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5 text-[#2FE92B] flex-shrink-0" />
-          <div>
-            <p className="text-[12px] font-medium text-white">唱片鉴真与成色认证</p>
-            <p className="text-[10px] text-[#BBCBB2] opacity-60">Goldmine 唱片品相分级系统已接入</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

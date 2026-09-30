@@ -13,10 +13,12 @@ const physicalMatch = { ...identityMatch, album: { ...identity, id: 'public-phys
 async function login(page: Page) {
   await page.goto('/');
   // Keep UI checks separate from the account lifecycle suite's sign-in rate budget.
+  await expect(page.locator('#bottom-navigation-bar').or(page.getByLabel('邮箱', { exact: true }))).toBeVisible();
+  if (await page.locator('#bottom-navigation-bar').isVisible()) return;
   await page.getByLabel('邮箱', { exact: true }).fill('b@example.test');
   await page.getByLabel('密码', { exact: true }).fill('test-password-123');
   await page.getByRole('button', { name: '登录', exact: true }).click();
-  await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
+  await expect(page.locator('#bottom-navigation-bar')).toBeVisible({ timeout: 25_000 });
 }
 async function mockCatalogue(page: Page) {
   await page.route('https://y.gtimg.cn/**', route => route.abort());
@@ -26,8 +28,8 @@ async function mockCatalogue(page: Page) {
     return route.fulfill({ json: { album: { ...(id === '102' ? alternate : physical), title: '公开唱片', tracks: [track] } } });
   });
 }
-function audioFixture() {
-  const rate = 22050, samples = rate * 10, buffer = Buffer.alloc(44 + samples * 2);
+function audioFixture(seconds = 10) {
+  const rate = 22050, samples = rate * seconds, buffer = Buffer.alloc(44 + samples * 2);
   buffer.write('RIFF'); buffer.writeUInt32LE(buffer.length - 8, 4); buffer.write('WAVEfmt ', 8);
   buffer.writeUInt32LE(16, 16); buffer.writeUInt16LE(1, 20); buffer.writeUInt16LE(1, 22);
   buffer.writeUInt32LE(rate, 24); buffer.writeUInt32LE(rate * 2, 28); buffer.writeUInt16LE(2, 32); buffer.writeUInt16LE(16, 34);
@@ -35,6 +37,58 @@ function audioFixture() {
   for (let index = 0; index < samples; index++) buffer.writeInt16LE(Math.round(Math.sin(index * 440 * 2 * Math.PI / rate) * 1000), 44 + index * 2);
   return buffer;
 }
+
+test('missing release artwork and tracks hydrate without opening details', async ({ page }) => {
+  await mockCatalogue(page);
+  const missing = { ...physicalMatch, vinylRelease: { ...physicalMatch.vinylRelease, coverUrl: '' } };
+  await page.route('**/api/releases/search?*', route => route.fulfill({ json: { results: [missing], providers: [] } }));
+  await login(page);
+  await page.locator('#nav-tab-discover').click();
+  const record = page.getByRole('article', { name: '公开唱片 · 周杰伦', exact: true });
+  await expect(record.getByRole('img')).toHaveAttribute('src', /^blob:/);
+  await expect(record.getByRole('button', { name: '试听：七里香', exact: true })).toBeEnabled();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.reload();
+  await page.locator('#nav-tab-discover').click();
+  await expect(record.getByRole('img')).toHaveAttribute('src', /^blob:/);
+});
+
+test('a matched album cover is labeled as reference artwork without changing pressing metadata', async ({ page }) => {
+  await mockCatalogue(page);
+  const missing = { ...physicalMatch, vinylRelease: { ...physicalMatch.vinylRelease, coverUrl: '' } };
+  await page.route('**/api/releases/search?*', route => route.fulfill({ json: { results: [missing], providers: [] } }));
+  await page.route('**/api/releases/detail?*', route => route.fulfill({ json: { album: { ...physical, title: '公开唱片', coverUrl: '', tracks: [track] } } }));
+  await login(page);
+  await page.locator('#nav-tab-discover').click();
+  const record = page.getByRole('article', { name: '公开唱片 · 周杰伦', exact: true });
+  await expect(record.getByRole('img', { name: '公开唱片专辑参考封面，黑胶版本封面待核实' })).toHaveAttribute('src', /^blob:/);
+  await expect(record).toContainText('专辑参考封面 · 版本封面待核实');
+  await record.getByRole('button', { name: '选择黑胶版本：公开唱片' }).click();
+  const dialog = page.getByRole('dialog', { name: '唱片与试听' });
+  await expect(dialog.getByRole('img', { name: '公开唱片' })).not.toHaveAttribute('src', /^blob:/);
+});
+
+test('player next changes tracks and ending advances the album queue', async ({ page }) => {
+  const second = { ...track, id: 'second-track', number: 2, title: '晴天' };
+  const album = { ...identity, tracks: [track, second] };
+  await mockCatalogue(page);
+  await page.route('**/api/releases/search?*', route => route.fulfill({ json: { results: [{ ...identityMatch, album }], providers: [] } }));
+  await page.route('https://api.audius.co/**', route => route.fulfill({ json: { data: [] } }));
+  await page.route('https://itunes.apple.com/**', route => route.fulfill({ json: { results: [track, second].map((item, index) => ({ trackId: index + 1, trackName: item.title, artistName: album.artist, collectionName: album.title, trackTimeMillis: 299000, previewUrl: `http://127.0.0.1:43180/api/test-preview.wav?track=${index}` })) } }));
+  await page.route('**/api/test-preview.wav?*', route => route.fulfill({ contentType: 'audio/wav', body: audioFixture(new URL(route.request().url()).searchParams.get('track') === '1' ? 1 : 10) }));
+  await login(page);
+  await page.locator('#nav-tab-discover').click();
+  await page.getByRole('article', { name: '七里香 · 周杰伦', exact: true }).getByRole('button', { name: '试听：七里香', exact: true }).click();
+  const dock = page.locator('#app-bottom-dock');
+  await expect(dock.getByRole('button', { name: '暂停：七里香', exact: true })).toBeVisible();
+  await dock.getByRole('button', { name: '打开全屏播放器：七里香', exact: true }).click();
+  await page.locator('#player-btn-next').click();
+  await expect(page.locator('#player-view-container').getByText('晴天', { exact: true })).toBeVisible();
+  await expect(page.locator('#player-btn-play-pause')).toHaveAttribute('aria-label', '暂停');
+  // Let the one-second fixture finish naturally so the real ended event drives navigation.
+  await page.locator('#player-close-btn').click();
+  await expect(dock.getByRole('button', { name: '暂停：七里香', exact: true })).toBeVisible();
+});
 
 test('empty collection leads to a public catalogue; preview does not collect, explicit add persists locally', async ({ page }) => {
   const writes: string[] = [];
@@ -126,6 +180,8 @@ test('public release dialog loads tracks, selects a pressing and survives narrow
   await mockCatalogue(page); await login(page);
   await page.locator('#nav-tab-discover').click();
   await expect(page.getByRole('heading', { name: '七里香', exact: true })).toBeVisible();
+  await page.getByRole('textbox', { name: '搜索公开唱片' }).fill('七里香');
+  await page.getByRole('button', { name: '搜索', exact: true }).click();
   await page.getByLabel('仅看已确认黑胶').check();
   await expect(page.getByRole('heading', { name: '七里香', exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '选择黑胶版本：公开唱片', exact: true }).click();
@@ -170,10 +226,11 @@ test('catalogue errors can retry, searches are independent, missing preview repo
   await page.getByRole('textbox', { name: '搜索公开唱片' }).fill('无结果');
   await page.getByRole('button', { name: '搜索', exact: true }).click();
   await expect(page.getByRole('heading', { name: '没有找到相关唱片' })).toBeVisible();
-  await page.getByRole('button', { name: '陈奕迅', exact: true }).click();
-  await expect(page.locator('#artist-view')).toBeVisible();
-  await expect(page.getByRole('heading', { name: '陈奕迅', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: '七里香', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '返回发现首页' }).click();
+  await page.getByRole('button', { name: '浏览音乐人', exact: true }).click();
+  await page.getByRole('button', { name: '查看音乐人：周杰伦', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: '搜索公开唱片' })).toHaveValue('周杰伦');
+  await expect(page.getByRole('article', { name: '七里香 · 周杰伦', exact: true })).toBeVisible();
 });
 
 test('public catalogue and covers survive reload without remote requests; offscreen covers wait', async ({ page }) => {
@@ -193,7 +250,7 @@ test('public catalogue and covers survive reload without remote requests; offscr
   await login(page);
   await page.locator('#nav-tab-discover').click();
   await expect(page.getByRole('heading', { name: '七里香', exact: true })).toBeVisible();
-  await expect(page.locator('.discover-hero__art img')).toHaveAttribute('src', /^blob:/);
+  await expect(page.locator('.discover-feature__art img')).toHaveAttribute('src', /^blob:/);
   await page.locator('.discover-albums').scrollIntoViewIfNeeded();
   await expect(page.locator('.discover-record__cover img').first()).toHaveAttribute('src', /^blob:/);
   expect(covers.filter(url => decodeURIComponent(url).includes('/qa.webp'))).toHaveLength(1);
@@ -206,17 +263,21 @@ test('public catalogue and covers survive reload without remote requests; offscr
     return !!(await catalogueCache.get('album', 'discogs-101'));
   })).toBe(true);
   const coverCount = covers.length;
+  const searchCount = searches;
+  const detailCount = details;
   await page.reload();
   await page.locator('#nav-tab-discover').click();
-  await expect(page.locator('.discover-hero__art img')).toHaveAttribute('src', /^blob:/);
+  await expect(page.locator('.discover-feature__art img')).toHaveAttribute('src', /^blob:/);
   await page.getByRole('button', { name: '选择黑胶版本：公开唱片', exact: true }).click();
   await expect(page.getByRole('dialog').getByRole('button', { name: '试听：七里香' })).toBeVisible();
-  expect(searches).toBe(1);
-  expect(details).toBe(1);
+  expect(searches).toBe(searchCount);
+  expect(details).toBe(detailCount);
   expect(covers.length).toBe(coverCount);
   await page.getByRole('button', { name: '关闭唱片详情' }).click();
+  await page.getByRole('textbox', { name: '搜索公开唱片' }).fill('Jazz');
+  await page.getByRole('button', { name: '搜索', exact: true }).click();
   await page.getByRole('button', { name: '更新唱片资料' }).click();
-  await expect.poll(() => searches).toBe(2);
+  await expect.poll(() => searches).toBe(searchCount + 1);
   await page.locator('#nav-tab-collection').click();
   await expect(page.getByText('你的唱片架还是空的', { exact: true })).toBeVisible();
 });

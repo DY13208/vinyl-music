@@ -57,7 +57,9 @@ body {
     radial-gradient(circle at 50% 50%, #111 0 37%, #090909 37.5% 67%, #161616 68% 70%, #070707 71% 100%);
   border: 1px solid rgba(255, 255, 255, .08);
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .78), 0 28px 54px rgba(0, 0, 0, .58);
-  animation: vinyl-loading-spin 19s linear infinite;
+  animation:
+    vinyl-loading-arrive .68s cubic-bezier(.16, 1, .3, 1) both,
+    vinyl-loading-spin 16s .68s linear infinite;
   will-change: transform;
 }
 
@@ -100,24 +102,153 @@ body {
   filter: blur(13px);
 }
 
+.vinyl-loading-stage {
+  animation: vinyl-loading-stage-in .58s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.vinyl-loading-pulse {
+  border: 1px solid rgba(47, 233, 43, .5);
+  opacity: 0;
+  animation: vinyl-loading-groove-pulse .8s .64s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.vinyl-loading-tonearm {
+  z-index: 5;
+  right: -8%;
+  top: -7%;
+  width: 47%;
+  height: 68%;
+  transform-origin: 86% 13%;
+  transform: rotate(-18deg);
+  animation: vinyl-loading-needle-drop .72s .16s cubic-bezier(.22, 1, .36, 1) both;
+  filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .7));
+}
+
+.vinyl-loading-tonearm__pivot {
+  position: absolute;
+  right: 1%;
+  top: 1%;
+  width: 28%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #8b8d86 0 8%, #3c3e3a 28%, #161715 69%, #080908 72%);
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: inset 0 0 0 5px rgba(0, 0, 0, .28), 0 6px 16px rgba(0, 0, 0, .58);
+}
+
+.vinyl-loading-tonearm__tube {
+  position: absolute;
+  right: 17%;
+  top: 14%;
+  width: 9px;
+  height: 68%;
+  border-radius: 999px;
+  transform: rotate(21deg);
+  transform-origin: 50% 0;
+  background: linear-gradient(90deg, #5d605a 0, #e4e5df 34%, #777a73 61%, #272926 100%);
+  box-shadow: 1px 2px 5px rgba(0, 0, 0, .58);
+}
+
+.vinyl-loading-tonearm__head {
+  position: absolute;
+  left: 17%;
+  bottom: 3%;
+  width: 31%;
+  height: 11%;
+  border-radius: 2px 5px 5px 2px;
+  transform: rotate(13deg);
+  background: linear-gradient(180deg, #393b37, #121311);
+  border: 1px solid rgba(255, 255, 255, .15);
+}
+
+.vinyl-loading-tonearm__stylus {
+  position: absolute;
+  left: 18%;
+  bottom: 0;
+  width: 2px;
+  height: 7%;
+  transform: rotate(10deg);
+  background: #dfe2da;
+  box-shadow: 0 0 7px rgba(47, 233, 43, .74);
+}
+
 .vinyl-loading-shadow {
   background: rgba(0, 0, 0, .64);
   filter: blur(22px);
 }
 
-.vinyl-loading-dot {
-  opacity: .32;
-  animation: vinyl-loading-dot 1.8s ease-in-out infinite;
-  transform-origin: center;
+.vinyl-loading-content > .space-y-2\.5 {
+  animation: vinyl-loading-copy-in .55s .46s cubic-bezier(.16, 1, .3, 1) both;
 }
-.vinyl-loading-dot:nth-child(2) { animation-delay: .22s; }
-.vinyl-loading-dot:nth-child(3) { animation-delay: .44s; }
+
+.vinyl-loading-progress > span {
+  animation: vinyl-loading-progress 1.35s .72s cubic-bezier(.65, 0, .35, 1) infinite;
+}
 
 @keyframes vinyl-loading-spin { to { transform: rotate(360deg); } }
-@keyframes vinyl-loading-dot {
-  0%, 55%, 100% { opacity: .28; transform: scale(.78); }
-  25% { opacity: .96; transform: scale(1); }
+@keyframes vinyl-loading-stage-in { from { opacity: 0; transform: translateY(18px) scale(.93); } }
+@keyframes vinyl-loading-arrive { from { transform: rotate(-12deg) scale(.9); } to { transform: rotate(0) scale(1); } }
+@keyframes vinyl-loading-needle-drop { from { opacity: 0; transform: rotate(-42deg); } to { opacity: 1; transform: rotate(-18deg); } }
+@keyframes vinyl-loading-groove-pulse { 0% { opacity: 0; transform: scale(.72); } 18% { opacity: .48; } 100% { opacity: 0; transform: scale(1.18); } }
+@keyframes vinyl-loading-copy-in { from { opacity: 0; transform: translateY(8px); filter: blur(5px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes vinyl-loading-progress { 0% { transform: translateX(-180%); } 56%, 100% { transform: translateX(250%); } }
+
+/* Launch composition: one photographic object, revealed like a listening-room light coming on. */
+.vinyl-loading-visual {
+  animation: vinyl-loading-photo-in .9s cubic-bezier(.16, 1, .3, 1) both;
+  background: #080807;
 }
+
+.vinyl-loading-visual > img {
+  transform: scale(1.025);
+  filter: saturate(.82) contrast(1.04) brightness(.88);
+  animation: vinyl-loading-photo-settle 1.15s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.vinyl-loading-light-sweep {
+  background: linear-gradient(112deg, transparent 26%, rgba(255, 255, 255, .13) 40%, rgba(255, 255, 255, .025) 47%, transparent 58%);
+  mix-blend-mode: screen;
+  transform: translateX(-110%);
+  animation: vinyl-loading-light-sweep 1.15s .18s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.vinyl-loading-vignette {
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, .16) 0%, transparent 22%, transparent 61%, rgba(4, 4, 3, .5) 76%, #080807 100%),
+    radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, .22) 100%);
+}
+
+.vinyl-loading-brand {
+  color: rgba(244, 245, 240, .78);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .24em;
+  animation: vinyl-loading-brand-in .5s .42s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.vinyl-loading-brand__mark {
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(255, 255, 255, .55);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .72), inset 0 0 0 4px #557f43;
+}
+
+.vinyl-loading-copy {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .75);
+  animation: vinyl-loading-copy-in .55s .5s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes vinyl-loading-photo-in {
+  from { opacity: 0; clip-path: inset(14% 0 14% 0); }
+  to { opacity: 1; clip-path: inset(0); }
+}
+@keyframes vinyl-loading-photo-settle {
+  from { transform: scale(1.08); filter: saturate(.62) contrast(1.08) brightness(.5); }
+  to { transform: scale(1.025); filter: saturate(.82) contrast(1.04) brightness(.88); }
+}
+@keyframes vinyl-loading-light-sweep { to { transform: translateX(115%); } }
+@keyframes vinyl-loading-brand-in { from { opacity: 0; transform: translateY(-5px); } }
 
 @media (max-height: 640px) {
   .vinyl-loading-screen section { transform: translateY(0); }
@@ -125,9 +256,19 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vinyl-loading-record { animation: none; }
-  .vinyl-loading-dot { animation: none; opacity: .64; transform: none; }
-  .vinyl-loading-dot:nth-child(2) { opacity: 1; }
+  .vinyl-loading-stage,
+  .vinyl-loading-record,
+  .vinyl-loading-pulse,
+  .vinyl-loading-tonearm,
+  .vinyl-loading-content > .space-y-2\.5,
+  .vinyl-loading-progress > span { animation: none; }
+  .vinyl-loading-pulse { display: none; }
+  .vinyl-loading-visual,
+  .vinyl-loading-visual > img,
+  .vinyl-loading-light-sweep,
+  .vinyl-loading-brand,
+  .vinyl-loading-copy { animation: none; }
+  .vinyl-loading-light-sweep { display: none; }
 }
 
 /* Home: a restrained, single-purpose vinyl browsing surface. */

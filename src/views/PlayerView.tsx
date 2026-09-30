@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ArtworkImage } from '../components/ArtworkImage';
 import { Album, Track, VinylSide } from '../types';
 import { PlayerThemeRenderer } from '../features/player/themes/PlayerThemeRenderer';
@@ -14,22 +14,17 @@ import '../features/player/themes/themes/crescent/crescentPlayer.css';
 import { LyricsView } from '../components/LyricsView';
 import { SideFlipAnimation } from '../components/SideFlipAnimation';
 import { usePlayerSideState } from '../hooks/usePlayerSideState';
+import { getAlbumDiscs } from '../utils/vinylSides';
 import {
   ChevronDown,
   Heart,
   Palette,
-  Play,
-  Volume2,
   FileText,
   ListMusic,
-  Sliders,
-  Speaker,
-  Sparkles,
   Disc,
-  Maximize2,
-  MoreHorizontal,
-  Shuffle,
-  Repeat,
+  Link2,
+  RefreshCw,
+  Upload,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
@@ -81,19 +76,51 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   onImportLocalSource,
   localImportPending,
 }) => {
-  const [activeBottomModal, setActiveBottomModal] = useState<'none' | 'more' | 'lyrics' | 'queue' | 'output' | 'quality'>('none');
+  const [activePanel, setActivePanel] = useState<'none' | 'queue' | 'source'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
-  const [isCrackleEnabled, setIsCrackleEnabled] = useState(true);
   const themeDialog = useRef<HTMLDialogElement>(null);
   
   // 翻面状态管理
-  const sideState = usePlayerSideState(album);
+  const playerAlbum = useMemo(() => ({ ...album, discs: getAlbumDiscs(album) }), [album]);
+  const sideState = usePlayerSideState(playerAlbum);
   const [isFlipping, setIsFlipping] = useState(false);
   const [touchStartX, setTouchStartX] = useState(0);
+  const sourceProvider = playbackSource?.provider === 'apple-music'
+    ? 'Apple Music'
+    : playbackSource?.provider === 'audius'
+      ? 'Audius'
+      : playbackSource?.provider === 'local'
+        ? '本地音频'
+        : playbackSource?.provider === 'jamendo'
+          ? 'Jamendo'
+          : '未连接';
+  const sourceNeedsAttention = (!playbackSource && !isPreviewLoading) || localImportPending;
 
   // 获取当前面信息
   const currentVinylSide = sideState.getCurrentVinylSide();
   const availableSides = sideState.getAvailableSides();
+
+  useEffect(() => {
+    const matchingDisc = playerAlbum.discs?.find(disc =>
+      disc.sides.some(side => side.tracks.some(track => track.id === currentTrack.id)),
+    );
+    const matchingSide = matchingDisc?.sides.find(side =>
+      side.tracks.some(track => track.id === currentTrack.id),
+    );
+    if (matchingDisc && matchingSide &&
+        (sideState.currentDisc !== matchingDisc.disc || sideState.currentSide !== matchingSide.side)) {
+      sideState.switchToSide(matchingDisc.disc, matchingSide.side);
+    }
+  }, [currentTrack.id, playerAlbum, sideState.currentDisc, sideState.currentSide, sideState.switchToSide]);
+
+  useEffect(() => {
+    if (activePanel === 'none') return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setActivePanel('none');
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [activePanel]);
 
   /**
    * 处理翻面动画
@@ -106,6 +133,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     
     setTimeout(() => {
       sideState.switchToSide(disc, side);
+      const nextSide = playerAlbum.discs?.find(item => item.disc === disc)?.sides.find(item => item.side === side);
+      if (nextSide?.tracks[0]) onSelectTrack(nextSide.tracks[0]);
       setIsFlipping(false);
     }, 200); // 动画时长
   };
@@ -185,13 +214,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     );
   };
 
-  /**
-   * 获取当前面的曲目
-   */
-  const getCurrentSideTracks = (): Track[] => {
-    return currentVinylSide?.tracks ?? album.tracks;
-  };
-
   return (
     <div
       id="player-view-container"
@@ -208,6 +230,25 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         >
           <ChevronDown className="w-5 h-5" />
         </button>
+
+        {availableSides.length > 1 && (
+          <div className="player-side-controls player-side-controls--header">
+            <div className="player-side-pill" role="group" aria-label="选择唱片面">
+              {availableSides.slice(0, 2).map((side, index) => (
+                <button
+                  key={side.side}
+                  type="button"
+                  onClick={() => handleFlipSide(sideState.currentDisc, side.side)}
+                  disabled={isFlipping}
+                  className={`player-side-pill__option ${sideState.currentSide === side.side ? 'is-active' : ''}`}
+                  title={`切换到 ${index === 0 ? 'A' : 'B'} 面`}
+                >
+                  {index === 0 ? 'A' : 'B'}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {themePreference.themeId === 'crescent' ? <span className="crescent-header-spacer" aria-hidden="true" /> : <div className="full-player__brand" aria-hidden="true">
           <strong>ORBIT</strong>
@@ -245,53 +286,36 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         </div>
 
         <div className="pt-header-actions">
-        <button type="button" className="full-player__quiet-button" title="播放器样式" aria-label="播放器样式" onClick={() => themeDialog.current?.showModal()}><Palette size={18}/></button>
-         {/* Vinyl Surface Noise / Crackle Audio Switch */}
-         <button
-           id="player-crackle-toggle"
-           type="button"
-           onClick={() => {
-             setIsCrackleEnabled(!isCrackleEnabled);
-             hapticsService.triggerHaptic('light');
-           }}
-           className="full-player__quiet-button"
-           aria-pressed={isCrackleEnabled}
-           title="实体唱针底噪模拟"
-         >
-           <Volume2 className="w-4 h-4" />
-         </button>
+          <button type="button" className="full-player__quiet-button pt-source-button" title="音源与来源" aria-label={`音源与来源：${sourceNeedsAttention ? '需要处理' : playbackSource ? '已连接' : '正在匹配'}`} aria-controls="player-source-panel" aria-expanded={activePanel === 'source'} data-attention={sourceNeedsAttention || undefined} onClick={() => setActivePanel(activePanel === 'source' ? 'none' : 'source')}><Link2 size={18}/><span aria-hidden="true" /></button>
+          <button type="button" className="full-player__quiet-button" title="播放队列" aria-label="播放队列" aria-expanded={activePanel === 'queue'} onClick={() => setActivePanel(activePanel === 'queue' ? 'none' : 'queue')}><ListMusic size={18}/></button>
+          <button type="button" className="full-player__quiet-button" title="播放器样式" aria-label="播放器样式" onClick={() => themeDialog.current?.showModal()}><Palette size={18}/></button>
         </div>
-        <button type="button" className="full-player__more-button" aria-label="更多播放操作" aria-expanded={activeBottomModal !== 'none'} onClick={() => setActiveBottomModal(activeBottomModal === 'more' ? 'none' : 'more')}><MoreHorizontal size={18}/></button>
       </header>
+
+      {activePanel === 'source' && (
+        <section id="player-source-panel" className="player-source-panel" role="dialog" aria-labelledby="player-source-title">
+          <header>
+            <div>
+              <h2 id="player-source-title">音源与来源</h2>
+              <p>{isPreviewLoading ? '正在匹配音源' : playbackSource ? '当前歌曲已连接' : '当前歌曲需要补充音源'}</p>
+            </div>
+            <button type="button" onClick={() => setActivePanel('none')}>完成</button>
+          </header>
+          <dl>
+            <div><dt>来源</dt><dd>{sourceProvider}{playbackSource ? ` · ${playbackSource.previewOnly ? '试听片段' : '完整音源'}` : ''}</dd></div>
+            {playbackSource?.metadata.filename && <div><dt>文件</dt><dd>{playbackSource.metadata.filename}</dd></div>}
+          </dl>
+          {playbackMessage && <p className="player-source-panel__message" role="status">{playbackMessage}</p>}
+          <footer>
+            {!playbackSource && !isPreviewLoading && <button type="button" onClick={onTogglePlay}><RefreshCw/>重新匹配</button>}
+            {playbackSource?.metadata.storeUrl && <a href={playbackSource.metadata.storeUrl} target="_blank" rel="noreferrer">查看来源</a>}
+            <button type="button" className="is-primary" onClick={onImportLocalSource} disabled={isPreviewLoading}><Upload/>{localImportPending ? '确认绑定' : playbackSource ? '更换音源' : '添加音源'}</button>
+          </footer>
+        </section>
+      )}
 
       {/* Main Stage: Turntable Mode OR Synchronized Lyrics Mode */}
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
-        {/* 翻面控制区 - 仅在有多面时显示 */}
-        {availableSides.length > 1 && (
-          <div className="player-side-controls">
-            {/* 当前面状态指示 */}
-            <div className="player-side-pill" role="group" aria-label="选择唱片面">
-              {availableSides.slice(0, 2).map((side, index) => (
-                    <button
-                      key={side.side}
-                      type="button"
-                      onClick={() => handleFlipSide(sideState.currentDisc, side.side)}
-                      disabled={isFlipping}
-                      className={`player-side-pill__option ${
-                        sideState.currentSide === side.side
-                          ? 'is-active'
-                          : ''
-                      }`}
-                      title={`切换到 ${index === 0 ? 'A' : 'B'} 面`}
-                    >
-                      {index === 0 ? 'A' : 'B'}
-                    </button>
-              ))}
-            </div>
-
-          </div>
-        )}
-
         {/* 唱片容器 - 支持滑动翻面 */}
         <div
           className="flex-1 flex items-center justify-center touch-none"
@@ -309,7 +333,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 themeId={themePreference.themeId}
                 album={album}
                 currentTrack={currentTrack}
-                queue={getCurrentSideTracks()}
+                queue={currentVinylSide?.tracks ?? album.tracks}
                 isPlaying={isPlaying}
                 isPreviewLoading={isPreviewLoading}
                 progressPercent={progressPercent}
@@ -323,7 +347,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 themeId={themePreference.themeId}
                 album={album}
                 currentTrack={currentTrack}
-                queue={getCurrentSideTracks()}
+                queue={currentVinylSide?.tracks ?? album.tracks}
                 isPlaying={isPlaying}
                 isPreviewLoading={isPreviewLoading}
                 progressPercent={progressPercent}
@@ -335,8 +359,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           />
         </div>
 
-        {themePreference.themeId !== 'crescent' && (
-          <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} playbackSource={playbackSource} playbackMessage={playbackMessage} loading={isPreviewLoading} onImportLocalSource={onImportLocalSource} localImportPending={localImportPending} />
+        {themePreference.themeId !== 'crescent' && themePreference.themeId !== 'luminous-card' && (
+          <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} />
         )}
       </div>
 
@@ -391,67 +415,8 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             <button type="button" id="player-favorite" aria-label={favorite ? '取消当前专辑的喜爱标记' : '将当前专辑标记为喜爱'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
           </div>
         </div>}
-        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={handlePrevSide} onNextTrack={handleNextSide} />
-        <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} animated={themePreference.themeId === 'crescent'} />
-        {playbackMessage && <p className="full-player__playback-status" role="status" aria-live="polite">{playbackMessage}</p>}
-
-        {/* Bottom 4 Utility Tools */}
-        <div className="full-player__utilities">
-          <button
-            id="player-util-lyrics"
-            type="button"
-            onClick={() => {
-              setViewMode(viewMode === 'lyrics' ? 'turntable' : 'lyrics');
-              setActiveBottomModal('none');
-              hapticsService.triggerHaptic('light');
-            }}
-            className={`flex items-center gap-1.5 text-[11px] py-1 px-2.5 rounded-[4px] transition-all ${
-              viewMode === 'lyrics'
-                ? 'text-white bg-[#18181E] border border-[#2B2B36]'
-                : 'hover:text-white'
-            }`}
-            title="切换全量同步歌词模式"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>歌词</span>
-          </button>
-
-          <button
-            id="player-util-queue"
-            type="button"
-            onClick={() => setActiveBottomModal(activeBottomModal === 'queue' ? 'none' : 'queue')}
-            className={`flex items-center gap-1.5 text-[11px] py-1 px-2 rounded-[4px] transition-colors ${
-              activeBottomModal === 'queue' ? 'text-white bg-[#18181E]' : 'hover:text-white'
-            }`}
-          >
-            <ListMusic className="w-3.5 h-3.5" />
-            <span>曲目</span>
-          </button>
-
-          <button
-            id="player-util-output"
-            type="button"
-            onClick={() => setActiveBottomModal(activeBottomModal === 'output' ? 'none' : 'output')}
-            className={`flex items-center gap-1.5 text-[11px] py-1 px-2 rounded-[4px] transition-colors ${
-              activeBottomModal === 'output' ? 'text-white bg-[#18181E]' : 'hover:text-white'
-            }`}
-          >
-            <Speaker className="w-3.5 h-3.5" />
-            <span>唱放</span>
-          </button>
-
-          <button
-            id="player-util-quality"
-            type="button"
-            onClick={() => setActiveBottomModal(activeBottomModal === 'quality' ? 'none' : 'quality')}
-            className={`flex items-center gap-1.5 text-[11px] py-1 px-2 rounded-[4px] transition-colors ${
-              activeBottomModal === 'quality' ? 'text-white bg-[#18181E]' : 'hover:text-white'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span className="font-mono text-white/70">Master</span>
-          </button>
-        </div>
+        <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' || themePreference.themeId === 'luminous-card' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
+        <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} />
       </div>
 
       <dialog ref={themeDialog} className="pt-theme-dialog" aria-label="播放器样式">
@@ -459,168 +424,45 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         <PlayerThemeSelector preference={themePreference}/>
       </dialog>
 
-      {/* Modal Drawers */}
-      {activeBottomModal !== 'none' && (
+      {activePanel === 'queue' && (
         <div
           id="player-modal-sheet"
           className="absolute inset-x-0 bottom-0 max-h-[65%] bg-[#0D0D10] border-t border-[#202026] rounded-t-[10px] z-50 p-4 shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-200"
         >
           <div className="flex items-center justify-between pb-3 border-b border-[#1E1E24]">
-            <span className="text-[13px] font-bold text-white flex items-center gap-2">
-              {activeBottomModal === 'more' && '更多播放操作'}
-              {activeBottomModal === 'lyrics' && '全量同步歌词 · Folia Major'}
-              {activeBottomModal === 'queue' && `曲目清单 · ${album.title} (${currentVinylSide?.side || 'N/A'})`}
-              {activeBottomModal === 'output' && '输出硬件'}
-              {activeBottomModal === 'quality' && '黑胶声学与均衡'}
-            </span>
-            <div className="flex items-center gap-2">
-              {activeBottomModal === 'lyrics' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setViewMode('lyrics');
-                    setActiveBottomModal('none');
-                    hapticsService.triggerHaptic('light');
-                  }}
-                  className="flex items-center gap-1 text-[11px] text-white/80 hover:text-white px-2 py-0.5 rounded-[4px] bg-[#16161C] border border-[#262730]"
-                  title="全屏歌词流"
-                >
-                  <Maximize2 className="w-3 h-3" />
-                  <span>全屏</span>
-                </button>
-              )}
-              <button
-                onClick={() => setActiveBottomModal('none')}
-                className="text-[11px] text-white/50 hover:text-white px-2 py-0.5 rounded-[4px] bg-[#16161C]"
-              >
-                收起
-              </button>
-            </div>
+            <span className="text-[13px] font-bold text-white">播放队列 · {album.title}</span>
+            <button type="button" onClick={() => setActivePanel('none')} className="text-[11px] text-white/60 hover:text-white px-3 py-1 rounded-[4px] bg-[#16161C]">收起</button>
           </div>
 
           <div className="overflow-y-auto no-scrollbar py-2 space-y-2 flex-1 min-h-0">
-            {activeBottomModal === 'more' && (
-              <div className="player-more">
-                <div className="player-more__source">
-                  <strong>当前音源</strong>
-                  <p>{playbackMessage || '尚未连接可播放音源'}</p>
-                  <div>
-                    {playbackSource?.metadata.storeUrl && <a href={playbackSource.metadata.storeUrl} target="_blank" rel="noreferrer">在 Apple Music 打开</a>}
-                    <button type="button" onClick={onImportLocalSource} disabled={isPreviewLoading}>{localImportPending ? '确认绑定本地音源' : '导入本地音源'}</button>
-                  </div>
-                </div>
-                <div className="player-more__actions">
-                  <button type="button" aria-pressed={isShuffle} onClick={() => onShuffleChange(!isShuffle)}><Shuffle/><span>随机播放</span></button>
-                  <button type="button" aria-pressed={repeatMode !== 'off'} onClick={() => onRepeatChange(repeatMode === 'off' ? 'all' : repeatMode === 'all' ? 'one' : 'off')}><Repeat/><span>{repeatMode === 'off' ? '全曲循环' : repeatMode === 'all' ? '单曲循环' : '关闭循环'}</span></button>
-                  <button type="button" onClick={() => { setViewMode('lyrics'); setActiveBottomModal('none'); }}><FileText/><span>歌词</span></button>
-                  <button type="button" onClick={() => setActiveBottomModal('queue')}><ListMusic/><span>曲目</span></button>
-                  <button type="button" onClick={() => setActiveBottomModal('output')}><Speaker/><span>唱放</span></button>
-                  <button type="button" onClick={() => setActiveBottomModal('quality')}><Sliders/><span>音效</span></button>
-                </div>
-              </div>
-            )}
-            {activeBottomModal === 'lyrics' && (
-              <div className="h-[380px] w-full flex flex-col">
-                <LyricsView
-                  currentTrack={currentTrack}
-                  album={album}
-                  currentTimeSec={currentTimeSec}
-                  durationSec={durationSec}
-                  isPlaying={isPlaying}
-                  onSeek={onSeek}
-                />
-              </div>
-            )}
-
-            {activeBottomModal === 'queue' && (
-              <div className="space-y-1">
-                {/* 显示当前面的曲目 */}
-                {getCurrentSideTracks().length > 0 ? (
-                  getCurrentSideTracks().map((track) => {
-                    const isCurrent = track.id === currentTrack.id;
-                    return (
-                      <button
-                        type="button"
-                        aria-label={`播放歌曲：${track.title}`}
-                        key={track.id}
-                        onClick={() => {
-                          onSelectTrack(track);
-                          setActiveBottomModal('none');
-                          hapticsService.triggerHaptic('light');
-                        }}
-                        className={`w-full text-left flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${
-                          isCurrent
-                            ? 'bg-[#16161C] text-[#2FE92B]'
-                            : 'hover:bg-[#141418] text-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-[11px] font-mono opacity-50 w-6">
-                            {currentVinylSide?.side}{track.number}
-                          </span>
-                          <span className="text-[13px] font-medium truncate">
-                            {track.title}
-                          </span>
-                        </div>
-                        <span className="text-[11px] font-mono text-white/40">
-                          {track.duration}
-                        </span>
-                      </button>
-                    );
-                  })
-                ) : (
-                  <p className="text-[12px] text-white/50 py-4 text-center">无此面曲目信息</p>
-                )}
-              </div>
-            )}
-
-            {activeBottomModal === 'output' && (
-              <div className="space-y-2">
-                {[
-                  { name: '直驱内置唱头放大器 (Preamp)', status: '当前激活', active: true },
-                  { name: '模拟胆机功放 (Tube Amp)', status: '就绪', active: false },
-                  { name: '无线高保真接收器 (LDAC 990kbps)', status: '已配对', active: false },
-                ].map((dev, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-[4px] border flex items-center justify-between ${
-                      dev.active
-                        ? 'bg-[#16161C] border-[#2A2A34]'
-                        : 'bg-[#0E0E12] border-[#1C1C22]'
-                    }`}
-                  >
-                    <div>
-                      <p className="text-[13px] font-medium text-white">{dev.name}</p>
-                      <p className="text-[10.5px] text-[#BBCBB2] opacity-70">{dev.status}</p>
-                    </div>
-                    {dev.active && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#2FE92B]" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeBottomModal === 'quality' && (
-              <div className="space-y-2">
-                {[
-                  { title: '192kHz / 24-bit 模拟母带直录', tag: 'DSD / DDA' },
-                  { title: 'RIAA 标准录音均衡曲线硬件直通', tag: 'Direct Bypass' },
-                  { title: '唱针物理循迹角 (VTA) 精密校准', tag: '23° Tracking' },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-[4px] bg-[#141418] border border-[#1E1E24] flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="text-[12.5px] font-medium text-white">{item.title}</p>
-                      <p className="text-[10px] font-mono text-white/40">{item.tag}</p>
-                    </div>
-                    <Sparkles className="w-3.5 h-3.5 text-white/40" />
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="space-y-1">
+              {(currentVinylSide?.tracks ?? album.tracks).length > 0 ? (
+                (currentVinylSide?.tracks ?? album.tracks).map((track) => {
+                  const isCurrent = track.id === currentTrack.id;
+                  return (
+                    <button
+                      type="button"
+                      aria-label={`播放歌曲：${track.title}`}
+                      key={track.id}
+                      onClick={() => {
+                        onSelectTrack(track);
+                        setActivePanel('none');
+                        hapticsService.triggerHaptic('light');
+                      }}
+                      className={`w-full text-left flex items-center justify-between p-2.5 rounded-[4px] cursor-pointer transition-colors ${isCurrent ? 'bg-[#16161C] text-[#2FE92B]' : 'hover:bg-[#141418] text-white'}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-[11px] font-mono opacity-50 w-6">{track.number}</span>
+                        <span className="text-[13px] font-medium truncate">{track.title}</span>
+                      </div>
+                      <span className="text-[11px] font-mono text-white/40">{track.duration}</span>
+                    </button>
+                  );
+                })
+              ) : (
+                <p className="text-[12px] text-white/50 py-4 text-center">暂无曲目信息</p>
+              )}
+            </div>
           </div>
         </div>
       )}

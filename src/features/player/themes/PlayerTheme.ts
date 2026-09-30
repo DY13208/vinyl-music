@@ -1,8 +1,8 @@
 import type React from 'react';
 import type { Album, Track } from '../../../types';
 
-export type PlayerThemeId = 'crescent' | 'halo' | 'nocturne' | 'classic';
-export type OrbitThemeId = Exclude<PlayerThemeId, 'classic'>;
+export type PlayerThemeId = 'crescent' | 'halo' | 'nocturne' | 'classic' | 'luminous-card';
+export type OrbitThemeId = 'crescent' | 'halo' | 'nocturne';
 export type RepeatMode = 'off' | 'all' | 'one';
 export type PlayerTokens = React.CSSProperties & { [key: `--player-${string}`]: string };
 export interface PlayerStageProps {

@@ -22,6 +22,12 @@ const versionTerms = (value: string) => {
   if (/\blive\b|\bconcert\b|演唱[会會]|現場|现场/i.test(value)) found.push('live');
   return [...new Set(found.map(term => ['现场', '現場'].includes(term) ? 'live' : term))];
 };
+const recordingYears = (value = '') => new Set(value.match(/\b(?:19|20)\d{2}\b/g) ?? []);
+const hasDisjointYears = (left = '', right = '') => {
+  const a = recordingYears(left);
+  const b = recordingYears(right);
+  return a.size > 0 && b.size > 0 && ![...a].some(year => b.has(year));
+};
 // A live suffix is redundant when the album already identifies a live recording.
 // Version checks below still reject studio/live substitutions in both directions.
 const titleIdentity = (value = '') => normalize(value.replace(/[（(]\s*live\s*[）)]/gi, ''));
@@ -47,10 +53,12 @@ export class TrackMatcher {
       score += 100; reasons.push('isrc');
     }
     const titleOverlap = overlap(titleIdentity(track.title), titleIdentity(candidate.title));
-    if (same(titleIdentity(track.title), titleIdentity(candidate.title))) { score += 30; reasons.push('title'); }
+    const exactTitle = same(titleIdentity(track.title), titleIdentity(candidate.title));
+    if (exactTitle) { score += 30; reasons.push('title'); }
     else if (titleOverlap >= .8) { score += 22; reasons.push('title-close'); }
     const artistOverlap = overlap(track.artist, candidate.artist);
-    if (sameArtistIdentity(track.artist, candidate.artist)) { score += 30; reasons.push('artist'); }
+    const exactArtist = sameArtistIdentity(track.artist, candidate.artist);
+    if (exactArtist) { score += 30; reasons.push('artist'); }
     else if (artistOverlap >= .8) { score += 22; reasons.push('artist-close'); }
     if (sameAlbum(track.album, candidate.album)) { score += 15; reasons.push('album'); }
     else if (overlap(track.album, candidate.album) >= .8) { score += 10; reasons.push('album-close'); }
@@ -68,9 +76,17 @@ export class TrackMatcher {
     const wrongVersions = candidateVersions.filter(term => !targetVersions.has(term));
     if (targetVersions.has('live') && !candidateVersions.includes('live')) wrongVersions.push('studio-for-live');
     if (wrongVersions.length) { score -= 40; reasons.push(`wrong-version:${wrongVersions.join(',')}`); }
+    const liveContextMismatch = targetVersions.has('live') && candidateVersions.includes('live')
+      && hasDisjointYears(`${track.title} ${track.album}`, `${candidate.title ?? ''} ${candidate.album ?? ''}`);
+    if (liveContextMismatch) { score -= 20; reasons.push('live-year-mismatch'); }
     if (titleOverlap < .5) { score -= 30; reasons.push('title-mismatch'); }
     if (artistOverlap < .5 && !sameArtistIdentity(track.artist, candidate.artist)) { score -= 35; reasons.push('artist-mismatch'); }
-    return { score, reliable: score >= 70, possible: score >= 50 && score < 70, reasons };
+    // Physical pressings and localized catalogues often use a different album
+    // title and omit duration. Exact song + artist identity is still safe when
+    // the version markers agree and no large duration mismatch is present.
+    const identityReliable = exactTitle && exactArtist && !wrongVersions.length && !liveContextMismatch && !reasons.includes('duration-mismatch');
+    const reliable = score >= 70 || identityReliable;
+    return { score, reliable, possible: !reliable && score >= 50, reasons };
   }
 
   public scoreSource(track: MusicTrack, source: TrackSource): TrackSource {

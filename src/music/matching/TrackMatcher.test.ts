@@ -26,6 +26,10 @@ test('same song on a different album can still be reliable with matching duratio
   assert.equal(score({ title: '晴天', artist: '周杰伦', album: '精选集', duration: 270 }).reliable, true);
 });
 
+test('exact song and artist remain playable when a physical edition has another album title and no duration', () => {
+  assert.equal(score({ title: '晴天', artist: '周杰伦', album: '葉惠美 20周年黑胶版' }).reliable, true);
+});
+
 test('exact title album and duration can accept a catalog artist alias', () => {
   assert.equal(score({ title: '晴天', artist: 'Jay Chou', album: '叶惠美', duration: 269 }).reliable, true);
 });

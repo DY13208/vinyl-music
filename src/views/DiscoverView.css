@@ -126,6 +126,30 @@
   color: #b9c5bd;
   font-size: 12px;
 }
+.discover-browse-artists {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  gap: 9px;
+  margin: 7px 0 19px;
+  padding: 0 3px;
+  border: 0;
+  border-bottom: 1px solid #ffffff0a;
+  background: transparent;
+  color: #c4d0c8;
+  font-size: 12px;
+  text-align: left;
+}
+.discover-browse-artists > span {
+  flex: 1;
+}
+.discover-browse-artists > svg:first-child {
+  color: #68e961;
+}
+.discover-browse-artists > svg:last-child {
+  color: #748279;
+}
 .discover-section-heading {
   display: flex;
   align-items: center;

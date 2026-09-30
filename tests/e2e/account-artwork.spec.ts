@@ -7,6 +7,10 @@ async function login(page: Page, email = 'a@example.test', password = 'test-pass
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
 }
 async function profile(page: Page) { await page.locator('#nav-tab-profile').click(); }
+async function logout(page: Page) {
+  await page.getByRole('button', { name: '系统设置' }).click();
+  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+}
 
 test('profile editor saves a local avatar and nickname, supports cancel/removal and isolates accounts', async ({ page }) => {
   const transfers: string[] = [];
@@ -42,11 +46,11 @@ test('profile editor saves a local avatar and nickname, supports cancel/removal 
   await expect(page.getByRole('button', { name: '编辑资料', exact: true })).toBeFocused();
   await expect(page.getByRole('heading', { name: '我的黑胶小屋' })).toBeVisible();
   await expect(page.getByRole('img', { name: '我的头像' })).toBeVisible();
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await login(page, 'b@example.test'); await profile(page);
   await expect(page.getByRole('heading', { name: 'b', exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: '我的头像' })).toHaveCount(0);
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await login(page); await profile(page);
   await expect(page.getByRole('heading', { name: '我的黑胶小屋' })).toBeVisible();
   await page.getByRole('button', { name: '编辑资料', exact: true }).click();
@@ -98,7 +102,7 @@ test('login layout, validation and account lifecycle work at mobile width', asyn
   await page.reload();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
   await profile(page);
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await expect(page.getByRole('heading', { name: '回到你的唱片架' })).toBeVisible();
 });
 
@@ -114,7 +118,7 @@ test('registration confirmation and password recovery use the backend contract',
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
   expect(page.url()).not.toContain('token_hash');
   await profile(page);
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await page.getByRole('button', { name: '忘记密码？' }).click();
   await page.getByLabel('邮箱', { exact: true }).fill('new@example.test');
   await page.getByRole('button', { name: '发送重置邮件' }).click();
@@ -126,7 +130,7 @@ test('registration confirmation and password recovery use the backend contract',
   await page.getByRole('button', { name: '保存新密码' }).click();
   await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
   await profile(page);
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await login(page, 'new@example.test', 'changed-password-123');
 });
 
@@ -172,11 +176,11 @@ test('private collection and cached cover survive reload, remain local and are i
   const otherTab = await context.newPage();
   await otherTab.goto('/');
   await expect(otherTab.locator('#bottom-navigation-bar')).toBeVisible();
-  await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await logout(page);
   await expect(otherTab.getByRole('heading', { name: '回到你的唱片架' })).toBeVisible();
   await login(page, 'b@example.test');
   await expect(page.getByRole('heading', { name: '你的第一张唱片' })).toBeVisible();
-  await profile(page); await page.getByRole('button', { name: '退出登录', exact: true }).click();
+  await profile(page); await logout(page);
   await login(page);
   await expect(page.locator('.album-artwork img').first()).toHaveAttribute('src', /^blob:/);
   expect(uploads).toEqual([]);

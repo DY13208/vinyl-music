@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import type { Album, Track } from "../types";
 import { ArtworkImage } from "../components/ArtworkImage";
+import { ScrollProgress } from "../components/rare-ui/ScrollProgress";
 import {
   CatalogueError,
   getPublicAlbum,
@@ -43,6 +44,11 @@ interface Props {
 }
 
 const HOME_SEED = "Jazz";
+const discoverySections = [
+  { id: "discover-weekly", label: "本周推荐" },
+  { id: "discover-popular-albums", label: "热门唱片" },
+  { id: "discover-popular-tracks", label: "热门歌曲" },
+] as const;
 const artistDiscoverySeeds = [
   "华语经典",
   "City Pop",
@@ -65,13 +71,10 @@ const quickSeeds = [
   ["原声", "Soundtrack"],
   ["90s", "90s hits"],
 ] as const;
-const genreSeeds = [
-  ["Jazz", "Jazz"],
-  ["Rock", "Rock"],
-  ["City Pop", "City Pop"],
-  ["Electronic", "Electronic"],
-] as const;
 const preferredAlbum = (match: Match) => match.vinylRelease ?? match.album;
+const displayCover = (match: Match, album: Album) => album.coverUrl || match.album.coverUrl;
+const isReferenceCover = (match: Match, album: Album) =>
+  Boolean(match.vinylRelease && !album.coverUrl && match.album.coverUrl);
 
 export function DiscoverView(props: Props) {
   const [mode, setMode] = useState<"home" | "artists" | "results">("home");
@@ -98,6 +101,7 @@ export function DiscoverView(props: Props) {
   const closeButton = useRef<HTMLButtonElement>(null);
   const backdropPressed = useRef(false);
   const details = useRef(new Map<string, Album>());
+  const [, refreshDetails] = useState(0);
   const [vinylOnly, setVinylOnly] = useState(false);
   const [allAlbums, setAllAlbums] = useState(false);
   const [allTracks, setAllTracks] = useState(false);
@@ -116,7 +120,8 @@ export function DiscoverView(props: Props) {
     setLoading(true);
     setResults([]);
     void (async () => {
-      const cached = await catalogueCache.get("search", search.query);
+      const cacheKey = search.artist ? `artist:${search.artist}:${search.query}` : search.query;
+      const cached = await catalogueCache.get("search", cacheKey);
       if (controller.signal.aborted) return;
       if (cached) {
         setResults(cached.data);
@@ -136,13 +141,13 @@ export function DiscoverView(props: Props) {
         if (controller.signal.aborted) return;
         setResults(response.results);
         setCacheMessage("");
-        void catalogueCache.put("search", search.query, response.results);
+        void catalogueCache.put("search", cacheKey, response.results);
       } catch (reason) {
         if (controller.signal.aborted) return;
         if (reason instanceof CatalogueError && reason.status === 404) {
           setResults([]);
           setCacheMessage("");
-          void catalogueCache.put("search", search.query, []);
+          void catalogueCache.put("search", cacheKey, []);
         } else if (cached)
           setCacheMessage("暂时无法更新，正在显示本机保存的资料。");
         else setError("暂时无法获取公开唱片资料，请稍后重试。");
@@ -157,12 +162,9 @@ export function DiscoverView(props: Props) {
   }, [search]);
 
   useEffect(() => {
-    if (mode === "results") return;
+    if (mode !== "artists") return;
     const controller = new AbortController();
-    const wanted = artistDiscoverySeeds.slice(
-      0,
-      mode === "artists" ? artistSeedLimit : 2,
-    );
+    const wanted = artistDiscoverySeeds.slice(0, artistSeedLimit);
     setArtistLoading(true);
     void (async () => {
       for (const seed of wanted) {
@@ -206,6 +208,33 @@ export function DiscoverView(props: Props) {
   }, [artistSeedLimit, mode]);
 
   const selectionId = selection?.album.id;
+  // Enrich after search renders with a small request pool; failed detail requests
+  // leave the original result available and never block browsing.
+  useEffect(() => {
+    const controller = new AbortController();
+    const targets = [...new Map(results.map(preferredAlbum).filter(album =>
+      (!album.coverUrl || !album.tracks.length) && !details.current.has(album.id),
+    ).map(album => [album.id, album])).values()];
+    const hydrate = async () => {
+      while (targets.length) {
+        if (controller.signal.aborted) return;
+        const album = targets.shift()!;
+        const provider = ['discogs', 'musicbrainz', 'deezer', 'apple-music'].find(id => album.id.startsWith(`${id}-`));
+        if (!provider) continue;
+        try {
+          const cached = await catalogueCache.get('album', album.id);
+          const detail = cached && !cached.stale ? cached.data : await getPublicAlbum(provider, album.id.slice(provider.length + 1), controller.signal);
+          if (controller.signal.aborted) return;
+          const enriched = { ...album, ...detail, coverUrl: detail.coverUrl || album.coverUrl, tracks: detail.tracks.length ? detail.tracks : album.tracks };
+          details.current.set(album.id, enriched);
+          refreshDetails(value => value + 1);
+          void catalogueCache.put('album', album.id, enriched);
+        } catch { /* Keep the original metadata; opening details permits retry. */ }
+      }
+    };
+    void Promise.all(Array.from({ length: Math.min(3, targets.length) }, hydrate));
+    return () => controller.abort();
+  }, [results]);
   useEffect(() => {
     const modal = dialog.current;
     if (selectionId && modal && !modal.open) {
@@ -375,12 +404,12 @@ export function DiscoverView(props: Props) {
   // A discovery home is cover-led. Preserve every result in explicit searches,
   // while keeping incomplete catalogue entries behind artwork-rich records here.
   const displayAlbums = mode === "home"
-    ? [...unsortedAlbums].sort((left, right) => Number(Boolean(right.album.coverUrl)) - Number(Boolean(left.album.coverUrl)))
+    ? [...unsortedAlbums].sort((left, right) => Number(Boolean(displayCover(right.match, right.album))) - Number(Boolean(displayCover(left.match, left.album))))
     : unsortedAlbums;
   const tracks = [
     ...new Map(
       displayAlbums
-        .flatMap(({ album }) => album.tracks.map((track) => ({ album, track })))
+        .flatMap(({ match, album }) => album.tracks.map((track) => ({ match, album, track })))
         .map(
           (item) =>
             [
@@ -390,9 +419,6 @@ export function DiscoverView(props: Props) {
         ),
     ).values(),
   ];
-  const vinylPicks = displayAlbums.filter(
-    ({ match }) => match.vinylReleaseFound,
-  );
   const lead = displayAlbums[0];
   const selected = selection?.album;
   const openAlbum = (match: Match) => {
@@ -466,6 +492,7 @@ export function DiscoverView(props: Props) {
 
   const albumRail = (home: boolean) => (
     <section
+      id={home ? "discover-popular-albums" : undefined}
       className={`discover-albums${home ? " discover-albums--home" : ""}`}
       aria-labelledby="discover-albums-title"
     >
@@ -484,8 +511,8 @@ export function DiscoverView(props: Props) {
         ),
       )}
       <div className={`discover-album-list${allAlbums ? " is-expanded" : ""}`}>
-        {displayAlbums.map(({ match, album }) => (
-          <article className="discover-record" key={album.id}>
+        {(home && !allAlbums ? displayAlbums.slice(0, 8) : displayAlbums).map(({ match, album }) => (
+          <article className="discover-record" key={album.id} aria-label={`${album.title} · ${album.artist}`}>
             <div className="discover-record__visual">
               <button
                 type="button"
@@ -494,8 +521,8 @@ export function DiscoverView(props: Props) {
                 aria-label={`打开专辑：${album.title}`}
               >
                 <span className="discover-record__cover">
-                  {album.coverUrl ? (
-                    <ArtworkImage src={album.coverUrl} alt={album.title} loading="lazy" />
+                  {displayCover(match, album) ? (
+                    <ArtworkImage src={displayCover(match, album)} alt={isReferenceCover(match, album) ? `${album.title}专辑参考封面，黑胶版本封面待核实` : album.title} loading="lazy" />
                   ) : (
                     <span className="discover-cover-fallback" aria-label={`${album.title}暂无封面`}>
                       <Disc3 aria-hidden="true" />
@@ -526,10 +553,10 @@ export function DiscoverView(props: Props) {
                 {album.year ? ` · ${album.year}` : ""}
               </button>
               <p>
-                {match.vinylReleaseFound ? "已查到黑胶版本" : "黑胶版本待核实"}
+                {isReferenceCover(match, album) ? "专辑参考封面 · 版本封面待核实" : match.vinylReleaseFound ? "已查到黑胶版本" : "黑胶版本待核实"}
               </p>
             </div>
-            {!home && (
+            {(
               <div className="discover-record__actions">
                 {!album.tracks[0] && (
                   <button type="button" onClick={() => open(match)}>
@@ -541,6 +568,7 @@ export function DiscoverView(props: Props) {
                   <button
                     type="button"
                     className="discover-add"
+                    aria-label={`选择黑胶版本：${album.title}`}
                     onClick={() => open(match)}
                   >
                     <Plus size={15} />
@@ -557,7 +585,7 @@ export function DiscoverView(props: Props) {
     </section>
   );
   const trackList = (
-    <section className="discover-songs" aria-labelledby="discover-songs-title">
+    <section id="discover-popular-tracks" className="discover-songs" aria-labelledby="discover-songs-title">
       {heading(
         "discover-songs-title",
         "热门歌曲",
@@ -574,7 +602,7 @@ export function DiscoverView(props: Props) {
       )}
       <ol className="discover-song-list">
         {(allTracks ? tracks : tracks.slice(0, 5)).map(
-          ({ album, track }, index) => {
+          ({ match, album, track }, index) => {
             const current =
               props.playingAlbumId === album.id &&
               props.playingTrackId === track.id;
@@ -600,7 +628,7 @@ export function DiscoverView(props: Props) {
                   }
                 >
                   <span className="discover-song__cover">
-                    {album.coverUrl ? <ArtworkImage src={album.coverUrl} alt="" loading="lazy" /> : <span className="discover-cover-fallback" aria-hidden="true"><Disc3 /><small>封面待补</small></span>}
+                    {displayCover(match, album) ? <ArtworkImage src={displayCover(match, album)} alt="" loading="lazy" /> : <span className="discover-cover-fallback" aria-hidden="true"><Disc3 /><small>封面待补</small></span>}
                   </span>
                   <span>
                     <strong>{track.title}</strong>
@@ -641,8 +669,9 @@ export function DiscoverView(props: Props) {
   return (
     <main id="discover-view" className={`discover-page discover-page--${mode}`}>
       <div className="discover-atmosphere" aria-hidden="true">
-        {lead && <ArtworkImage src={lead.album.coverUrl} alt="" />}
+        {lead && <ArtworkImage src={displayCover(lead.match, lead.album)} alt="" />}
       </div>
+      {props.playbackMessage && <p className="discover-playback" role="status">{props.playbackMessage}</p>}
       {mode === "home" ? (
         <>
           <header className="discover-header">
@@ -657,27 +686,9 @@ export function DiscoverView(props: Props) {
               </button>
             ))}
           </nav>
-          <section
-            className="discover-artists"
-            aria-labelledby="discover-artists-title"
-          >
-            {heading(
-              "discover-artists-title",
-              "热门音乐人",
-              <button type="button" onClick={() => setMode("artists")}>
-                查看全部
-                <ChevronRight size={15} />
-              </button>,
-            )}
-            <div id="discover-artist-list" className="discover-artist-list">
-              {artistDirectory.slice(0, 6).map(artistButton)}
-              {artistLoading && artistDirectory.length === 0 && (
-                <span className="discover-artists-loading" role="status">
-                  正在获取音乐人…
-                </span>
-              )}
-            </div>
-          </section>
+          <button type="button" className="discover-browse-artists" onClick={() => setMode("artists")}>
+            <Music2 size={16}/><span>浏览音乐人</span><ChevronRight size={16}/>
+          </button>
           {loading ? (
             loadingBlock
           ) : error ? (
@@ -686,6 +697,7 @@ export function DiscoverView(props: Props) {
             <>
               {lead && (
                 <section
+                  id="discover-weekly"
                   className="discover-feature"
                   aria-labelledby="discover-feature-title"
                 >
@@ -697,7 +709,9 @@ export function DiscoverView(props: Props) {
                       {lead.album.year ? ` · ${lead.album.year}` : ""}
                     </span>
                     <small>
-                      {lead.match.vinylReleaseFound
+                      {isReferenceCover(lead.match, lead.album)
+                        ? "专辑参考封面 · 版本封面待核实"
+                        : lead.match.vinylReleaseFound
                         ? "已找到黑胶版本"
                         : "黑胶版本待核实"}
                     </small>
@@ -713,68 +727,15 @@ export function DiscoverView(props: Props) {
                     onClick={() => openAlbum(lead.match)}
                   >
                     <ArtworkImage
-                      src={lead.album.coverUrl}
-                      alt={lead.album.title}
+                      src={displayCover(lead.match, lead.album)}
+                      alt={isReferenceCover(lead.match, lead.album) ? `${lead.album.title}专辑参考封面，黑胶版本封面待核实` : lead.album.title}
                     />
                   </button>
                 </section>
               )}
               {albumRail(true)}
-              {!!vinylPicks.length && (
-                <section
-                  className="discover-vinyl-picks"
-                  aria-labelledby="discover-vinyl-title"
-                >
-                  {heading("discover-vinyl-title", "值得收藏")}
-                  <div>
-                    {vinylPicks.slice(0, 5).map(({ match, album }) => (
-                      <article key={album.id}>
-                        <button type="button" onClick={() => open(match)}>
-                          <ArtworkImage
-                            src={album.coverUrl}
-                            alt={album.title}
-                          />
-                        </button>
-                        <div>
-                          <strong>{album.title}</strong>
-                          <p>{album.artist}</p>
-                          <small>
-                            {[
-                              album.year || "",
-                              album.country,
-                              album.edition,
-                              album.catalogNumber,
-                            ]
-                              .filter(Boolean)
-                              .join(" · ") || "已确认实体黑胶版本"}
-                          </small>
-                          {addButton(album, true)}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              )}
               {tracks.length > 0 && trackList}
-              <section
-                className="discover-genres"
-                aria-labelledby="discover-genres-title"
-              >
-                {heading("discover-genres-title", "按风格探索")}
-                <div>
-                  {genreSeeds.map(([label, seed], index) => (
-                    <button
-                      type="button"
-                      key={label}
-                      style={{ "--genre-index": index } as React.CSSProperties}
-                      onClick={() => runSearch(seed)}
-                    >
-                      <Disc3 size={48} />
-                      <span>{label}</span>
-                    </button>
-                  ))}
-                </div>
-              </section>
+              <ScrollProgress sections={tracks.length > 0 ? discoverySections : discoverySections.slice(0, 2)} />
             </>
           ) : (
             <div className="discover-empty">
@@ -880,11 +841,6 @@ export function DiscoverView(props: Props) {
           {notice && !selection && (
             <p className="discover-notice" role="status">
               {notice}
-            </p>
-          )}
-          {props.playingAlbumId && !selection && props.playbackMessage && (
-            <p className="discover-playback" role="status">
-              {props.playbackMessage}
             </p>
           )}
           {loading ? (

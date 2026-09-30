@@ -22,9 +22,7 @@
 .browse-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-bottom: 8px; }
 .browse-toolbar__extra { display: flex; align-items: center; gap: 10px; }
 .browse-total { font-size: 11px; color: var(--browse-muted); white-space: nowrap; }
-.browse-modes { display: flex; gap: 3px; padding: 3px; border: 1px solid var(--browse-line); border-radius: var(--browse-radius); background: var(--browse-surface); }
-.browse-modes button { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; color: var(--browse-muted); font-size: 12px; }
-.browse-modes button[aria-pressed=true] { color: var(--browse-accent); background: color-mix(in srgb, var(--browse-accent) 9%, var(--browse-surface)); }
+.browse-mode-switch { display: flex; align-items: center; }
 .browse-layout { min-height: 0; position: relative; animation: browse-enter 180ms ease-out; }
 .gallery-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 18px 16px; align-content: start; height: 100%; min-height: 0; overflow-y: auto; padding: 5px 4px 16px; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--browse-line) transparent; }
 .gallery-grid__album { padding: 0; min-width: 0; align-self: start; border: 0; background: transparent; text-align: left; }
@@ -97,5 +95,5 @@
   .browse-selection__actions { gap: 5px; }
   .spine-carousel__album { --record-size: min(30vw, 86cqh); }
 }
-@media (hover: hover) { .browse-modes button:hover, .browse-selection button:hover:not(:disabled) { background: color-mix(in srgb, var(--browse-ink) 7%, var(--browse-surface)); } .gallery-grid__album:hover .gallery-grid__sleeve { border-color: var(--browse-muted); } }
+@media (hover: hover) { .browse-selection button:hover:not(:disabled) { background: color-mix(in srgb, var(--browse-ink) 7%, var(--browse-surface)); } .gallery-grid__album:hover .gallery-grid__sleeve { border-color: var(--browse-muted); } }
 @media (prefers-reduced-motion: reduce) { .album-browser *, .album-browser *::before, .album-browser *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
