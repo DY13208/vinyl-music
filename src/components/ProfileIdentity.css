@@ -1,6 +1,7 @@
 .profile-identity { width: 100%; display: flex; flex-direction: column; align-items: center; }
 .profile-identity__avatar { position: relative; width: 80px; height: 80px; border-radius: 50%; padding: 3px; border: 1px solid #61745b; background: #141713; color: #bbcbb2; display: grid; place-items: center; cursor: pointer; }
-.profile-identity__avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+/* Absolutely positioned so a tall/wide image can never size the grid row: always a centered, cropped circle. */
+.profile-identity__avatar img { position: absolute; top: 3px; left: 3px; width: calc(100% - 6px); height: calc(100% - 6px); object-fit: cover; object-position: center; border-radius: 50%; }
 .profile-identity__camera { position: absolute; bottom: -2px; right: -2px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #252c22; border: 1px solid #7c8b73; }
 .profile-identity__file { display: none; }
 .profile-identity h2 { font-size: 19px; font-weight: 700; line-height: 1.5; margin: 12px 0 0; max-width: 100%; overflow-wrap: anywhere; }

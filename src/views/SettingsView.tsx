@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ChevronRight, ExternalLink, LogOut, RotateCw } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CirclePlay, HardDrive, Info, LogOut, Palette, RotateCw, UserRound } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { artworkService } from '../platform/artwork/WebArtworkAdapter';
 import { importLegacyCollection } from '../platform/storage/LegacyCollectionImport';
@@ -12,6 +12,7 @@ import type { PlayerThemePreference } from '../features/player/themes/usePlayerT
 import { AlbumDetailThemeSelector } from '../features/album-detail/themes/AlbumDetailThemeSelector';
 import type { AlbumDetailThemePreference } from '../features/album-detail/themes/useAlbumDetailTheme';
 import { HOME_THEMES, type HomeTheme } from '../hooks/useHomeTheme';
+import './SettingsDesktop.css';
 
 interface SettingsViewProps {
   onImportLegacy?: (albums: Album[]) => Promise<void>;
@@ -116,11 +117,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           <ArrowLeft className="w-4 h-4" />
         </button>
         <h1 className="text-[18px] font-bold tracking-tight">设置</h1>
+        {/* Desktop-only lead line (display:none on mobile). */}
+        <p className="settings-desktop__lead" aria-hidden="true">外观主题、播放、本机存储与账户</p>
       </header>
 
       <div className="px-4 py-4 space-y-6">
         <section aria-labelledby="appearance-settings" className="space-y-3">
+          <span className="settings-desktop__icon" aria-hidden="true"><Palette /></span>
           <h2 id="appearance-settings" className="text-[15px] font-semibold">外观与展示</h2>
+          <p className="settings-desktop__sub" aria-hidden="true">首页、唱片架、专辑详情与播放器的展示风格</p>
           <details className="pt-settings-section">
             <summary>首页陈列样式</summary>
             <div className="grid grid-cols-2 gap-2">
@@ -147,7 +152,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
 
         <section aria-labelledby="playback-settings" className="space-y-3">
+          <span className="settings-desktop__icon" aria-hidden="true"><CirclePlay /></span>
           <h2 id="playback-settings" className="text-[15px] font-semibold">播放</h2>
+          <p className="settings-desktop__sub" aria-hidden="true">底栏播放入口的显示方式</p>
           <div className="rounded-md border border-[#26272D] bg-[#0F0F0F] p-3.5">
             <div className="flex items-center justify-between gap-4">
               <div><h3 id="floating-player-setting" className="text-[13.5px] font-medium">显示底栏播放器</h3><p id="floating-player-setting-help" className="text-[11px] text-[#BBCBB2]/70 mt-1">隐藏入口不会停止正在播放的音乐</p></div>
@@ -160,7 +167,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
 
         <section aria-labelledby="storage-settings" className="space-y-3">
+          <span className="settings-desktop__icon" aria-hidden="true"><HardDrive /></span>
           <h2 id="storage-settings" className="text-[15px] font-semibold">本机存储</h2>
+          <p className="settings-desktop__sub" aria-hidden="true">封面缓存与本机馆藏数据</p>
           <div className="rounded-md border border-[#26272D] bg-[#0F0F0F] overflow-hidden divide-y divide-[#1F2024]">
             <button type="button" disabled={clearing} onClick={clearCache} className="w-full min-h-14 px-3.5 flex items-center justify-between text-left">
               <span><strong className="block text-[13.5px] font-medium">{clearing ? '正在清理…' : '清理浏览封面缓存'}</strong><small className="mt-1 block text-[10.5px] text-[#BBCBB2]/70">保留唱片架封面和本地音乐</small></span>
@@ -177,7 +186,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
 
         <section aria-labelledby="account-settings" className="space-y-3">
+          <span className="settings-desktop__icon" aria-hidden="true"><UserRound /></span>
           <h2 id="account-settings" className="text-[15px] font-semibold">账户</h2>
+          <p className="settings-desktop__sub" aria-hidden="true">当前登录的账户</p>
           <div className="rounded-md border border-[#26272D] bg-[#0F0F0F] overflow-hidden divide-y divide-[#1F2024]">
             <div className="p-3.5"><span className="block text-[11px] text-white/45">当前账户</span><strong className="mt-1 block text-[13px] font-medium">{auth?.user.email || '本机账户'}</strong></div>
             <button type="button" disabled={loggingOut} onClick={logout} className="w-full min-h-12 px-3.5 flex items-center gap-3 text-left text-[13px] text-white/80">
@@ -189,10 +200,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </section>
 
         <section aria-labelledby="about-settings" className="space-y-3">
+          <span className="settings-desktop__icon" aria-hidden="true"><Info /></span>
           <h2 id="about-settings" className="text-[15px] font-semibold">关于</h2>
+          <p className="settings-desktop__sub" aria-hidden="true">版本信息</p>
           <div className="rounded-md border border-[#26272D] bg-[#0F0F0F] p-3.5">
             <div className="flex items-center justify-between gap-4"><div><strong className="block text-[13.5px]">VINYL</strong><span className="mt-1 block text-[10.5px] text-[#BBCBB2]/70">版本 2.4.0 · 本地优先的黑胶收藏与播放</span></div><span className="text-[10px] font-mono text-[#71ef68]">LATEST</span></div>
-            <a href="https://rareui.com" target="_blank" rel="noreferrer" className="mt-4 min-h-11 border-t border-[#26272D] flex items-center gap-2 text-[11px] text-white/55">部分交互动效基于 Rare UI <ExternalLink className="w-3 h-3" /></a>
           </div>
         </section>
       </div>

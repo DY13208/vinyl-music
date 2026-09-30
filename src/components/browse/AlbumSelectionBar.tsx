@@ -7,7 +7,7 @@ export function AlbumSelectionBar({ albums, selectedAlbumId, onSelectAlbum, onOp
   const album = albums[index];
   if (!album) return null;
   return <footer className="browse-selection">
-    <div className="browse-selection__copy" aria-live="polite" aria-atomic="true"><h2 title={album.title}>{album.title}</h2><p>{album.artist}<span> · {album.year || '年份未知'} · {album.genre || '未分类'}</span></p></div>
+    <div className="browse-selection__copy" aria-live="polite" aria-atomic="true">{album.genre && <span className="browse-selection__kicker" aria-hidden="true">{album.genre}</span>}<h2 title={album.title}>{album.title}</h2><p>{album.artist}<span> · {album.year || '年份未知'} · {album.genre || '未分类'}</span></p><p className="browse-selection__meta" aria-hidden="true">{[album.year ? String(album.year) : '', album.genre, album.artist].filter(Boolean).join(' · ')}</p></div>
     <div className="browse-selection__actions">
       <button className="browse-selection__detail" type="button" onClick={() => onOpenAlbumDetail(album)}>专辑详情<ArrowUpRight size={16} /></button>
       <button type="button" aria-label="上一张唱片" disabled={albums.length < 2} onClick={() => onSelectAlbum(albums[(index - 1 + albums.length) % albums.length].id)}><ChevronLeft size={20} /></button>

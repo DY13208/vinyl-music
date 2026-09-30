@@ -3,9 +3,18 @@ import { Disc3, X } from 'lucide-react';
 import { Album, Track } from '../types';
 import { VerticalRecordBrowser } from '../components/VerticalRecordBrowser';
 import { AlbumBrowser } from '../components/browse/AlbumBrowser';
+import { VinylCarouselItem } from '../components/VinylCarouselItem';
 import { BrowseState } from '../hooks/useAlbumBrowserState';
 import { HomeTheme } from '../hooks/useHomeTheme';
 import './HomeView.css';
+import './HomeDesktop.css';
+
+// Spine (non-grid) mode renders the same VinylCarouselItem as the default, plus a caption that is display:none
+// everywhere except the desktop (>=1100px + fine pointer) home layout.
+const renderSpineRecord = (album: Album) => <>
+  <VinylCarouselItem album={album} />
+  <span className="home-record-caption" aria-hidden="true"><strong>{album.title}</strong><small>{album.artist}</small></span>
+</>;
 
 interface HomeViewProps {
   browse: BrowseState;
@@ -33,7 +42,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ browse, albums, carouselInde
     </header>
 
     {currentAlbum ? <section className="shelf-focus" aria-label="当前唱片">
-      <AlbumBrowser albums={albums} browse={browse} onOpenAlbumDetail={onOpenAlbumDetail} portrait={<div className="shelf-stage shelf-stage--portrait">
+      <AlbumBrowser albums={albums} browse={browse} onOpenAlbumDetail={onOpenAlbumDetail} renderArtwork={browse.mode !== 'grid' ? renderSpineRecord : undefined} portrait={<div className="shelf-stage shelf-stage--portrait">
         <VerticalRecordBrowser albums={albums} currentIndex={carouselIndex} onSelectIndex={onSelectCarouselIndex} onOpenAlbumDetail={onOpenAlbumDetail} />
       </div>} />
       <div className="shelf-caption" aria-live="polite" aria-atomic="true"><h1 title={currentAlbum.title}>{currentAlbum.title}</h1><p>{currentAlbum.artist}</p></div>

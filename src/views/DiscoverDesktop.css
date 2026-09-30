@@ -1,0 +1,385 @@
+/*
+ * Discover (发现) desktop presentation.
+ * Everything visual lives inside the desktop pointer query; the base rules only hide
+ * the desktop-only nodes so phones and touch landscape keep the existing page untouched.
+ */
+.discover-desk-hero,
+.discover-desk-artists,
+.discover-desk-genres,
+.discover-record__disc { display: none; }
+
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+  #mobile-viewport[data-screen="discover"] {
+    max-width: none;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    box-shadow: none;
+    background: #050706;
+  }
+
+  #mobile-viewport[data-screen="discover"] .discover-page {
+    --desk-inset: max(32px, calc((100vw - 1540px) / 2));
+    --desk-ink: #eef2ef;
+    --desk-muted: #93a198;
+    --desk-faint: #6f7c74;
+    --desk-surface: #111411;
+    min-height: 100%;
+    padding: 0 var(--desk-inset) 150px;
+    background:
+      radial-gradient(ellipse at 72% 0%, rgba(47, 233, 43, .03), transparent 42%),
+      linear-gradient(180deg, #0b0d0c 0, #050706 360px, #050706 100%);
+    color: var(--desk-ink);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-atmosphere { opacity: .08; }
+
+  /* ---------- home mode: one grid, the mobile-only blocks step aside ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-page--home {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    column-gap: 44px;
+    align-content: start;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home > * { grid-column: 1 / -1; min-width: 0; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home > .discover-desk-genres:has(+ .discover-songs) { grid-column: 1; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home > .discover-songs { grid-column: 2; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home > :is(.discover-header, .discover-chips, .discover-browse-artists, .discover-feature, .rare-scroll-progress) { display: none; }
+
+  #mobile-viewport[data-screen="discover"] .discover-section-heading { margin-bottom: 16px; }
+  #mobile-viewport[data-screen="discover"] .discover-section-heading h2 { font-size: 18px; font-weight: 650; letter-spacing: -.01em; }
+  #mobile-viewport[data-screen="discover"] .discover-section-heading > button { min-height: 32px; color: var(--desk-muted); font-size: 12px; }
+  #mobile-viewport[data-screen="discover"] .discover-section-heading > button:hover { color: var(--desk-ink); }
+
+  /* ---------- hero ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero {
+    --hero-h: clamp(270px, 34vh, 320px);
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    align-items: center;
+    height: var(--hero-h);
+    margin: 0 calc(var(--desk-inset) * -1) 30px;
+    padding: 0 var(--desk-inset);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(5, 7, 6, .05), rgba(5, 7, 6, .45) 72%, #050706 100%),
+      url('/assets/vinyl/home-room-bg.webp') 72% 42% / cover no-repeat;
+    opacity: .9;
+    -webkit-mask-image: linear-gradient(90deg, transparent 18%, rgba(0, 0, 0, .55) 42%, #000 70%), linear-gradient(180deg, #000 60%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 18%, rgba(0, 0, 0, .55) 42%, #000 70%), linear-gradient(180deg, #000 60%, transparent 100%);
+    mask-composite: intersect;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__copy { align-self: center; padding-top: 18px; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__kicker {
+    color: var(--desk-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .34em;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero h1 {
+    margin-top: 14px;
+    font-size: clamp(30px, 2.5vw, 42px);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -.02em;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__copy > p:last-child {
+    margin-top: 12px;
+    color: var(--desk-muted);
+    font-size: 14px;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__scene {
+    --sleeve: calc(var(--hero-h) - 122px);
+    position: relative;
+    display: flex;
+    height: 100%;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 28px;
+    padding: 0 12px 30px 0;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__record {
+    position: relative;
+    flex: none;
+    width: calc(var(--sleeve) * 1.3);
+    height: var(--sleeve);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__sleeve {
+    position: absolute;
+    z-index: 1;
+    inset: 0 auto 0 0;
+    width: var(--sleeve);
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--desk-surface);
+    box-shadow: 0 22px 44px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .05);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__sleeve img { width: 100%; height: 100%; object-fit: cover; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__disc {
+    position: absolute;
+    top: 3%;
+    left: 27%;
+    width: 94%;
+    aspect-ratio: 1;
+    width: calc(var(--sleeve) * .94);
+    transition: transform 260ms cubic-bezier(.2, .7, .2, 1);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__disc .vinyl-disc { width: 100% !important; height: 100% !important; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__record:hover .discover-desk-hero__disc,
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__record:focus-visible .discover-desk-hero__disc { transform: translateX(10px); }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption {
+    display: flex;
+    max-width: 240px;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    padding-bottom: 4px;
+    text-align: right;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption small { color: var(--desk-muted); font-size: 11px; letter-spacing: .12em; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption strong,
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption strong { font-size: 18px; font-weight: 650; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption > span { color: #b5c1b9; font-size: 12px; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-hero__caption > div { display: flex; gap: 8px; margin-top: 8px; }
+
+  /* Search: existing form, docked into the hero's top-right corner. */
+  #mobile-viewport[data-screen="discover"] .discover-page--home > .discover-search-sticky {
+    position: absolute;
+    z-index: 5;
+    top: 24px;
+    right: var(--desk-inset);
+    width: min(380px, 30%);
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-search {
+    min-height: 46px;
+    border-color: rgba(255, 255, 255, .08);
+    background: rgba(11, 13, 12, .78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* ---------- artists ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists { display: block; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row {
+    display: grid;
+    grid-template-columns: repeat(var(--artist-cols, 8), minmax(0, 1fr));
+    gap: 22px;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row > button {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--desk-ink);
+    text-align: center;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__portrait {
+    position: relative;
+    display: grid;
+    width: min(100%, 128px);
+    aspect-ratio: 1;
+    place-items: center;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 38%, #1b211d, var(--desk-surface));
+    box-shadow: 0 12px 26px rgba(0, 0, 0, .42), 0 0 0 1px rgba(255, 255, 255, .05);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__portrait b { color: #56635a; font-size: 34px; font-weight: 600; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row > button:hover .discover-desk-artists__portrait {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .14);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row strong,
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row small {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row strong { font-size: 13px; font-weight: 600; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-artists__row small { color: var(--desk-faint); font-size: 11px; }
+
+  /* ---------- records: sleeve + disc peeking right ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-page--home > .discover-albums { margin-top: 36px; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-album-list {
+    --cols: 8;
+    --gap: 26px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols));
+    gap: var(--gap);
+    margin: 0;
+    padding: 8px 0 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-album-list.is-expanded {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+    row-gap: 30px;
+    overflow: visible;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record,
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-album-list.is-expanded .discover-record {
+    position: relative;
+    display: flex;
+    width: auto;
+    max-width: none;
+    flex: none;
+    flex-direction: column;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__visual {
+    position: relative;
+    padding-right: 22%;
+    transition: transform 220ms cubic-bezier(.2, .7, .2, 1);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__disc {
+    position: absolute;
+    z-index: 0;
+    top: 3%;
+    left: 25.5%;
+    display: block;
+    width: 73.3%;
+    aspect-ratio: 1;
+    transition: transform 240ms cubic-bezier(.2, .7, .2, 1);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__disc .vinyl-disc { width: 100% !important; height: 100% !important; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__open { position: relative; z-index: 1; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__cover {
+    border-radius: 3px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .04);
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:hover .discover-record__visual,
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:focus-within .discover-record__visual { transform: translateY(-4px); }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:hover .discover-record__disc,
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:focus-within .discover-record__disc { transform: translateX(8px); }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__visual > .discover-preview {
+    z-index: 2;
+    right: calc(22% + 8px);
+    bottom: 8px;
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:is(:hover, :focus-within) .discover-record__visual > .discover-preview { opacity: 1; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__copy { margin: 12px 22% 0 1px; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__title { font-size: 13px; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__artist { margin-top: 4px; color: var(--desk-faint); font-size: 11px; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__copy > p { display: none; }
+  /* Existing add / version actions stay available, surfaced over the sleeve on hover or focus. */
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__actions {
+    position: absolute;
+    z-index: 2;
+    top: 16px;
+    left: 8px;
+    right: calc(22% + 8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record:is(:hover, :focus-within) .discover-record__actions { opacity: 1; pointer-events: auto; }
+  #mobile-viewport[data-screen="discover"] .discover-page--home .discover-record__actions > button {
+    min-height: 32px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(8, 11, 9, .86);
+    font-size: 11px;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  /* ---------- genres ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres { display: block; margin-top: 40px; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres__grid > button {
+    --tint: hsl(calc(140 + var(--genre-i, 0) * 37) 22% 16%);
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 88px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    overflow: hidden;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, .05);
+    border-radius: 12px;
+    background:
+      linear-gradient(95deg, #0b0d0c 30%, rgba(11, 13, 12, .78) 58%, rgba(11, 13, 12, .35)),
+      url('/assets/vinyl/vinyl-texture.webp') right -34px center / 120px 120px no-repeat,
+      linear-gradient(135deg, var(--tint), #0b0d0c 80%);
+    color: var(--desk-ink);
+    text-align: left;
+    transition: border-color 180ms ease, transform 180ms ease;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres__grid > button:hover { border-color: rgba(255, 255, 255, .14); transform: translateY(-2px); }
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres__grid strong { font-size: 16px; font-weight: 650; }
+  #mobile-viewport[data-screen="discover"] .discover-desk-genres__grid small { color: var(--desk-muted); font-size: 11px; }
+
+  /* ---------- songs (beside genres) ---------- */
+  #mobile-viewport[data-screen="discover"] .discover-page--home > .discover-songs { margin-top: 40px; }
+  #mobile-viewport[data-screen="discover"] .discover-song-list > li { min-height: 64px; padding: 8px 0; }
+
+  #mobile-viewport[data-screen="discover"] .discover-loading,
+  #mobile-viewport[data-screen="discover"] .discover-empty { min-height: 180px; }
+
+  /* ---------- results / artists sub-pages: same measure, wrapped grids ---------- */
+  #mobile-viewport[data-screen="discover"] :is(.discover-page--results, .discover-page--artists) { padding-top: 28px; }
+  #mobile-viewport[data-screen="discover"] .discover-page--results .discover-album-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 0;
+    padding: 0 0 8px;
+    overflow: visible;
+  }
+  #mobile-viewport[data-screen="discover"] .discover-page--results .discover-record { width: auto; max-width: none; flex: none; }
+  #mobile-viewport[data-screen="discover"] .discover-page--results .discover-search-sticky { max-width: 640px; }
+  #mobile-viewport[data-screen="discover"] .discover-artists-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+  @media (max-width: 1599px) {
+    #mobile-viewport[data-screen="discover"] .discover-page--home .discover-album-list { --cols: 6; --gap: 22px; }
+    #mobile-viewport[data-screen="discover"] .discover-desk-artists__row { --artist-cols: 6; }
+    #mobile-viewport[data-screen="discover"] .discover-desk-artists__row > button:nth-child(n + 7) { display: none; }
+  }
+  @media (max-height: 760px) {
+    #mobile-viewport[data-screen="discover"] .discover-desk-hero { --hero-h: 262px; margin-bottom: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #mobile-viewport[data-screen="discover"] :is(.discover-desk-hero__disc, .discover-record__visual, .discover-record__disc, .discover-desk-artists__portrait, .discover-desk-genres__grid > button) { transition: none; }
+  }
+}

@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArtworkImage } from '../../../../../components/ArtworkImage';
+import type { Album } from '../../../../../types';
 import type { CollectionPresentationProps } from '../../CollectionTheme';
 import { createAshenPressCollectionDocument } from './createAshenPressCollectionDocument';
 import './ashenPressCollectionView.css';
@@ -12,6 +14,11 @@ type AshenPressMessage = {
   albumId?: string;
 };
 
+const albumTag = (album: Album) => album.collectionTags?.find(Boolean)
+  || album.genre.split('·').map(value => value.trim()).find(Boolean)
+  || (album.rpm && !album.rpm.includes('待确认') ? album.rpm : '')
+  || '已收藏';
+
 export function AshenPressCollectionView({
   albums,
   selectedAlbumId,
@@ -21,6 +28,9 @@ export function AshenPressCollectionView({
   const hostRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [ready, setReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches
+  ));
   const [hostVisible, setHostVisible] = useState(true);
   const [documentVisible, setDocumentVisible] = useState(() => (
     typeof document === 'undefined' || !document.hidden
@@ -36,6 +46,14 @@ export function AshenPressCollectionView({
     page: safePage,
     totalPages,
   }), [pageAlbums, safePage, totalPages]);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 700px)');
+    const update = () => setIsMobile(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
 
   useEffect(() => {
     setPage(current => Math.min(current, totalPages - 1));
@@ -80,14 +98,44 @@ export function AshenPressCollectionView({
     return () => window.clearTimeout(fallback);
   }, [safePage]);
 
-  const mounted = hostVisible && documentVisible;
+  const mounted = !isMobile && hostVisible && documentVisible;
   const changePage = (nextPage: number) => {
     setPage(Math.max(0, Math.min(totalPages - 1, nextPage)));
   };
 
   return (
-    <div ref={hostRef} className="ct-ashen-press" data-state={ready ? 'ready' : 'loading'}>
-      {!ready && <div className="ct-ashen-press__loading" role="status">正在摆放唱片册…</div>}
+    <div ref={hostRef} className="ct-ashen-press" data-state={isMobile || ready ? 'ready' : 'loading'}>
+      {isMobile ? (
+        <div className="ct-ashen-press__mobile" aria-label="立体唱片架">
+          {Array.from({ length: Math.ceil(pageAlbums.length / 2) }, (_, rowIndex) => (
+            <section className="ct-ashen-press__shelf-row" key={rowIndex} aria-label={`第 ${rowIndex + 1} 层唱片架`}>
+              <div className="ct-ashen-press__records">
+                {pageAlbums.slice(rowIndex * 2, rowIndex * 2 + 2).map(album => (
+                  <button
+                    type="button"
+                    className="ct-ashen-press__record"
+                    data-album-id={album.id}
+                    data-selected={selectedAlbumId === album.id}
+                    key={album.id}
+                    onClick={() => onOpenAlbumDetail(album)}
+                    aria-label={`打开 ${album.title}`}
+                  >
+                    <span className="ct-ashen-press__vinyl" aria-hidden="true" />
+                    <span className="ct-ashen-press__sleeve">
+                      <ArtworkImage src={album.coverUrl} alt="" loading="lazy" />
+                    </span>
+                    <span className="ct-ashen-press__record-copy">
+                      <strong>{album.title}</strong>
+                      <small>{albumTag(album)}</small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+          {!pageAlbums.length && <p className="ct-ashen-press__empty">这层唱片架还没有收藏</p>}
+        </div>
+      ) : !ready ? <div className="ct-ashen-press__loading" role="status">正在摆放唱片…</div> : null}
       {mounted && (
         <iframe
           key={safePage}

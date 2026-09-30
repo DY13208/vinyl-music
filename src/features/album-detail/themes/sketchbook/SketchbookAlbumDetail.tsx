@@ -67,6 +67,7 @@ export function SketchbookAlbumDetail({
         title={`${album.title} 封面手记`}
         srcDoc={source}
         sandbox="allow-scripts"
+        scrolling="yes"
         onLoad={() => setReady(true)}
       />
     </main>

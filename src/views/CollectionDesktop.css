@@ -1,0 +1,50 @@
+/*
+ * Collection (我的唱片架) desktop blending.
+ * Desktop pointer devices only; mobile and touch landscape keep the existing presentation.
+ * Theme files stay untouched: the page simply lets the active theme's own
+ * background (--collection-bg / .ct-page treatment) run edge to edge, and the
+ * ashen-press stage fades into that background instead of ending on hard edges.
+ */
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+  #mobile-viewport[data-screen="collection"] {
+    max-width: none;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    box-shadow: none;
+    background: var(--collection-bg, #0a0e0c);
+  }
+
+  /* Full-bleed theme background, content kept to the previous ~1360px measure. */
+  #mobile-viewport[data-screen="collection"] .ct-page {
+    padding-left: max(20px, calc((100% - 1360px) / 2));
+    padding-right: max(20px, calc((100% - 1360px) / 2));
+  }
+
+  /* Header sits on the theme surface, never on a separate strip. */
+  #mobile-viewport[data-screen="collection"] .ct-heading {
+    background-color: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+  }
+
+  /* Ashen-press: the 3D room is rendered inside its own document, so its lit back wall
+     is softened at the top and sides with a mask; the labels row at the bottom stays crisp. */
+  #mobile-viewport[data-collection-theme="ashen-press"] .ct-ashen-press {
+    background: transparent;
+  }
+  #mobile-viewport[data-collection-theme="ashen-press"] .ct-ashen-press__frame {
+    /* ((side fade ∩ top fade) ∪ bottom band) ∩ hairline side fade: the labels row stays readable. */
+    -webkit-mask-image:
+      linear-gradient(90deg, transparent 0, #000 2.5%, #000 97.5%, transparent 100%),
+      linear-gradient(180deg, transparent 0, transparent 62%, #000 68%),
+      linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%),
+      linear-gradient(180deg, transparent 0, #000 11%, #000 100%);
+    -webkit-mask-composite: source-in, source-over, source-in;
+    mask-image:
+      linear-gradient(90deg, transparent 0, #000 2.5%, #000 97.5%, transparent 100%),
+      linear-gradient(180deg, transparent 0, transparent 62%, #000 68%),
+      linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%),
+      linear-gradient(180deg, transparent 0, #000 11%, #000 100%);
+    mask-composite: intersect, add, intersect;
+  }
+}

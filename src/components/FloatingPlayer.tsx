@@ -22,7 +22,7 @@ export const FloatingPlayer: React.FC<Props> = (props) => {
   const ready = !!currentAlbum && !!currentTrack;
   const progress = Number.isFinite(progressPercent) ? Math.min(100, Math.max(0, progressPercent)) : 0;
   return <div id="floating-player" className={`floating-player floating-player--dock ${isPlaying ? 'is-playing' : ''}`} style={{ '--playback-progress': `${progress * 3.6}deg` } as React.CSSProperties}>
-    <button type="button" className="floating-player__disc" disabled={!ready} aria-label={ready ? `${isPlaying ? '暂停' : '播放'}：${currentTrack.title}` : '尚未选择歌曲'} onClick={() => { onTogglePlay(); hapticsService.triggerHaptic('medium'); }}>
+    <button type="button" className="floating-player__disc" disabled={!ready} aria-label={ready ? `${isPlaying ? '暂停' : '播放'}：${currentTrack.title}` : '尚未选择歌曲'} onClick={() => { onTogglePlay(); hapticsService.triggerHaptic('medium'); }} onDoubleClick={onOpenPlayer}>
       <span className="floating-player__art">{currentAlbum && <ArtworkImage src={currentAlbum.coverUrl} alt="" draggable={false} />}</span>
       <span className="floating-player__state" aria-hidden="true">{isPlaying ? <Pause size={22} fill="currentColor" /> : <Play size={22} fill="currentColor" />}</span>
     </button>

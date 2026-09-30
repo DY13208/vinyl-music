@@ -1,8 +1,11 @@
 import { ArtworkImage } from '../components/ArtworkImage';
-import React, { useState } from 'react';
+import { VinylDisc } from '../components/VinylDisc';
+import React, { useEffect, useRef, useState } from 'react';
 import { Artist, Album } from '../types';
-import { ChevronLeft, Disc, Check, Plus, Share2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Disc, Check, MoreHorizontal, Plus, Share2 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
+import { getVinylAppearance } from '../utils/vinylAppearance';
+import './ArtistDesktop.css';
 
 interface ArtistViewProps {
   artist: Artist;
@@ -140,6 +143,217 @@ export const ArtistView: React.FC<ArtistViewProps> = ({
           </div>
         </section>
 
+      </div>
+      <ArtistDesktop
+        artist={artist}
+        isFollowed={isFollowed}
+        onToggleFollow={() => {
+          setIsFollowed(!isFollowed);
+          hapticsService.triggerHaptic('medium');
+        }}
+        onBack={onBack}
+        onOpenAlbumDetail={onOpenAlbumDetail}
+      />
+    </div>
+  );
+};
+
+const styleTokens = (artist: Artist) => {
+  const seen = new Set<string>();
+  for (const album of artist.albums) {
+    for (const part of album.genre.split(/[·/|,，、]/)) {
+      const token = part.trim();
+      if (token) seen.add(token);
+    }
+  }
+  return [...seen];
+};
+
+const followerFigure = (value: string) => {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  return trimmed.replace(/\s*(人关注|位关注|关注)$/u, '').trim() || trimmed;
+};
+
+const albumCaption = (album: Album) => [album.year ? String(album.year) : '', album.genre].filter(Boolean).join(' · ');
+
+const ArtistDesktop: React.FC<{
+  artist: Artist;
+  isFollowed: boolean;
+  onToggleFollow: () => void;
+  onBack: () => void;
+  onOpenAlbumDetail: (album: Album) => void;
+}> = ({ artist, isFollowed, onToggleFollow, onBack, onOpenAlbumDetail }) => {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [albumsExpanded, setAlbumsExpanded] = useState(false);
+  const moreRef = useRef<HTMLDivElement>(null);
+  const styles = styleTokens(artist);
+  const heroStyle = styles.slice(0, 4).join(' / ');
+  const archiveStyle = styles.join(' / ');
+  const followers = followerFigure(artist.followers);
+  const portrait = artist.bannerUrl || artist.albums[0]?.coverUrl || artist.avatarUrl || '';
+  const facts = [
+    { label: '专辑', value: String(artist.albumCount) },
+    ...(followers ? [{ label: '关注', value: followers }] : []),
+    ...(archiveStyle ? [{ label: '音乐风格', value: archiveStyle }] : []),
+  ];
+  const hasExtraAlbums = artist.albums.length > 4;
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!moreRef.current?.contains(event.target as Node)) setMoreOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMoreOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [moreOpen]);
+
+  const toggleAlbums = () => {
+    if (hasExtraAlbums) setAlbumsExpanded((value) => !value);
+  };
+
+  return (
+    <div className="artist-desktop">
+      <section className="artist-hero">
+        <div className="artist-hero__media" aria-hidden="true">
+          {portrait && <ArtworkImage className="artist-hero__photo" src={portrait} alt="" />}
+          <div className="artist-hero__shade" />
+          <div className="artist-hero__floor" />
+        </div>
+        <div className="artist-hero__content">
+          <button type="button" className="artist-hero__back" onClick={onBack} aria-label="返回">
+            <ChevronLeft size={22} />
+          </button>
+          <div className="artist-hero__copy">
+            <h1>{artist.name}</h1>
+            {heroStyle && <p className="artist-hero__genre">{heroStyle}</p>}
+            <div className="artist-hero__actions">
+              <button type="button" className="artist-hero__follow" aria-pressed={isFollowed} onClick={onToggleFollow}>
+                {isFollowed ? <Check size={15} strokeWidth={2.4} /> : <Plus size={15} strokeWidth={2.4} />}
+                <span>{isFollowed ? '已关注' : '关注'}</span>
+              </button>
+              <div className="artist-hero__more-wrap" ref={moreRef}>
+                <button
+                  type="button"
+                  className="artist-hero__more"
+                  aria-label="更多"
+                  aria-expanded={moreOpen}
+                  aria-haspopup="menu"
+                  onClick={() => setMoreOpen((value) => !value)}
+                >
+                  <MoreHorizontal size={18} />
+                </button>
+                {moreOpen && (
+                  <div className="artist-hero__menu" role="menu">
+                    <button type="button" role="menuitem" onClick={() => { setMoreOpen(false); onBack(); }}>返回</button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="artist-hero__stats">
+              <div>
+                <strong>{artist.albumCount}</strong>
+                <span>专辑</span>
+              </div>
+              {followers && (
+                <div>
+                  <strong className={followers.length > 6 ? 'is-long' : undefined}>{followers}</strong>
+                  <span>关注</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="artist-desktop__body">
+        <section className={`artist-dossier${portrait ? '' : ' is-no-portrait'}${facts.length ? '' : ' is-no-facts'}`} aria-labelledby="artist-archive-title">
+          {portrait && <ArtworkImage className="artist-dossier__portrait" src={portrait} alt="" />}
+          <div className="artist-dossier__copy">
+            <h2 id="artist-archive-title">艺术家档案</h2>
+            {artist.bio.trim() && <p>{artist.bio}</p>}
+          </div>
+          {facts.length > 0 && (
+            <dl className="artist-dossier__facts">
+              {facts.map((fact) => (
+                <div key={fact.label}>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+
+        <section className="artist-albums" aria-labelledby="artist-albums-title">
+          <div className="artist-albums__head">
+            <h2 id="artist-albums-title"><span className="artist-albums__mark" aria-hidden="true" />热门黑胶专辑</h2>
+            {artist.albums.length > 0 && (
+              <div className="artist-albums__tools">
+                {hasExtraAlbums && (
+                  <button type="button" className="artist-albums__pager" aria-label={albumsExpanded ? '收起专辑' : '查看更多专辑'} onClick={toggleAlbums}>
+                    <ChevronRight size={16} />
+                  </button>
+                )}
+                <button type="button" className="artist-albums__all" onClick={toggleAlbums} aria-expanded={hasExtraAlbums ? albumsExpanded : undefined}>
+                  {albumsExpanded && hasExtraAlbums ? '收起' : '查看全部'}
+                </button>
+              </div>
+            )}
+          </div>
+          {artist.albums.length === 0 ? (
+            <p className="artist-albums__empty">还没有这位艺术家的黑胶。</p>
+          ) : (
+            <div className={`artist-albums__grid${albumsExpanded ? ' is-expanded' : ''}`}>
+              {artist.albums.map((album) => {
+                const appearance = getVinylAppearance(album);
+                return (
+                  <article className="artist-record" key={album.id}>
+                    <div className="artist-record__stage" aria-hidden="true">
+                      <div className="artist-record__disc">
+                        <VinylDisc
+                          coverUrl={album.coverUrl}
+                          albumTitle={album.title}
+                          artistName={album.artist}
+                          size="100%"
+                          type={appearance.variant}
+                          texture={appearance.texture}
+                          vinylColors={appearance.colors}
+                          labelColor={appearance.label?.color}
+                          labelImage={appearance.label?.image}
+                          labelText={appearance.label?.text}
+                          rpm={album.rpm}
+                          showSideLabel={false}
+                        />
+                      </div>
+                      <div className="artist-record__sleeve">
+                        <ArtworkImage src={album.coverUrl} alt="" draggable={false} />
+                      </div>
+                    </div>
+                    <div className="artist-record__plinth" aria-hidden="true" />
+                    <div className="artist-record__meta" aria-hidden="true">
+                      <strong>{album.title}</strong>
+                      {albumCaption(album) && <small>{albumCaption(album)}</small>}
+                    </div>
+                    <button
+                      type="button"
+                      className="artist-record__hit"
+                      aria-label={[album.title, album.year || null, album.genre].filter(Boolean).join('，')}
+                      onClick={() => onOpenAlbumDetail(album)}
+                    />
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

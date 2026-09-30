@@ -1,0 +1,249 @@
+/*
+ * Desktop presentation for ProfileView ("我的").
+ * Mobile/tablet: the wrapper is transparent (display:contents) and every desktop-only node is hidden,
+ * so the original mobile layout is untouched. All visual rules live inside the desktop query.
+ */
+.profile-desktop__shell { display: contents; }
+.profile-desktop__ambient,
+.profile-desktop__stat-icon,
+.profile-desktop__stat-title,
+.profile-desktop__crate,
+.profile-desktop__entry-sub,
+.profile-desktop__strip,
+.profile-desktop__settings-card,
+.profile-desktop__recent { display: none; }
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) {
+  #mobile-viewport[data-screen="profile"] { max-width: none; border-inline-width: 0; box-shadow: none; background: #0a0908; }
+  #profile-view { padding-bottom: 0; background: #0a0908; }
+
+  /* ---------- Ambient room light ---------- */
+  #profile-view .profile-desktop__ambient {
+    display: block; position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    background:
+      radial-gradient(1100px 720px at 80% 6%, rgba(255, 178, 104, .12), transparent 62%),
+      radial-gradient(900px 600px at 8% -10%, rgba(150, 132, 108, .10), transparent 65%),
+      linear-gradient(180deg, #14110e 0%, #0c0a09 48%, #080706 100%);
+  }
+  /* Newest real cover, heavily blurred, as warm ambient light. */
+  #profile-view .profile-desktop__ambient img {
+    position: absolute; top: -18%; right: -12%; width: 78%; height: 92%;
+    object-fit: cover; filter: blur(110px) saturate(1.25); opacity: .34;
+  }
+  /* Existing repo room photo (dark sideboard, framed record, lamp) as a dimmed backdrop. */
+  #profile-view .profile-desktop__ambient::before {
+    content: ''; position: absolute; top: 0; right: 0; width: min(1500px, 92vw); height: 620px;
+    background: url('/assets/vinyl/collection-header-bg.webp') right top / cover no-repeat;
+    opacity: .5;
+    -webkit-mask-image: linear-gradient(to left, #000 30%, transparent 92%), linear-gradient(to bottom, #000 45%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to left, #000 30%, transparent 92%), linear-gradient(to bottom, #000 45%, transparent 100%);
+    mask-composite: intersect;
+  }
+  /* Grain + vignette. */
+  #profile-view .profile-desktop__ambient::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      radial-gradient(ellipse 120% 90% at 50% 30%, transparent 55%, rgba(0,0,0,.6) 100%);
+  }
+
+  /* ---------- Page grid ---------- */
+  #profile-view .profile-desktop__shell {
+    position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 20px; align-content: start;
+    width: 100%; max-width: 1400px; margin: 0 auto;
+    padding: 12px clamp(40px, 4vw, 64px) calc(140px + env(safe-area-inset-bottom, 0px));
+  }
+  #profile-view .profile-desktop__shell > :is([data-profile-part="hero"], .profile-desktop__recent) { grid-column: 1 / -1; }
+  /* The settings entry now lives in the card row, so the mobile top bar is not needed here. */
+  #profile-view [data-profile-part="header"] { display: none; }
+
+  /* ---------- Hero ---------- */
+  #profile-view [data-profile-part="hero"] {
+    display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr); grid-template-rows: auto auto;
+    column-gap: 28px; align-items: center; padding: 28px 0 0; text-align: left;
+  }
+  #profile-view .profile-identity {
+    grid-column: 1; grid-row: 1; width: auto; min-width: 0;
+    display: grid; grid-template-columns: 148px minmax(0, 1fr); column-gap: 32px; align-items: center; justify-items: start;
+  }
+  #profile-view .profile-identity > .profile-identity__avatar {
+    grid-row: 1 / span 3; width: 148px; height: 148px; padding: 4px;
+    border-color: rgba(255,255,255,.16); background: #17140f;
+    box-shadow: 0 0 0 8px rgba(255,255,255,.035), 0 26px 60px rgba(0,0,0,.55);
+  }
+  #profile-view .profile-identity > .profile-identity__avatar > svg { width: 56px; height: 56px; }
+  #profile-view .profile-identity > .profile-identity__avatar .profile-identity__camera {
+    right: 8px; bottom: 8px; width: 34px; height: 34px; background: rgba(28,25,21,.92); border-color: rgba(255,255,255,.22);
+  }
+  #profile-view .profile-identity > h2 { grid-column: 2; align-self: end; margin: 0; font-size: 36px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; }
+  #profile-view .profile-identity > .profile-identity__email { grid-column: 2; margin-top: 8px; font-size: 14.5px; color: rgba(255,255,255,.62); }
+  #profile-view .profile-identity > .profile-identity__edit {
+    grid-column: 2; align-self: start; margin-top: 18px; min-height: 40px; padding: 0 18px; gap: 8px;
+    border: 1px solid rgba(255,255,255,.22); border-radius: 999px; background: rgba(255,255,255,.03);
+    color: rgba(255,255,255,.88); font-size: 13.5px; transition: background-color 160ms ease, border-color 160ms ease;
+  }
+  #profile-view .profile-identity > .profile-identity__edit:hover:not(:disabled) { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.34); }
+  #profile-view .profile-identity > p { grid-column: 2; }
+
+  /* Stats: one glass bar */
+  #profile-view [data-profile-part="stats"] {
+    grid-column: 1; grid-row: 2; width: 100%; margin: 30px 0 0; padding: 22px 6px; gap: 0;
+    border: 1px solid rgba(255,255,255,.09); border-radius: 18px;
+    background: linear-gradient(180deg, rgba(38,33,28,.58), rgba(18,16,14,.58));
+    -webkit-backdrop-filter: blur(20px) saturate(1.2); backdrop-filter: blur(20px) saturate(1.2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 20px 50px rgba(0,0,0,.35);
+  }
+  #profile-view [data-profile-part="stats"] > div {
+    display: grid; grid-template-columns: 50px minmax(0, 1fr); column-gap: 14px; align-items: center; justify-items: start;
+    padding: 0 22px; border-width: 0 0 0 1px; border-style: solid; border-color: rgba(255,255,255,.08);
+  }
+  #profile-view [data-profile-part="stats"] > div:first-child { border-left-width: 0; }
+  #profile-view .profile-desktop__stat-icon { display: grid; place-items: center; grid-column: 1; grid-row: 1 / span 3; width: 50px; height: 50px; color: rgba(255,255,255,.82); }
+  #profile-view .profile-desktop__stat-icon svg { width: 30px; height: 30px; stroke-width: 1.5; }
+  #profile-view .profile-desktop__stat-title { display: block; grid-column: 2; font-size: 13px; color: rgba(255,255,255,.72); }
+  #profile-view [data-profile-part="stats"] .rare-counter {
+    grid-column: 2; margin-top: 2px; color: #2FE92B; font-size: 30px; font-weight: 800; line-height: 1.15;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", "PingFang SC", sans-serif;
+  }
+  #profile-view [data-profile-part="stats"] > div > span:last-child { grid-column: 2; margin-top: 2px; font-size: 12px; color: rgba(255,255,255,.5); opacity: 1; }
+
+  /* Record crate: newest real sleeves leaning in front of a record */
+  #profile-view .profile-desktop__crate {
+    display: block; position: relative; grid-column: 2; grid-row: 1 / span 2; justify-self: end;
+    width: min(100%, 540px); aspect-ratio: 540 / 400;
+  }
+  #profile-view .profile-desktop__crate::after {
+    content: ''; position: absolute; left: 4%; right: 0; bottom: 3%; height: 12%; z-index: 0;
+    background: radial-gradient(ellipse at 45% 50%, rgba(0,0,0,.65), transparent 70%);
+  }
+  #profile-view .profile-desktop__crate-disc {
+    position: absolute; z-index: 1; right: 0; top: 12%;
+    width: 58% !important; height: auto !important; filter: drop-shadow(0 22px 30px rgba(0,0,0,.6));
+  }
+  /* Centre label = the album's real cover (VinylDisc labelImage), circular; text overlays hidden when a cover exists. */
+  #profile-view .profile-desktop__crate-disc .vinyl-disc__label { inset: 31%; background-color: #1a1714 !important; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35), 0 0 0 2px rgba(0,0,0,.25); }
+  #profile-view .profile-desktop__crate-disc .vinyl-disc__label:has(.vinyl-disc__label-image) > :not(.vinyl-disc__label-image) { display: none; }
+  #profile-view .profile-desktop__crate-disc .vinyl-disc__label:has(.vinyl-disc__label-image)::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 7%; aspect-ratio: 1; transform: translate(-50%, -50%);
+    border-radius: 50%; background: #0a0908; box-shadow: 0 0 0 1px rgba(255,255,255,.12);
+  }
+  #profile-view .profile-desktop__crate-sleeve {
+    --i: var(--sleeve-index);
+    position: absolute; z-index: calc(10 - var(--i)); display: block; overflow: hidden;
+    left: calc(6% + var(--i) * 6.5%); bottom: calc(8% + var(--i) * 3%); width: 46%; aspect-ratio: 1;
+    border-radius: 4px; background: #1a1714;
+    transform: rotate(calc(-3deg + var(--i) * 1.6deg)) scale(calc(1 - var(--i) * .045));
+    transform-origin: bottom left;
+    box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 10px 18px 34px rgba(0,0,0,.55);
+    filter: brightness(calc(1 - var(--i) * .16));
+  }
+  #profile-view .profile-desktop__crate-sleeve img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---------- Entry cards: collection, wishlist, settings ---------- */
+  #profile-view [data-profile-part="menu"] { display: contents; }
+  #profile-view [data-profile-part="menu"] > *,
+  #profile-view .profile-desktop__settings-card { margin: 0; }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"],
+  #profile-view .profile-desktop__settings-card {
+    position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;
+    min-height: 156px; margin-top: 26px; padding: 20px 20px 20px 22px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px;
+    background: #15120f; color: #fff; text-align: left; cursor: pointer;
+    box-shadow: 0 18px 40px rgba(0,0,0,.35); transition: border-color 180ms ease, transform 180ms ease;
+  }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"]:hover,
+  #profile-view .profile-desktop__settings-card:hover { border-color: rgba(255,255,255,.2); transform: translateY(-2px); }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:first-child {
+    display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 12px; align-items: center;
+  }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:first-child > div {
+    grid-row: 1 / span 2; width: 34px; height: 34px; border: 0; background: transparent;
+  }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:first-child > div svg { width: 26px; height: 26px; color: #fff; stroke-width: 1.6; }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:first-child > span { font-size: 17px; font-weight: 700; color: #fff; }
+  #profile-view .profile-desktop__entry-sub { display: block; grid-column: 2; margin-top: 3px; font-size: 12.5px; color: rgba(255,255,255,.62); }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:nth-child(2) > span { display: none; }
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"] > div:nth-child(2) > svg { width: 20px; height: 20px; color: rgba(255,255,255,.7); }
+
+  /* Card imagery: real covers as a right-aligned collage, dimmed toward the text side. */
+  #profile-view .profile-desktop__strip {
+    position: absolute; inset: 0; z-index: -1; display: grid; grid-auto-flow: column; grid-auto-columns: 156px; justify-content: end;
+  }
+  #profile-view .profile-desktop__strip::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      linear-gradient(90deg, rgba(16,13,11,.97) 0%, rgba(16,13,11,.86) 38%, rgba(16,13,11,.38) 100%),
+      linear-gradient(0deg, rgba(0,0,0,.5), transparent 65%);
+  }
+  #profile-view .profile-desktop__strip-cover { display: block; height: 100%; overflow: hidden; }
+  #profile-view .profile-desktop__strip-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #profile-view .profile-desktop__strip-more,
+  #profile-view .profile-desktop__strip-empty { display: none; }
+  /* No wishlist covers yet: existing room photo (framed record + record stack) instead. */
+  #profile-view .profile-desktop__strip.is-empty { background: url('/assets/vinyl/collection-header-bg.webp') 6% 72% / auto 210% no-repeat; }
+
+  #profile-view .profile-desktop__settings-art {
+    position: absolute; inset: 0; z-index: -1;
+    background:
+      linear-gradient(90deg, rgba(16,13,11,.97) 0%, rgba(16,13,11,.84) 40%, rgba(16,13,11,.3) 100%),
+      linear-gradient(0deg, rgba(0,0,0,.45), transparent 65%),
+      url('/assets/loading/splash-turntable-v2.png') right -40px top -70px / 300px auto no-repeat, #121110;
+  }
+  #profile-view .profile-desktop__settings-icon { display: grid; place-items: center; width: 34px; height: 34px; align-self: center; }
+  #profile-view .profile-desktop__settings-icon svg { width: 26px; height: 26px; stroke-width: 1.6; }
+  #profile-view .profile-desktop__settings-copy { flex: 1 1 auto; min-width: 0; margin-left: -2px; }
+  #profile-view .profile-desktop__settings-copy strong { display: block; font-size: 17px; font-weight: 700; }
+  #profile-view .profile-desktop__settings-copy small { display: block; margin-top: 3px; font-size: 12.5px; color: rgba(255,255,255,.62); }
+  #profile-view .profile-desktop__settings-chevron { width: 20px; height: 20px; color: rgba(255,255,255,.7); align-self: center; }
+  #profile-view .profile-desktop__settings-card:focus-visible,
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"]:focus-visible { outline: 2px solid #2FE92B; outline-offset: 3px; }
+
+  /* ---------- Recently added panel ---------- */
+  #profile-view .profile-desktop__recent {
+    display: block; margin-top: 22px; padding: 18px 24px 24px; border: 1px solid rgba(255,255,255,.08); border-radius: 18px;
+    background: linear-gradient(180deg, rgba(30,27,23,.6), rgba(14,12,11,.6));
+    -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  }
+  #profile-view .profile-desktop__recent-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  #profile-view .profile-desktop__recent-head h2 { margin: 0; font-size: 17px; font-weight: 700; }
+  #profile-view .profile-desktop__recent-head button {
+    display: inline-flex; align-items: center; gap: 2px; min-height: 32px; font-size: 12.5px; color: rgba(255,255,255,.6); transition: color 160ms ease;
+  }
+  #profile-view .profile-desktop__recent-head button:hover { color: #fff; }
+  #profile-view .profile-desktop__recent-grid {
+    display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 22px; margin: 14px 0 0; padding: 0; list-style: none;
+  }
+  #profile-view .profile-desktop__album { display: block; width: 100%; min-width: 0; padding: 0; text-align: left; color: inherit; cursor: pointer; }
+  #profile-view .profile-desktop__album-cover {
+    display: block; aspect-ratio: 1; overflow: hidden; border-radius: 6px; background: #1a1714;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 12px 26px rgba(0,0,0,.45); transition: transform 180ms ease;
+  }
+  #profile-view .profile-desktop__album-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  #profile-view .profile-desktop__album:hover .profile-desktop__album-cover { transform: translateY(-3px); }
+  #profile-view .profile-desktop__album strong,
+  #profile-view .profile-desktop__album small,
+  #profile-view .profile-desktop__album em { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #profile-view .profile-desktop__album strong { margin-top: 10px; font-size: 13.5px; font-weight: 600; }
+  #profile-view .profile-desktop__album small { margin-top: 3px; font-size: 12px; color: rgba(255,255,255,.62); }
+  #profile-view .profile-desktop__album em { margin-top: 3px; font-size: 10.5px; font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+  #profile-view .profile-desktop__album:focus-visible,
+  #profile-view .profile-desktop__recent-head button:focus-visible { outline: 2px solid #2FE92B; outline-offset: 4px; border-radius: 8px; }
+  #profile-view .profile-desktop__recent-empty {
+    margin-top: 14px; padding: 36px 24px; border: 1px dashed rgba(255,255,255,.12); border-radius: 12px;
+    color: rgba(255,255,255,.55); font-size: 14px; text-align: center;
+  }
+}
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) and (max-width:1279px) {
+  #profile-view .profile-desktop__recent-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  #profile-view .profile-desktop__recent-grid > li:nth-child(n + 7) { display: none; }
+}
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion: reduce) {
+  #profile-view .profile-desktop__album-cover,
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"],
+  #profile-view .profile-desktop__settings-card { transition: none; }
+  #profile-view .profile-desktop__album:hover .profile-desktop__album-cover,
+  #profile-view [data-profile-part="menu"] > [id^="profile-menu-"]:hover,
+  #profile-view .profile-desktop__settings-card:hover { transform: none; }
+}

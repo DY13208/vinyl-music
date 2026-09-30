@@ -92,9 +92,9 @@ export interface Artist {
 export interface WishlistItem {
   id: string;
   album: Album;
-  addedDate: string;
+  addedDate: string; // ISO timestamp set when added (older sample data: 'YYYY.MM.DD')
   targetPrice: number;
-  condition: 'Mint (M)' | 'Near Mint (NM)' | 'Very Good Plus (VG+)';
+  condition?: string; // media condition copied from Album.condition; empty when unknown
   pressing: string;
 }
 

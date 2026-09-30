@@ -135,6 +135,31 @@ export function createAlbumSketchbookDocument({ album, favorite, wishlistEnabled
   const bridge = `<script id="vinyl-album-bridge">
   function vinylMessage(action,payload){parent.postMessage(Object.assign({type:'vinyl-album-sketchbook',action:action},payload||{}),'*')}
   function vinylScrollBehavior(){return matchMedia('(max-width: 640px), (pointer: coarse), (prefers-reduced-motion: reduce)').matches?'auto':'smooth'}
+  var vinylTouchScroll=null;
+  document.addEventListener('touchstart',function(event){
+    if(event.touches.length!==1||event.target.closest('.loupe')){vinylTouchScroll=null;return}
+    var touch=event.touches[0];
+    vinylTouchScroll={x:touch.clientX,y:touch.clientY,scrollY:window.scrollY,vertical:false};
+  },{passive:true,capture:true});
+  document.addEventListener('touchmove',function(event){
+    if(!vinylTouchScroll||event.touches.length!==1)return;
+    var touch=event.touches[0],dx=touch.clientX-vinylTouchScroll.x,dy=touch.clientY-vinylTouchScroll.y;
+    if(!vinylTouchScroll.vertical){
+      if(Math.abs(dx)>8&&Math.abs(dx)>Math.abs(dy)*1.15){vinylTouchScroll=null;return}
+      if(Math.abs(dy)<6)return;
+      vinylTouchScroll.vertical=Math.abs(dy)>Math.abs(dx);
+    }
+    if(!vinylTouchScroll.vertical)return;
+    event.preventDefault();
+    window.scrollTo(0,vinylTouchScroll.scrollY-dy);
+  },{passive:false,capture:true});
+  document.addEventListener('touchend',function(){vinylTouchScroll=null},{passive:true,capture:true});
+  document.addEventListener('touchcancel',function(){vinylTouchScroll=null},{passive:true,capture:true});
+  document.addEventListener('wheel',function(event){
+    if(document.documentElement.scrollHeight<=innerHeight||!event.deltaY)return;
+    event.preventDefault();
+    window.scrollBy({top:event.deltaY,left:0,behavior:'auto'});
+  },{passive:false});
   document.querySelectorAll('a[href^="#"]').forEach(function(link){
     link.addEventListener('click',function(event){
       var target=document.getElementById(link.getAttribute('href').slice(1));

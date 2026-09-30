@@ -1,0 +1,126 @@
+/*
+ * Desktop presentation for the HOME page (>=1100px + fine pointer).
+ * The records are the only protagonist: logo, one row of records (AlbumSleeve + VinylDisc via the
+ * existing VinylCarouselItem / SpineCarousel), current album info, prev/next, BottomNav + FloatingPlayer.
+ * Everything visual is scoped to #mobile-viewport[data-screen="home"] inside the desktop query.
+ * Outside it, the desktop-only nodes below are hidden, so mobile / landscape phones render as before.
+ */
+.home-record-caption,
+.browse-selection__kicker,
+.browse-selection__meta { display: none; }
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) {
+  #mobile-viewport[data-screen="home"] {
+    --home-dock-w: min(520px, calc(100% - 660px));
+    max-width: none; border-inline-width: 0; box-shadow: none;
+  }
+  #mobile-viewport[data-screen="home"].browse-shell { background: #070909 !important; }
+
+  /* Pure-CSS room: faint green floor light + near-black vertical falloff. No images on home. */
+  #mobile-viewport[data-screen="home"] .home-shelf__atmosphere {
+    background:
+      radial-gradient(ellipse at 50% 65%, rgba(47,233,43,.035), transparent 38%),
+      linear-gradient(180deg, #070909 0%, #090b0a 60%, #050606 100%);
+  }
+  /* Other home themes keep their own base colour (browse.css --shelf-bg) with the same structure. */
+  #mobile-viewport[data-screen="home"]:not([data-home-theme="dark"]).browse-shell { background: var(--shelf-bg) !important; }
+  #mobile-viewport[data-screen="home"]:not([data-home-theme="dark"]) .home-shelf__atmosphere {
+    background:
+      radial-gradient(ellipse at 50% 65%, color-mix(in srgb, var(--shelf-accent) 3.5%, transparent), transparent 38%),
+      linear-gradient(180deg, var(--shelf-bg) 0%, color-mix(in srgb, var(--shelf-bg) 86%, #fff 2%) 60%, color-mix(in srgb, var(--shelf-bg) 70%, #000) 100%);
+  }
+
+  /* Logo, top-left. */
+  #mobile-viewport[data-screen="home"] .shelf-header { top: 26px; left: 40px; right: 40px; }
+  #mobile-viewport[data-screen="home"] .shelf-brand { gap: 10px; opacity: 1; }
+  #mobile-viewport[data-screen="home"] .shelf-brand svg { width: 30px; height: 30px; stroke-width: 1.2; }
+  #mobile-viewport[data-screen="home"] .shelf-brand strong { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
+
+  /* Main column: toolbar / record row / info bar aligned with the dock. */
+  #mobile-viewport[data-screen="home"] .shelf-focus { align-items: center; padding: 22px 0 calc(12px + env(safe-area-inset-bottom, 0px)); }
+  #mobile-viewport[data-screen="home"] .album-browser { width: min(calc(100% - 80px), 1580px); margin-inline: auto; }
+
+  /* Existing view switch centred on the logo line; existing "N 张唱片架" count at the right. */
+  #mobile-viewport[data-screen="home"] .browse-toolbar { position: relative; justify-content: center; min-height: 58px; padding: 0; }
+  #mobile-viewport[data-screen="home"] .browse-toolbar__extra { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+  #mobile-viewport[data-screen="home"] .browse-total { font-size: 13px; color: rgba(255,255,255,.55); }
+
+  /* ---------- Record row ---------- */
+  #mobile-viewport[data-screen="home"] .spine-carousel { overflow: visible; perspective: none; }
+  /* Display stage under the records. */
+  #mobile-viewport[data-screen="home"] .spine-carousel::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 45%; bottom: 10%; pointer-events: none;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,.025) 55%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  }
+  #mobile-viewport[data-screen="home"] .spine-carousel__album {
+    --record-size: min(clamp(180px, 14vw, 270px), calc(20cqw / 1.36), calc(100cqh - 150px));
+    --pitch: min(20cqw, calc(var(--record-size) * 1.55));
+    top: 46%;
+    transform: translate(calc(-50% + var(--offset) * var(--pitch)), -50%) scale(.95);
+    opacity: .85;
+  }
+  #mobile-viewport[data-screen="home"] .spine-carousel__album.is-selected { transform: translate(-50%, calc(-50% - 8px)) scale(1.04); opacity: 1; }
+  #mobile-viewport[data-screen="home"] .spine-carousel__album:hover:not(.is-selected) { opacity: 1; }
+  /* Five records in the row: the outer carousel slots (|offset| = 3) are not shown on desktop. */
+  #mobile-viewport[data-screen="home"] .spine-carousel__album[style*="--distance: 3"] { visibility: hidden; opacity: 0; pointer-events: none; }
+
+  /* Sleeve + real VinylDisc peeking ~28% to the right. */
+  #mobile-viewport[data-screen="home"] .spine-carousel__album .vinyl-object { width: calc(var(--record-size) * 1.28); }
+  #mobile-viewport[data-screen="home"] .spine-carousel .vinyl-object__disc { left: calc(var(--record-size) * .28); filter: drop-shadow(6px 10px 14px rgba(0,0,0,.6)); }
+  #mobile-viewport[data-screen="home"] .spine-carousel .vinyl-object__sleeve { filter: none; }
+  #mobile-viewport[data-screen="home"] .spine-carousel .vinyl-object__sleeve > div {
+    border-radius: 3px; box-shadow: 0 16px 34px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.07) !important;
+    transition: box-shadow 220ms ease;
+  }
+  #mobile-viewport[data-screen="home"] .spine-carousel__album.is-selected .vinyl-object__sleeve > div {
+    box-shadow: 0 24px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(47,233,43,.55) !important;
+  }
+  /* Weak floor reflection: gradient only. */
+  #mobile-viewport[data-screen="home"] .spine-carousel .vinyl-object::after {
+    content: ''; position: absolute; left: 0; top: calc(100% + 3px); width: var(--record-size); height: calc(var(--record-size) * .2);
+    border-radius: 2px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.045), transparent 85%);
+  }
+
+  /* Title + artist under each record. */
+  #mobile-viewport[data-screen="home"] .home-record-caption {
+    position: absolute; left: calc(50% - var(--record-size) * .14); top: calc(100% + 26px); z-index: 1;
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    width: calc(var(--record-size) * 1.1); transform: translateX(-50%); text-align: center; pointer-events: none;
+  }
+  #mobile-viewport[data-screen="home"] .home-record-caption::before {
+    content: ''; width: 5px; height: 5px; margin-bottom: 7px; border-radius: 50%; background: rgba(255,255,255,.18);
+  }
+  #mobile-viewport[data-screen="home"] .is-selected .home-record-caption::before { background: #2FE92B; }
+  #mobile-viewport[data-screen="home"] .home-record-caption strong,
+  #mobile-viewport[data-screen="home"] .home-record-caption small { max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  #mobile-viewport[data-screen="home"] .home-record-caption strong { font-size: 14px; font-weight: 600; line-height: 1.3; color: rgba(255,255,255,.8); }
+  #mobile-viewport[data-screen="home"] .home-record-caption small { font-size: 11px; letter-spacing: .08em; color: rgba(255,255,255,.42); }
+  #mobile-viewport[data-screen="home"] .is-selected .home-record-caption strong { color: #fff; }
+
+  /* ---------- Current album + controls, on the dock line ---------- */
+  #mobile-viewport[data-screen="home"] .browse-selection { min-height: 74px; padding: 0; gap: 24px; border-top: 0; }
+  #mobile-viewport[data-screen="home"] .browse-selection__copy { max-width: calc(50% - var(--home-dock-w) / 2 - 24px); }
+  #mobile-viewport[data-screen="home"] .browse-selection__kicker {
+    display: block; margin-bottom: 6px; overflow: hidden; font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+    white-space: nowrap; text-overflow: ellipsis; color: rgba(150, 214, 140, .72);
+  }
+  #mobile-viewport[data-screen="home"] .browse-selection h2 { font-size: 24px; font-weight: 600; line-height: 1.25; letter-spacing: -.01em; }
+  #mobile-viewport[data-screen="home"] .browse-selection p:not(.browse-selection__meta) { display: none; }
+  #mobile-viewport[data-screen="home"] .browse-selection__meta { display: block; margin-top: 6px; font-size: 12.5px; color: rgba(255,255,255,.5); }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions { gap: 10px; }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions > button {
+    min-width: 44px; min-height: 44px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: transparent;
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions > button:hover:not(:disabled) { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.05); }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions > button:nth-of-type(2) { order: 1; }
+  #mobile-viewport[data-screen="home"] .browse-selection__count { order: 2; min-width: 58px; font-size: 13px; color: rgba(255,255,255,.7); }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions > button:nth-of-type(3) { order: 3; }
+  #mobile-viewport[data-screen="home"] .browse-selection__actions > .browse-selection__detail { order: 4; margin-left: 10px; padding-inline: 18px; font-size: 13px; border-color: rgba(255,255,255,.2); }
+
+  /* Dock: same order/logic, widened on the home page only. */
+  #mobile-viewport[data-screen="home"] #app-bottom-dock.app-bottom-dock { width: var(--home-dock-w); }
+}

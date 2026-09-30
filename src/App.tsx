@@ -1,5 +1,5 @@
 import { artworkService } from './platform/artwork/WebArtworkAdapter';
-import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   Album,
   Track,
@@ -56,6 +56,11 @@ export default function App({ repository = collectionRepository }: { repository?
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('all');
   // Navigation State
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('home');
+  const homeBodyRef = useRef<HTMLDivElement>(null);
+  // The scroll container is shared by every screen; the artist page always opens at its top.
+  useLayoutEffect(() => {
+    if (currentScreen === 'artist_detail' && homeBodyRef.current) homeBodyRef.current.scrollTop = 0;
+  }, [currentScreen]);
   const [activeTab, setActiveTab] = useState<MainTab>('home');
   const [isImportOpen, setIsImportOpen] = useState(false);
 
@@ -263,9 +268,9 @@ export default function App({ repository = collectionRepository }: { repository?
         {
           id: `w-${Date.now()}`,
           album,
-          addedDate: '2026.09.08',
+          addedDate: new Date().toISOString(),
           targetPrice: album.price || 320,
-          condition: 'Mint (M)',
+          condition: album.condition || undefined,
           pressing: album.edition,
         },
       ];
@@ -385,6 +390,7 @@ export default function App({ repository = collectionRepository }: { repository?
     <div className="fixed inset-0 w-full h-full bg-[#000000] flex justify-center overflow-hidden select-none">
       <div
         id="mobile-viewport"
+         data-screen={currentScreen}
          data-home-theme={theme}
          data-collection-theme={currentScreen === 'collection' ? collectionTheme.themeId : undefined}
          data-album-detail-theme={currentScreen === 'album_detail' ? albumDetailTheme.themeId : undefined}
@@ -392,7 +398,7 @@ export default function App({ repository = collectionRepository }: { repository?
          className={`relative w-full h-full flex flex-col bg-[#000000] text-white overflow-hidden ${isImmersiveAlbumDetail ? 'max-w-none' : 'max-w-md shadow-2xl border-x border-[#1C1C20]/40'} ${currentScreen === 'home' ? 'home-shell' : ''} ${currentScreen === 'home' || currentScreen === 'collection' ? 'browse-shell' : ''}`}
       >
         {/* Scrollable Body Content Area (Fixed Full-Height Mobile Canvas) */}
-        <div className={`home-body flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full ${isImmersiveAlbumDetail ? 'immersive-album-body' : ''}`}>
+        <div ref={homeBodyRef} className={`home-body flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full ${isImmersiveAlbumDetail ? 'immersive-album-body' : ''}`}>
           {currentScreen === 'splash' && (
             <SplashView onEnterApp={() => setCurrentScreen('home')} />
           )}
@@ -507,6 +513,9 @@ export default function App({ repository = collectionRepository }: { repository?
               collectionCount={albums.length}
               artistCount={new Set(albums.map(album => album.artist)).size}
               wishlistCount={wishlist.length}
+              albums={albums}
+              wishlist={wishlist}
+              onOpenAlbumDetail={handleOpenAlbumDetail}
               onOpenSettings={() => setCurrentScreen('settings')}
               onOpenWishlist={() => setCurrentScreen('wishlist')}
               onOpenCollection={() => {

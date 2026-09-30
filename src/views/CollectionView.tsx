@@ -13,6 +13,7 @@ import { CollectionActionMenu, collectionModes } from '../features/collection/Co
 import type { CollectionViewMode } from '../features/collection/themes/CollectionTheme';
 import { CollectionArtwork } from '../features/collection/themes/CollectionAlbumCard';
 import '../features/collection/themes/collectionThemes.css';
+import './CollectionDesktop.css';
 
 interface CollectionViewProps {
   albums: Album[];

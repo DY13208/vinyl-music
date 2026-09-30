@@ -1,0 +1,142 @@
+/*
+ * Desktop presentation for SettingsView ("设置"). Presentation only, no logic changes.
+ * Mobile/tablet: the desktop-only lead line, section icons and subtitles are hidden;
+ * every visual rule lives inside the desktop query.
+ */
+.settings-desktop__lead,
+.settings-desktop__icon,
+.settings-desktop__sub { display: none; }
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) {
+  #mobile-viewport[data-screen="settings"] { max-width: none; border-inline-width: 0; box-shadow: none; background: #0a0908; }
+
+  #settings-view {
+    --settings-gutter: max(clamp(40px, 4vw, 64px), calc((100% - 1400px) / 2));
+    padding-bottom: 0; background: #0a0908; isolation: isolate;
+  }
+  /* Ambient room: existing repo photo, warm light, grain and vignette (fixed behind the scroller). */
+  #settings-view::before {
+    content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      radial-gradient(ellipse 120% 90% at 50% 30%, transparent 55%, rgba(0,0,0,.62) 100%),
+      linear-gradient(90deg, rgba(10,9,8,.9) 0%, rgba(10,9,8,.55) 55%, rgba(10,9,8,.4) 100%),
+      linear-gradient(180deg, transparent 40%, #0a0908 78%),
+      url('/assets/vinyl/collection-header-bg.webp') right top / min(1600px, 100vw) auto no-repeat,
+      radial-gradient(1000px 640px at 86% 0%, rgba(255,178,104,.12), transparent 60%),
+      linear-gradient(180deg, #14110e, #090807);
+  }
+
+  /* Page title */
+  #settings-view > header {
+    position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 18px; align-items: center;
+    padding: 30px var(--settings-gutter) 22px; background: transparent; border-bottom: 0;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  #settings-view > header > button { grid-row: 1 / span 2; width: 44px; height: 44px; background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.14); }
+  #settings-view > header > button:hover { background: rgba(255,255,255,.08); color: #fff; }
+  #settings-view > header h1 { font-size: 34px; line-height: 1.15; letter-spacing: -.01em; }
+  #settings-view .settings-desktop__lead { display: block; margin-top: 6px; font-size: 13.5px; color: rgba(255,255,255,.6); }
+
+  /* Two columns: appearance left; playback, storage, account, about right.
+     The trailing 1fr row absorbs the taller left column so right-hand cards stay compact. */
+  #settings-view > div {
+    display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto 1fr; column-gap: 20px; row-gap: 20px; align-items: start;
+    padding: 0 var(--settings-gutter) calc(140px + env(safe-area-inset-bottom, 0px));
+  }
+  #settings-view > div > section[aria-labelledby="appearance-settings"] { grid-column: 1; grid-row: 1 / -1; }
+  #settings-view > div > section[aria-labelledby="playback-settings"] { grid-column: 2; grid-row: 1; }
+  #settings-view > div > section[aria-labelledby="storage-settings"] { grid-column: 2; grid-row: 2; }
+  #settings-view > div > section[aria-labelledby="account-settings"] { grid-column: 2; grid-row: 3; }
+  #settings-view > div > section[aria-labelledby="about-settings"] { grid-column: 2; grid-row: 4; }
+
+  /* Section card: translucent dark glass, icon square + title + subtitle */
+  #settings-view > div > section {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 14px; align-content: start; min-width: 0;
+    margin: 0; padding: 22px 24px 20px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px;
+    background: linear-gradient(180deg, rgba(32,29,25,.7), rgba(16,14,12,.7));
+    -webkit-backdrop-filter: blur(22px) saturate(1.15); backdrop-filter: blur(22px) saturate(1.15);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px rgba(0,0,0,.35);
+  }
+  #settings-view > div > section > * { grid-column: 1 / -1; margin: 0; }
+  #settings-view .settings-desktop__icon {
+    display: grid; place-items: center; grid-column: 1; grid-row: 1 / span 2; width: 44px; height: 44px;
+    border: 1px solid rgba(255,255,255,.16); border-radius: 12px; background: rgba(255,255,255,.03); color: #fff;
+  }
+  #settings-view .settings-desktop__icon svg { width: 22px; height: 22px; stroke-width: 1.6; }
+  #settings-view > div > section > h2 { grid-column: 2; grid-row: 1; align-self: end; font-size: 18px; font-weight: 700; line-height: 1.3; }
+  #settings-view .settings-desktop__sub { display: block; grid-column: 2; grid-row: 2; align-self: start; margin-top: 2px; font-size: 12.5px; color: rgba(255,255,255,.55); }
+  #settings-view > div > section > .settings-desktop__sub + * { margin-top: 18px; }
+
+  /* Right column rows: label + description left, control right, hairline dividers. */
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md {
+    border: 0; border-radius: 0; background: transparent; padding: 0;
+  }
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md > :is(div, button) { padding-inline: 0; }
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md > *,
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md a { border-color: rgba(255,255,255,.08); }
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md :is(strong, h3) { font-size: 14.5px; font-weight: 600; }
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > div.rounded-md :is(small, p) { font-size: 12px; }
+  #settings-view > div > section:not([aria-labelledby="appearance-settings"]) > p { margin-top: 12px; font-size: 12px; }
+  #settings-view section[aria-labelledby="playback-settings"] > div.rounded-md { padding-block: 4px; }
+  #settings-view section[aria-labelledby="storage-settings"] > div.rounded-md > div { padding-block: 14px 4px; }
+  #settings-view section[aria-labelledby="account-settings"] > div.rounded-md > div { padding-block: 4px 14px; }
+
+  /* Left column: native collapsible <details> rows (unchanged behaviour) and the always-open collection picker, hairline separated. */
+  #settings-view section[aria-labelledby="appearance-settings"] > :is(details, .ct-picker, button:last-child) { border-top: 1px solid rgba(255,255,255,.08); }
+  #settings-view section[aria-labelledby="appearance-settings"] > .settings-desktop__sub + * { margin-top: 14px; }
+  #settings-view section[aria-labelledby="appearance-settings"] details > summary {
+    display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 54px; margin: 0; padding: 0;
+    border: 0; background: transparent; text-align: left; cursor: pointer;
+    font-size: 14.5px; font-weight: 600; color: rgba(255,255,255,.9); transition: color 160ms ease;
+  }
+  #settings-view section[aria-labelledby="appearance-settings"] details > summary:hover { color: #fff; }
+  #settings-view section[aria-labelledby="appearance-settings"] details > summary::after { content: '+'; font-size: 18px; font-weight: 400; color: #bbcbb2; }
+  #settings-view section[aria-labelledby="appearance-settings"] details[open] > summary::after { content: '\2212'; }
+  #settings-view section[aria-labelledby="appearance-settings"] details[open] { padding-bottom: 18px; }
+  /* Collection theme picker stays always expanded; its own title reads as the row label. */
+  #settings-view .ct-picker { padding-bottom: 18px; }
+  #settings-view .ct-picker > h2 { display: flex; align-items: center; min-height: 54px; margin: 0; font-size: 14.5px; font-weight: 600; color: rgba(255,255,255,.9); }
+  #settings-view section[aria-labelledby="appearance-settings"] details > p[role="status"],
+  #settings-view .ct-picker > p { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,.6); }
+
+  /* Segmented controls for the existing home + album-detail choices. */
+  #settings-view section[aria-labelledby="appearance-settings"] details > .grid {
+    gap: 4px; padding: 4px; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: rgba(0,0,0,.28);
+  }
+  #settings-view section[aria-labelledby="appearance-settings"] details:nth-of-type(1) > .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #settings-view section[aria-labelledby="appearance-settings"] details:nth-of-type(2) > .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #settings-view section[aria-labelledby="appearance-settings"] details > .grid > button {
+    min-height: 46px; padding: 9px 12px; border-color: transparent; border-radius: 9px; background: transparent;
+    color: rgba(255,255,255,.66); transition: background-color 160ms ease, color 160ms ease;
+  }
+  #settings-view section[aria-labelledby="appearance-settings"] details:nth-of-type(1) > .grid > button { text-align: center; }
+  #settings-view section[aria-labelledby="appearance-settings"] details > .grid > button:hover:not([aria-pressed="true"]) { background: rgba(255,255,255,.05); color: #fff; }
+  #settings-view section[aria-labelledby="appearance-settings"] details > .grid > button[aria-pressed="true"] {
+    border-color: rgba(47,233,43,.6); background: rgba(47,233,43,.09); color: #eafbe6;
+  }
+  #settings-view section[aria-labelledby="appearance-settings"] details:nth-of-type(2) > .grid > button > span { margin-bottom: 8px; }
+  #settings-view section[aria-labelledby="appearance-settings"] details > .grid > button svg { color: inherit; }
+  #settings-view section[aria-labelledby="appearance-settings"] details:nth-of-type(2) > .grid > button[aria-pressed="true"] svg:last-child { color: #2FE92B; }
+
+  /* Image-card pickers (collection + player themes). */
+  #settings-view .ct-picker__choices { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  #settings-view .pt-selector__options { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  #settings-view :is(.ct-picker__option, .pt-selector__option) { border-color: rgba(255,255,255,.1); border-radius: 12px; transition: border-color 160ms ease; }
+  #settings-view :is(.ct-picker__option, .pt-selector__option):hover:not([aria-pressed="true"]) { border-color: rgba(255,255,255,.26); }
+  #settings-view :is(.ct-picker__option, .pt-selector__option)[aria-pressed="true"] { border-color: rgba(47,233,43,.75); box-shadow: 0 0 0 1px rgba(47,233,43,.25); }
+  #settings-view :is(.ct-picker__name, .pt-selector__name) svg { color: #2FE92B; }
+
+  /* Landscape entry as a plain row. */
+  #settings-view section[aria-labelledby="appearance-settings"] > button:last-child {
+    min-height: 0; padding: 16px 0 2px; border-width: 1px 0 0; border-radius: 0; border-color: rgba(255,255,255,.08); background: transparent;
+  }
+  #settings-view section[aria-labelledby="appearance-settings"] > button:last-child strong { font-size: 14.5px; font-weight: 600; }
+  #settings-view section[aria-labelledby="appearance-settings"] > button:last-child small { font-size: 12px; }
+  #settings-view section[aria-labelledby="appearance-settings"] > button:last-child:hover strong { color: #fff; }
+}
+
+@media (min-width:1100px) and (hover:hover) and (pointer:fine) and (max-width:1399px) {
+  #settings-view .pt-selector__options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

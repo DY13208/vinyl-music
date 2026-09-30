@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   ArrowLeft,
   AudioLines as Equalizer,
@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import type { Album, Track } from "../types";
 import { ArtworkImage } from "../components/ArtworkImage";
+import { VinylDisc } from "../components/VinylDisc";
+import { getVinylAppearance } from "../utils/vinylAppearance";
 import { ScrollProgress } from "../components/rare-ui/ScrollProgress";
 import {
   CatalogueError,
@@ -25,6 +27,7 @@ import {
 import { isInCollection } from "../utils/catalogue";
 import { catalogueCache } from "../services/catalogueCache";
 import "./DiscoverView.css";
+import "./DiscoverDesktop.css";
 
 type Match = VinylSearchResponse["results"][number];
 type SearchState = { query: string; retry: number; artist?: string };
@@ -71,12 +74,22 @@ const quickSeeds = [
   ["原声", "Soundtrack"],
   ["90s", "90s hits"],
 ] as const;
+// Desktop-only presentation nodes are rendered only for fine-pointer desktops, so phones keep the original DOM.
+const DESKTOP_QUERY = "(min-width: 1100px) and (hover: hover) and (pointer: fine)";
+const subscribeDesktop = (notify: () => void) => {
+  if (typeof window === "undefined" || !window.matchMedia) return () => {};
+  const query = window.matchMedia(DESKTOP_QUERY);
+  query.addEventListener("change", notify);
+  return () => query.removeEventListener("change", notify);
+};
+const readDesktop = () => typeof window !== "undefined" && !!window.matchMedia && window.matchMedia(DESKTOP_QUERY).matches;
 const preferredAlbum = (match: Match) => match.vinylRelease ?? match.album;
 const displayCover = (match: Match, album: Album) => album.coverUrl || match.album.coverUrl;
 const isReferenceCover = (match: Match, album: Album) =>
   Boolean(match.vinylRelease && !album.coverUrl && match.album.coverUrl);
 
 export function DiscoverView(props: Props) {
+  const isDesktop = useSyncExternalStore(subscribeDesktop, readDesktop, () => false);
   const [mode, setMode] = useState<"home" | "artists" | "results">("home");
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState<SearchState>({
@@ -433,6 +446,38 @@ export function DiscoverView(props: Props) {
         .filter((item) => item.album.artist === artist)
         .map((item) => item.album),
     );
+  // Desktop-only presentation: artists are derived from the records already on screen (no extra requests).
+  const deskArtists = (() => {
+    const seen = new Map<string, { name: string; album: Album; cover: string }>();
+    for (const { match, album } of displayAlbums) {
+      const name = album.artist.trim();
+      if (!name || name === "未知艺术家") continue;
+      const key = name.toLocaleLowerCase();
+      const cover = displayCover(match, album);
+      const previous = seen.get(key);
+      if (!previous || (!previous.cover && cover)) seen.set(key, { name: album.artist, album, cover });
+    }
+    return [...seen.values()].slice(0, 8);
+  })();
+  const deskDisc = (album: Album, cover: string) => {
+    const appearance = getVinylAppearance(album);
+    return (
+      <VinylDisc
+        coverUrl={cover}
+        albumTitle={album.title}
+        artistName={album.artist}
+        size="100%"
+        type={appearance.variant}
+        texture={appearance.texture}
+        vinylColors={appearance.colors}
+        labelColor={appearance.label?.color}
+        labelImage={appearance.label?.image}
+        labelText={appearance.label?.text}
+        rpm={album.rpm}
+        showSideLabel={false}
+      />
+    );
+  };
   const artistButton = (item: { name: string; album: Album }) => {
     const { name: artist, album } = item;
     const cover = album.coverUrl;
@@ -514,6 +559,11 @@ export function DiscoverView(props: Props) {
         {(home && !allAlbums ? displayAlbums.slice(0, 8) : displayAlbums).map(({ match, album }) => (
           <article className="discover-record" key={album.id} aria-label={`${album.title} · ${album.artist}`}>
             <div className="discover-record__visual">
+              {isDesktop && (
+                <span className="discover-record__disc" aria-hidden="true">
+                  {deskDisc(album, displayCover(match, album))}
+                </span>
+              )}
               <button
                 type="button"
                 className="discover-record__open"
@@ -645,6 +695,106 @@ export function DiscoverView(props: Props) {
       </ol>
     </section>
   );
+  const deskHero = (
+    <section className="discover-desk-hero" aria-labelledby="discover-desk-title">
+      <div className="discover-desk-hero__copy">
+        <p className="discover-desk-hero__kicker">DISCOVER</p>
+        <h1 id="discover-desk-title">发现值得收藏的声音</h1>
+        <p>探索更多黑胶、音乐人与唱片故事</p>
+      </div>
+      <div className="discover-desk-hero__scene">
+        {lead && !loading && !error && (
+          <>
+            <button
+              type="button"
+              className="discover-desk-hero__record"
+              onClick={() => openAlbum(lead.match)}
+              aria-label={`本周推荐：${lead.album.title}`}
+            >
+              <span className="discover-desk-hero__disc" aria-hidden="true">
+                {deskDisc(lead.album, displayCover(lead.match, lead.album))}
+              </span>
+              <span className="discover-desk-hero__sleeve">
+                {displayCover(lead.match, lead.album) ? (
+                  <ArtworkImage src={displayCover(lead.match, lead.album)} alt="" />
+                ) : (
+                  <span className="discover-cover-fallback" aria-hidden="true"><Disc3 /><small>封面待补</small></span>
+                )}
+              </span>
+            </button>
+            <div className="discover-desk-hero__caption">
+              <small>本周推荐</small>
+              <strong>{lead.album.title}</strong>
+              <span>
+                {lead.album.artist}
+                {lead.album.year ? ` · ${lead.album.year}` : ""}
+              </span>
+              <div>
+                {lead.album.tracks[0] && previewButton(lead.album, lead.album.tracks[0], "试听", true)}
+                {addButton(lead.album, true)}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
+  );
+  const deskArtistRow = deskArtists.length > 0 && (
+    <section className="discover-desk-artists" aria-labelledby="discover-desk-artists-title">
+      {heading(
+        "discover-desk-artists-title",
+        "热门艺术家",
+        <button type="button" onClick={() => setMode("artists")}>
+          查看全部
+          <ChevronRight size={15} />
+        </button>,
+      )}
+      <div className="discover-desk-artists__row">
+        {deskArtists.map(({ name, album, cover }) => (
+          <button
+            type="button"
+            key={name}
+            onClick={() => openArtist(name)}
+            aria-label={`查看音乐人：${name}`}
+          >
+            <span className="discover-desk-artists__portrait">
+              <b aria-hidden="true">{name.trim().slice(0, 1).toUpperCase()}</b>
+              {cover && (
+                <ArtworkImage
+                  src={cover}
+                  alt=""
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              )}
+            </span>
+            <strong>{name}</strong>
+            {album.genre && <small>{album.genre}</small>}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+  const deskGenres = (
+    <section className="discover-desk-genres" aria-labelledby="discover-desk-genres-title">
+      {heading("discover-desk-genres-title", "流派探索")}
+      <div className="discover-desk-genres__grid">
+        {quickSeeds.map(([label, seed], index) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => runSearch(seed)}
+            style={{ "--genre-i": index } as React.CSSProperties}
+          >
+            <strong>{label}</strong>
+            {seed !== label && <small>{seed}</small>}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
   const loadingBlock = (
     <div className="discover-loading" role="status">
       <span>正在整理公开唱片资料…</span>
@@ -674,6 +824,7 @@ export function DiscoverView(props: Props) {
       {props.playbackMessage && <p className="discover-playback" role="status">{props.playbackMessage}</p>}
       {mode === "home" ? (
         <>
+          {isDesktop && deskHero}
           <header className="discover-header">
             <h1>发现</h1>
             <p>找到下一张想放进唱片架的唱片。</p>
@@ -733,7 +884,9 @@ export function DiscoverView(props: Props) {
                   </button>
                 </section>
               )}
+              {isDesktop && deskArtistRow}
               {albumRail(true)}
+              {isDesktop && deskGenres}
               {tracks.length > 0 && trackList}
               <ScrollProgress sections={tracks.length > 0 ? discoverySections : discoverySections.slice(0, 2)} />
             </>
@@ -744,6 +897,7 @@ export function DiscoverView(props: Props) {
               <p>你仍然可以从上方搜索或探索风格。</p>
             </div>
           )}
+          {isDesktop && (loading || error || !displayAlbums.length) && deskGenres}
         </>
       ) : mode === "artists" ? (
         <section

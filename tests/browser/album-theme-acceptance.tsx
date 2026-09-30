@@ -7,7 +7,13 @@ import '../../src/index.css';
 
 const requested = new URLSearchParams(location.search).get('theme');
 const themeId: AlbumDetailThemeId = requested === 'holo-card' ? requested : 'cover-notes';
-const album = ALBUMS[2];
+const album = {
+  ...ALBUMS[2],
+  tracks: ALBUMS[2].tracks.map((track, index) => ({
+    ...track,
+    coverUrl: index === 3 ? ALBUMS[1].coverUrl : track.coverUrl,
+  })),
+};
 
 function Acceptance() {
   const [result, setResult] = useState('尚未操作');
