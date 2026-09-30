@@ -9,6 +9,8 @@ import { CollectionThemePicker } from '../features/collection/themes/CollectionT
 import type { CollectionThemeState } from '../features/collection/themes/useCollectionTheme';
 import { PlayerThemeSelector } from '../features/player/themes/settings/PlayerThemeSelector';
 import type { PlayerThemePreference } from '../features/player/themes/usePlayerTheme';
+import { AlbumDetailThemeSelector } from '../features/album-detail/themes/AlbumDetailThemeSelector';
+import type { AlbumDetailThemePreference } from '../features/album-detail/themes/useAlbumDetailTheme';
 import { HOME_THEMES, type HomeTheme } from '../hooks/useHomeTheme';
 
 interface SettingsViewProps {
@@ -20,6 +22,7 @@ interface SettingsViewProps {
   preferenceMessage: string;
   collectionTheme: CollectionThemeState;
   playerTheme: PlayerThemePreference;
+  albumDetailTheme: AlbumDetailThemePreference;
   homeTheme: HomeTheme;
   onSelectHomeTheme: (theme: HomeTheme) => void;
   homeThemeMessage: string;
@@ -37,6 +40,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   preferenceMessage,
   collectionTheme,
   playerTheme,
+  albumDetailTheme,
   homeTheme,
   onSelectHomeTheme,
   homeThemeMessage,
@@ -130,6 +134,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             {homeThemeMessage && <p role="status">{homeThemeMessage}</p>}
           </details>
           <CollectionThemePicker preference={collectionTheme} />
+          <AlbumDetailThemeSelector preference={albumDetailTheme} />
           <details className="pt-settings-section">
             <summary>播放器样式</summary>
             <PlayerThemeSelector preference={playerTheme} />

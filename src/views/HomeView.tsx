@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Disc3, Search, X } from 'lucide-react';
+import { Disc3, X } from 'lucide-react';
 import { Album, Track } from '../types';
 import { VerticalRecordBrowser } from '../components/VerticalRecordBrowser';
 import { AlbumBrowser } from '../components/browse/AlbumBrowser';
@@ -10,14 +10,14 @@ import './HomeView.css';
 interface HomeViewProps {
   browse: BrowseState;
   albums: Album[]; carouselIndex: number; onSelectCarouselIndex: (index: number) => void;
-  onOpenAlbumDetail: (album: Album) => void; onOpenSearch: () => void; onAddAlbum: () => void;
+  onOpenAlbumDetail: (album: Album) => void; onAddAlbum: () => void;
   theme: HomeTheme; onSelectTheme: (theme: HomeTheme) => void; themeMessage: string;
   playingAlbum: Album | null; currentTrack: Track | null; isPlaying: boolean; isLoading: boolean;
   playbackMessage: string; onPlayTrack: (album: Album, track: Track) => void;
   onTogglePlay: () => void; onOpenPlayer: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ browse, albums, carouselIndex, onSelectCarouselIndex, onOpenAlbumDetail, onOpenSearch, onAddAlbum, playingAlbum, currentTrack, isPlaying, isLoading, playbackMessage, onPlayTrack, onTogglePlay, onOpenPlayer }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ browse, albums, carouselIndex, onSelectCarouselIndex, onOpenAlbumDetail, onAddAlbum, playingAlbum, currentTrack, isPlaying, isLoading, playbackMessage, onPlayTrack, onTogglePlay, onOpenPlayer }) => {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const infoDialog = useRef<HTMLDialogElement>(null);
   const currentAlbum = albums[carouselIndex] || albums[0];
@@ -30,7 +30,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ browse, albums, carouselInde
     <div className="home-shelf__atmosphere" aria-hidden="true" />
     <header className="shelf-header">
       <div className="shelf-brand"><Disc3 aria-hidden="true" /><strong>Vinyl Shelf</strong></div>
-      <button id="home-search-btn" type="button" className="shelf-icon" aria-label="搜索唱片" onClick={onOpenSearch}><Search size={20} /></button>
     </header>
 
     {currentAlbum ? <section className="shelf-focus" aria-label="当前唱片">

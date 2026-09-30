@@ -60,3 +60,10 @@
 .album-archive button:disabled { opacity: .45; cursor: default; }
 @container (max-width: 350px) { .archive-object { --archive-sleeve: 190px; --archive-disc: 186px; width: 274px; } .archive-display { height: 240px; } .archive-tracks { padding: 0 17px; } }
 @container (min-width: 700px) { .archive-display { height: 370px; } .archive-object { --archive-sleeve: 275px; --archive-disc: 268px; width: 389px; } .archive-info h1 { font-size: 34px; } }
+
+.archive-info__description { max-width: 65ch; margin: 17px auto 0; color: #c6bfb4; font-size: 12px; line-height: 1.7; white-space: pre-line; text-align: left; }
+
+.home-body.immersive-album-body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}

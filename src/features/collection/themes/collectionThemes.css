@@ -37,6 +37,7 @@
 [data-collection-theme] .collection-room__empty { min-height: 130px; padding: 24px; background: transparent; color: var(--collection-muted); }
 [data-collection-theme] .collection-room__empty button { min-height: 44px; color: var(--collection-accent); }
 .ct-default { position: relative; height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--collection-border) transparent; padding: 8px 16px 20px; animation: ct-reveal 180ms ease; }
+.ct-presentation-loading { display: grid; min-height: 100%; place-items: center; padding: 24px; color: var(--collection-muted); font-size: 12px; }
 .ct-shelf, .ct-glass, .ct-cinematic__albums, .ct-editorial__gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; align-content: start; }
 .ct-card { position: relative; min-width: 0; border-radius: var(--collection-radius); background: var(--collection-card-bg); box-shadow: var(--collection-shadow); transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 .ct-card__open { display: block; width: 100%; padding: 12px 9px 0; border: 0; background: transparent; border-radius: inherit; }
@@ -93,6 +94,11 @@
 [data-collection-theme='shelf'] .spine-carousel { background: linear-gradient(0deg,#0006,transparent 35%), url('/assets/vinyl/shelf-dark-wood.webp') center/700px auto; }
 [data-collection-theme='glass'] .gallery-grid__sleeve { border-color: var(--collection-border); }
 [data-collection-theme='glass'] .gallery-grid__album[aria-pressed=true] .gallery-grid__sleeve { border-color: var(--collection-accent); }
+[data-collection-theme='ashen-press'] .ct-heading { flex: 0 0 0; height: 0; padding: 0; overflow: hidden; }
+[data-collection-theme='ashen-press'] .collection-room__filters,
+[data-collection-theme='ashen-press'] .collection-room__search { display: none; }
+[data-collection-theme='ashen-press'] .ct-default { padding: 0; overflow: hidden; scrollbar-width: none; }
+[data-collection-theme='ashen-press'] .ct-default > .ct-ashen-press { width: 100%; height: 100%; }
 
 /* Lightweight static previews: no live collection, listeners or 3D scenes. */
 .ct-picker > h2 { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
@@ -126,6 +132,14 @@
 [data-preview-theme='cinematic'] .ct-preview__header { margin-bottom: 32px; }
 [data-preview-theme='glass'] { background: radial-gradient(at top right, #42645388, transparent),var(--collection-bg); }
 [data-preview-theme='glass'] .ct-preview__albums > div { border: 1px solid var(--collection-border); }
+[data-preview-theme='ashen-press'] { padding: 10px 8px 14px; background: linear-gradient(#efe7d7 0 72%,#59422e 72% 78%,#221911 78%); }
+[data-preview-theme='ashen-press'] .ct-preview__header { margin-bottom: 18px; }
+[data-preview-theme='ashen-press'] .ct-preview__albums { display: flex; align-items: end; justify-content: center; gap: 2px; }
+[data-preview-theme='ashen-press'] .ct-preview__albums > div { width: 14px; height: 52px; padding: 0; border-radius: 1px 2px 2px 1px; background: #624935; box-shadow: inset 2px 0 #ffffff12, 1px 2px 2px #0005; }
+[data-preview-theme='ashen-press'] .ct-preview__albums > div:nth-child(2n) { height: 47px; background: #27394b; }
+[data-preview-theme='ashen-press'] .ct-preview__albums img,
+[data-preview-theme='ashen-press'] .ct-preview__albums span,
+[data-preview-theme='ashen-press'] .ct-preview__nav { display: none; }
 
 @media (orientation: landscape) and (min-width: 640px) {
   #mobile-viewport[data-collection-theme] .ct-page { padding: env(safe-area-inset-top,0px) max(20px,env(safe-area-inset-right,0px)) calc(114px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px)); }
@@ -225,4 +239,13 @@
   #mobile-viewport[data-collection-theme='cover-wall'] .ct-heading { padding-inline: 12px; }
   .ct-cover-wall { grid-template-columns: repeat(auto-fill,minmax(116px,1fr)); gap: 4px; }
   [data-collection-theme='cover-wall'] .ct-default { padding-inline: 0; }
+}
+
+/* The shelf used to reserve a solid band for the floating dock, which clipped the next row of records. */
+#mobile-viewport[data-collection-theme='shelf'] .ct-page {
+  padding-bottom: 0;
+}
+[data-collection-theme='shelf'] .ct-default {
+  scroll-padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
 }

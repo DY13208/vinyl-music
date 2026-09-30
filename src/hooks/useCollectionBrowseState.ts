@@ -1,6 +1,5 @@
 import { useState } from 'react';
-export const genres = ['全部', '摇滚', '流行', '爵士', '电子', '古典', '其他'] as const;
-export type Genre = typeof genres[number];
+export type Genre = string;
 export type SortOption = 'recent' | 'artist' | 'year';
 
 /** Owned by App so opening a detail page does not discard the collection context. */

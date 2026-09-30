@@ -22,9 +22,11 @@ import { HomeView } from './views/HomeView';
 import { useHomeTheme } from './hooks/useHomeTheme';
 import { useAlbumBrowserState } from './hooks/useAlbumBrowserState';
 import { useCollectionBrowseState } from './hooks/useCollectionBrowseState';
+import { useCollectionCategories, type CategoryKind } from './hooks/useCollectionCategories';
 import { useFloatingPlayerPreference } from './hooks/useFloatingPlayerPreference';
 import { useCollectionTheme } from './features/collection/themes/useCollectionTheme';
 import { usePlayerTheme } from './features/player/themes/usePlayerTheme';
+import { useAlbumDetailTheme } from './features/album-detail/themes/useAlbumDetailTheme';
 import type { RepeatMode } from './features/player/themes/PlayerTheme';
 import { collectionThemeRegistry } from './features/collection/themes/collectionThemeRegistry';
 import { PlayerView } from './views/PlayerView';
@@ -49,6 +51,7 @@ export default function App({ repository = collectionRepository }: { repository?
   const floatingPlayer = useFloatingPlayerPreference();
   const collectionTheme = useCollectionTheme();
   const playerTheme = usePlayerTheme();
+  const albumDetailTheme = useAlbumDetailTheme();
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('all');
   // Navigation State
@@ -63,6 +66,8 @@ export default function App({ repository = collectionRepository }: { repository?
   // Carousel & Content State
   const browse = useAlbumBrowserState(albums);
   const collectionBrowse = useCollectionBrowseState();
+  const categoryState = useCollectionCategories();
+  const [categoryError, setCategoryError] = useState('');
   const carouselIndex = Math.max(0, albums.findIndex(album => album.id === browse.selectedAlbumId));
   const setCarouselIndex = (index: number) => { if (albums[index]) browse.selectAlbum(albums[index].id); };
   const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(albums[0] || null);
@@ -195,6 +200,19 @@ export default function App({ repository = collectionRepository }: { repository?
     void startTrackPreview(album, track);
   };
 
+  const handleImmersiveAlbumPlay = (album: Album) => {
+    const track = album.tracks[0];
+    if (!track) {
+      setPlaybackMessage('这张专辑没有曲目，请先补充曲目或导入本地音频');
+      return;
+    }
+    void startTrackPreview(album, track);
+  };
+
+  const handleImmersiveTrackPlay = (album: Album, track: Track) => {
+    void startTrackPreview(album, track);
+  };
+
   const playAdjacentTrack = (direction: 'next' | 'previous', automatic = false) => {
     if (!currentPlayingAlbum || !currentTrack) return;
     const tracks = currentPlayingAlbum.tracks;
@@ -286,6 +304,33 @@ export default function App({ repository = collectionRepository }: { repository?
     setAlbums(await repository.saveAlbums(newAlbums));
   };
 
+  const handleCategoryChange = async (kind: CategoryKind, oldName: string | null, newName: string | null) => {
+    const current = categoryState.categories;
+    const next = { ...current, [kind]: oldName
+      ? current[kind].filter(item => item !== oldName).concat(newName ? [newName] : [])
+      : [...current[kind], newName!] };
+    setCategoryError('');
+    try {
+      await repository.whenReady?.();
+      const affected = oldName ? albums.filter(album => kind === 'genres'
+        ? album.genre.split(' · ').includes(oldName)
+        : album.collectionTags?.includes(oldName)) : [];
+      for (const album of affected) {
+        const updated = kind === 'genres'
+          ? { ...album, genre: album.genre.split(' · ').flatMap(item => item === oldName ? (newName ? [newName] : []) : [item]).join(' · ') || '其他' }
+          : { ...album, collectionTags: album.collectionTags?.flatMap(item => item === oldName ? (newName ? [newName] : []) : [item]) };
+        await repository.updateAlbum(updated);
+      }
+      if (affected.length) setAlbums(repository.getAlbums());
+      if (!categoryState.save(next)) return false;
+      if (kind === 'genres' && collectionBrowse.genre === oldName) collectionBrowse.setGenre(newName || '全部');
+      return true;
+    } catch (error) {
+      setCategoryError(error instanceof Error ? error.message : '分类修改失败');
+      return false;
+    }
+  };
+
   const handleRemoveAlbum = async (albumId: string) => {
     try { setAlbums(await repository.deleteAlbum(albumId)); }
     catch (error) { setPlaybackMessage(error instanceof Error ? error.message : '本地保存失败'); }
@@ -332,20 +377,22 @@ export default function App({ repository = collectionRepository }: { repository?
     );
   }
 
-  // Bottom Nav is permanently visible on all standard screens (except full-screen player and splash)
-  const isBottomNavVisible = currentScreen !== 'player' && currentScreen !== 'splash';
+  const isImmersiveAlbumDetail = currentScreen === 'album_detail' && albumDetailTheme.themeId !== 'archive';
+  // Immersive ThreeUI album themes own the full viewport and provide their own navigation.
+  const isBottomNavVisible = currentScreen !== 'player' && currentScreen !== 'splash' && !isImmersiveAlbumDetail;
 
   return (
     <div className="fixed inset-0 w-full h-full bg-[#000000] flex justify-center overflow-hidden select-none">
       <div
         id="mobile-viewport"
-        data-home-theme={theme}
-        data-collection-theme={currentScreen === 'collection' ? collectionTheme.themeId : undefined}
-        style={currentScreen === 'collection' ? collectionThemeRegistry[collectionTheme.themeId].tokens : undefined}
-        className={`relative w-full max-w-md h-full flex flex-col bg-[#000000] text-white overflow-hidden shadow-2xl border-x border-[#1C1C20]/40 ${currentScreen === 'home' ? 'home-shell' : ''} ${currentScreen === 'home' || currentScreen === 'collection' ? 'browse-shell' : ''}`}
+         data-home-theme={theme}
+         data-collection-theme={currentScreen === 'collection' ? collectionTheme.themeId : undefined}
+         data-album-detail-theme={currentScreen === 'album_detail' ? albumDetailTheme.themeId : undefined}
+         style={currentScreen === 'collection' ? collectionThemeRegistry[collectionTheme.themeId].tokens : undefined}
+         className={`relative w-full h-full flex flex-col bg-[#000000] text-white overflow-hidden ${isImmersiveAlbumDetail ? 'max-w-none' : 'max-w-md shadow-2xl border-x border-[#1C1C20]/40'} ${currentScreen === 'home' ? 'home-shell' : ''} ${currentScreen === 'home' || currentScreen === 'collection' ? 'browse-shell' : ''}`}
       >
         {/* Scrollable Body Content Area (Fixed Full-Height Mobile Canvas) */}
-        <div className="home-body flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full">
+        <div className={`home-body flex-1 overflow-y-auto no-scrollbar relative flex flex-col w-full ${isImmersiveAlbumDetail ? 'immersive-album-body' : ''}`}>
           {currentScreen === 'splash' && (
             <SplashView onEnterApp={() => setCurrentScreen('home')} />
           )}
@@ -357,7 +404,6 @@ export default function App({ repository = collectionRepository }: { repository?
               carouselIndex={carouselIndex}
               onSelectCarouselIndex={setCarouselIndex}
               onOpenAlbumDetail={handleOpenAlbumDetail}
-              onOpenSearch={() => setCurrentScreen('search')}
               onAddAlbum={() => setIsImportOpen(true)}
               theme={theme}
               onSelectTheme={selectTheme}
@@ -374,7 +420,7 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
 
           {currentScreen === 'collection' && (
-            <CollectionView albums={albums} browse={browse} filters={collectionBrowse} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
+            <CollectionView albums={albums} browse={browse} filters={collectionBrowse} categories={categoryState.categories} themePreference={collectionTheme} favoriteIds={favorites} onToggleFavorite={handleToggleFavorite} onOpenAlbumDetail={handleOpenAlbumDetail} onAddVinyl={() => setIsImportOpen(true)} onDiscover={() => handleChangeTab('discover')} />
           )}
 
           {currentScreen === 'discover' && (
@@ -424,12 +470,13 @@ export default function App({ repository = collectionRepository }: { repository?
           {currentScreen === 'album_detail' && selectedAlbum && (
             <AlbumDetailView
               album={selectedAlbum}
+              themePreference={albumDetailTheme}
               currentTrackId={currentTrack?.id}
               isPlayingAlbum={currentPlayingAlbum?.id === selectedAlbum.id}
               isPlaying={isPlaying}
               onBack={() => setCurrentScreen(activeTab)}
-              onPlayAlbum={handleTogglePlay}
-              onSelectTrack={handleSelectTrack}
+              onPlayAlbum={albumDetailTheme.themeId === 'archive' ? handleTogglePlay : handleImmersiveAlbumPlay}
+              onSelectTrack={albumDetailTheme.themeId === 'archive' ? handleSelectTrack : handleImmersiveTrackPlay}
               onToggleFavorite={handleToggleFavorite}
               isFavorite={favorites.includes(selectedAlbum.id)}
               onToggleWishlist={handleToggleWishlist}
@@ -470,7 +517,7 @@ export default function App({ repository = collectionRepository }: { repository?
           )}
 
           {currentScreen === 'settings' && (
-            <SettingsView onImportLegacy={handleImportMultiple} onBack={() => setCurrentScreen('profile')} onOpenLandscape={() => setCurrentScreen('landscape')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
+            <SettingsView onImportLegacy={handleImportMultiple} onBack={() => setCurrentScreen('profile')} onOpenLandscape={() => setCurrentScreen('landscape')} floatingPlayerVisible={floatingPlayer.visible} onFloatingPlayerVisibleChange={floatingPlayer.setVisible} preferenceMessage={floatingPlayer.message} collectionTheme={collectionTheme} playerTheme={playerTheme} albumDetailTheme={albumDetailTheme} homeTheme={theme} onSelectHomeTheme={selectTheme} homeThemeMessage={themeMessage} />
           )}
 
           {currentScreen === 'player' && currentPlayingAlbum && currentTrack && (
@@ -530,6 +577,9 @@ export default function App({ repository = collectionRepository }: { repository?
               onAddAlbum={handleAddAlbum}
               onImportMultiple={handleImportMultiple}
               currentAlbums={albums}
+              categories={categoryState.categories}
+              onCategoryChange={handleCategoryChange}
+              categoryMessage={categoryError || categoryState.message}
             />
           </Suspense>
         )}

@@ -1,0 +1,166 @@
+.rare-counter {
+  display: inline-flex;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+}
+.rare-counter__digit {
+  display: inline-grid;
+  height: 1.35em;
+  overflow: hidden;
+  line-height: 1.35;
+  mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent);
+}
+.rare-counter__digit > span {
+  display: flex;
+  flex-direction: column;
+}
+.rare-counter__digit > span > span {
+  display: grid;
+  height: 1.35em;
+  place-items: center;
+}
+
+.rare-gooey-nav ul {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rare-gooey-nav li {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--browse-line, rgba(255,255,255,.1));
+  background: var(--browse-surface, #111519);
+}
+.rare-gooey-nav li[data-active] {
+  border-color: color-mix(in srgb, var(--browse-accent, #2fe92b) 30%, var(--browse-line, rgba(255,255,255,.1)));
+  background: color-mix(in srgb, var(--browse-accent, #2fe92b) 11%, var(--browse-surface, #111519));
+}
+.rare-gooey-nav button {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--browse-muted, rgba(255,255,255,.55));
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.rare-gooey-nav button[aria-pressed="true"] {
+  color: var(--browse-accent, #2fe92b);
+}
+.rare-gooey-nav button:focus-visible {
+  outline: 2px solid var(--browse-accent, #2fe92b);
+  outline-offset: -3px;
+}
+
+.rare-scroll-progress {
+  position: fixed;
+  z-index: 42;
+  right: max(16px, calc((100vw - 430px) / 2 + 16px));
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+.rare-scroll-progress__trigger,
+.rare-scroll-progress__menu {
+  border: 1px solid rgba(255,255,255,.11);
+  background: rgba(13,18,15,.94);
+  color: #dce7df;
+  box-shadow: 0 12px 30px rgba(0,0,0,.38);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.rare-scroll-progress__trigger {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px 0 8px;
+  border-radius: 21px;
+  font-size: 11px;
+}
+.rare-scroll-progress__trigger > svg {
+  color: #829088;
+  transition: transform 180ms ease-out;
+}
+.rare-scroll-progress__trigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+.rare-scroll-progress__ring {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+}
+.rare-scroll-progress__ring svg {
+  width: 24px;
+  height: 24px;
+  transform: rotate(-90deg);
+}
+.rare-scroll-progress__ring circle {
+  fill: none;
+  stroke: rgba(255,255,255,.12);
+  stroke-width: 2;
+}
+.rare-scroll-progress__ring circle:last-child {
+  stroke: #62ed58;
+  stroke-linecap: round;
+}
+.rare-scroll-progress__menu {
+  min-width: 144px;
+  padding: 5px;
+  border-radius: 17px;
+  list-style: none;
+}
+.rare-scroll-progress__menu button {
+  display: flex;
+  width: 100%;
+  min-height: 38px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #91a097;
+  font-size: 11px;
+  text-align: left;
+}
+.rare-scroll-progress__menu button > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5d6a62;
+}
+.rare-scroll-progress__menu button[aria-current] {
+  background: rgba(47,233,43,.09);
+  color: #eaf3ec;
+}
+.rare-scroll-progress__menu button[aria-current] > span {
+  background: #62ed58;
+}
+.rare-scroll-progress :is(button):focus-visible {
+  outline: 2px solid #72f569;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .rare-gooey-nav button:hover,
+  .rare-scroll-progress__menu button:hover {
+    color: #edf5ef;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rare-scroll-progress__trigger > svg {
+    transition: none;
+  }
+}
+

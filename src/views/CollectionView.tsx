@@ -4,7 +4,8 @@ import { Album } from '../types';
 import { hapticsService } from '../platform/platformService';
 import { AlbumBrowser } from '../components/browse/AlbumBrowser';
 import { BrowseState } from '../hooks/useAlbumBrowserState';
-import { CollectionBrowseState, Genre, genres } from '../hooks/useCollectionBrowseState';
+import { CollectionBrowseState, Genre } from '../hooks/useCollectionBrowseState';
+import type { Categories } from '../hooks/useCollectionCategories';
 import { CollectionThemeState } from '../features/collection/themes/useCollectionTheme';
 import { collectionThemeRegistry } from '../features/collection/themes/collectionThemeRegistry';
 import { CollectionDefaultLayout } from '../features/collection/themes/CollectionDefaultLayout';
@@ -17,6 +18,7 @@ interface CollectionViewProps {
   albums: Album[];
   browse: BrowseState;
   filters: CollectionBrowseState;
+  categories: Categories;
   themePreference: CollectionThemeState;
   favoriteIds: readonly string[];
   onToggleFavorite: (id: string) => void;
@@ -28,11 +30,10 @@ interface CollectionViewProps {
 
 const genreMatches = (album: Album, genre: Genre) => {
   if (genre === '全部') return true;
-  if (genre === '其他') return !['摇滚', '流行', '爵士', '电子', '古典'].some((name) => album.genre.includes(name));
-  return album.genre.includes(genre);
+  return album.genre.split(' · ').includes(genre);
 };
 
-export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, filters, themePreference, favoriteIds, onToggleFavorite, onOpenAlbumDetail, onAddVinyl, onDiscover }) => {
+export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, filters, categories, themePreference, favoriteIds, onToggleFavorite, onOpenAlbumDetail, onAddVinyl, onDiscover }) => {
   const theme = collectionThemeRegistry[themePreference.themeId];
   const Header = theme.Header;
   const { query, setQuery, genre, setGenre, sort, setSort } = filters;
@@ -83,7 +84,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
       )}
 
       <nav className="collection-room__filters" aria-label="唱片架分类">
-        <div className="collection-room__categories">{genres.map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div>
+        <div className="collection-room__categories">{['全部', ...categories.genres].map((item) => <button key={item} type="button" className={genre === item ? 'is-selected' : ''} onClick={() => updateCollection(() => setGenre(item))}>{item}</button>)}</div>
         <div className="collection-room__toolbar-actions">
           <button type="button" className="collection-room__add" onClick={onAddVinyl} aria-label="新增唱片"><Plus /><span className="collection-room__add-label"><span>新增唱片</span><span>新增</span></span></button>
           <button type="button" className="collection-room__sort" onClick={() => setSheetOpen(true)}><ArrowDownUp /><span>{sort === 'recent' ? '最近入架' : sort === 'artist' ? '艺术家' : '发行年份'}</span></button>
@@ -94,7 +95,7 @@ export const CollectionView: React.FC<CollectionViewProps> = ({ albums, browse, 
         <AlbumBrowser showToolbar={false} galleryLayout={theme.coversOnly ? defaultLayout : undefined} showSelection={!theme.coversOnly || themePreference.viewMode === 'spine-carousel'} albums={shelfAlbums} browse={collectionBrowser} onOpenAlbumDetail={onOpenAlbumDetail} empty={empty} defaultLayout={defaultLayout} portrait={shelfAlbums.length ? defaultLayout : empty} renderArtwork={album => <CollectionArtwork album={album} variant={theme.cardVariant} />} />
       </section>
 
-      <CollectionActionMenu open={sheetOpen} onClose={() => setSheetOpen(false)} filters={filters} preference={themePreference} onAddVinyl={onAddVinyl}/>
+      <CollectionActionMenu open={sheetOpen} onClose={() => setSheetOpen(false)} filters={filters} categories={categories} preference={themePreference} onAddVinyl={onAddVinyl}/>
     </main>
   );
 };

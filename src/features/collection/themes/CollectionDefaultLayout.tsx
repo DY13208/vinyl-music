@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { Suspense, useLayoutEffect, useRef } from 'react';
 import { CollectionPresentationProps, CollectionTheme } from './CollectionTheme';
 
 export function CollectionDefaultLayout({ theme, ...props }: CollectionPresentationProps & { theme: CollectionTheme }) {
@@ -20,5 +20,9 @@ export function CollectionDefaultLayout({ theme, ...props }: CollectionPresentat
     return () => observer.disconnect();
   }, [props.selectedAlbumId, theme.id]);
   const Presentation = theme.Presentation;
-  return <div ref={root} className="ct-default" data-layout={theme.layout}><Presentation {...props} /></div>;
+  return <div ref={root} className="ct-default" data-layout={theme.layout}>
+    <Suspense fallback={<div className="ct-presentation-loading" role="status">正在准备唱片架…</div>}>
+      <Presentation {...props} />
+    </Suspense>
+  </div>;
 }

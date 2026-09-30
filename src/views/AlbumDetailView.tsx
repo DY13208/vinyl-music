@@ -8,6 +8,9 @@ import { ChevronLeft, Play, Heart, BookmarkPlus, ArrowLeftRight } from 'lucide-r
 import { hapticsService } from '../platform/platformService';
 import { getVinylAppearance } from '../utils/vinylAppearance';
 import { albumForSide, durationOf, getAlbumDiscs } from '../utils/vinylSides';
+import type { AlbumDetailThemePreference } from '../features/album-detail/themes/useAlbumDetailTheme';
+import { DarkSoulsAlbumDetail } from '../features/album-detail/themes/holo-card/DarkSoulsAlbumDetail';
+import { SketchbookAlbumDetail } from '../features/album-detail/themes/sketchbook/SketchbookAlbumDetail';
 import './AlbumDetailView.css';
 
 interface AlbumDetailViewProps {
@@ -21,12 +24,20 @@ interface AlbumDetailViewProps {
   onToggleFavorite: (albumId: string) => void;
   isFavorite: boolean;
   onToggleWishlist?: (album: Album) => void;
+  themePreference?: AlbumDetailThemePreference;
 }
 
-export const AlbumDetailView: React.FC<AlbumDetailViewProps> = ({ album, ...props }) =>
-  <AlbumArchive key={album.id} album={album} {...props} />;
+export const AlbumDetailView: React.FC<AlbumDetailViewProps> = ({ album, themePreference, ...props }) => {
+  if (themePreference?.themeId === 'cover-notes') {
+    return <SketchbookAlbumDetail key={album.id} album={album} {...props} />;
+  }
+  if (themePreference?.themeId === 'holo-card') {
+    return <DarkSoulsAlbumDetail key={album.id} album={album} {...props} />;
+  }
+  return <AlbumArchive key={album.id} album={album} {...props} />;
+};
 
-const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
+const AlbumArchive: React.FC<Omit<AlbumDetailViewProps, 'themePreference'>> = ({
   album, currentTrackId, isPlayingAlbum = false, isPlaying = false,
   onBack, onSelectTrack, onToggleFavorite, isFavorite, onToggleWishlist,
 }) => {
@@ -74,6 +85,7 @@ const AlbumArchive: React.FC<AlbumDetailViewProps> = ({
       <p className="archive-info__summary">{album.year} · {album.genre} · {album.trackCount} 首 · {album.totalDuration}</p>
       <p className="archive-info__edition">{album.weight} · {album.edition}</p>
       <p className="archive-info__label">{album.label}</p>
+      {album.description && <p className="archive-info__description">{album.description}</p>}
       <div className="archive-actions">
         <button id="album-detail-play-btn" className="archive-actions__play" type="button" disabled={!allTracks.length} onClick={() => play(allTracks)}><Play size={17} fill="currentColor" />播放整张</button>
         <button id="album-detail-fav-btn" type="button" aria-label={isFavorite ? '取消唱片架喜爱标记' : '唱片架'} aria-pressed={isFavorite} onClick={() => { onToggleFavorite(album.id); hapticsService.triggerHaptic('light'); }}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button>

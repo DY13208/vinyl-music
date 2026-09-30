@@ -10,8 +10,8 @@ test('an existing installation defaults to shelf without borrowing the homepage 
   assert.equal(readCollectionTheme(source), 'shelf');
   assert.equal(readCollectionViewMode(source), 'default');
 });
-test('all five collection themes round-trip independently from all three view modes', () => {
-  for (const theme of ['shelf', 'editorial', 'cinematic', 'glass', 'cover-wall']) {
+test('all six collection themes round-trip independently from all three view modes', () => {
+  for (const theme of ['shelf', 'editorial', 'cinematic', 'glass', 'cover-wall', 'ashen-press']) {
     for (const mode of ['default', 'gallery-grid', 'spine-carousel']) {
       const source = storage({ collection_theme: theme, collection_view_mode: mode });
       assert.equal(readCollectionTheme(source), theme);

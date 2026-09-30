@@ -5,6 +5,7 @@ export interface Track {
   duration: string;
   durationSec: number;
   composer?: string;
+  coverUrl?: string;
 }
 
 export interface LyricLine {

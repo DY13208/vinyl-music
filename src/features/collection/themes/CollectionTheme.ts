@@ -1,7 +1,7 @@
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
 import type { Album } from '../../../types';
 
-export type CollectionThemeId = 'shelf' | 'editorial' | 'cinematic' | 'glass' | 'cover-wall';
+export type CollectionThemeId = 'shelf' | 'editorial' | 'cinematic' | 'glass' | 'cover-wall' | 'ashen-press';
 export type CollectionViewMode = 'default' | 'gallery-grid' | 'spine-carousel';
 export type CollectionTokens = CSSProperties & Record<`--collection-${string}`, string>;
 export type CollectionCardVariant = 'sleeve' | 'cover';
