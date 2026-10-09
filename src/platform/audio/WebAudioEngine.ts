@@ -10,11 +10,13 @@ export class WebAudioEngine implements AudioEngine {
   private currentFreqs: number[] = [196, 246.94, 293.66, 392]; // G major 7 warm chord
   private previewAudio: HTMLAudioElement | null = null;
   private previewKey: string | null = null;
+  private volume = 1;
 
   public async load(source: AudioSource, events: AudioLoadEvents = {}): Promise<void> {
     this.stopPlayback();
     const audio = new Audio(source.uri);
     audio.preload = 'metadata';
+    audio.volume = this.volume;
     audio.crossOrigin = 'anonymous';
     audio.addEventListener('timeupdate', () => events.onTimeUpdate?.(audio.currentTime, audio.duration || 0));
     audio.addEventListener('durationchange', () => events.onTimeUpdate?.(audio.currentTime, audio.duration || 0));
@@ -37,7 +39,9 @@ export class WebAudioEngine implements AudioEngine {
   }
 
   public async setVolume(volume: number): Promise<void> {
-    if (this.previewAudio) this.previewAudio.volume = Math.max(0, Math.min(1, volume));
+    if (!Number.isFinite(volume)) return;
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.previewAudio) this.previewAudio.volume = this.volume;
   }
 
   public async setPlaybackRate(rate: number): Promise<void> {

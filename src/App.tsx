@@ -51,6 +51,7 @@ export default function App({ repository = collectionRepository }: { repository?
   const floatingPlayer = useFloatingPlayerPreference();
   const collectionTheme = useCollectionTheme();
   const playerTheme = usePlayerTheme();
+  const [volume, setVolume] = useState(1);
   const albumDetailTheme = useAlbumDetailTheme();
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('all');
@@ -211,10 +212,6 @@ export default function App({ repository = collectionRepository }: { repository?
       setPlaybackMessage('这张专辑没有曲目，请先补充曲目或导入本地音频');
       return;
     }
-    void startTrackPreview(album, track);
-  };
-
-  const handleImmersiveTrackPlay = (album: Album, track: Track) => {
     void startTrackPreview(album, track);
   };
 
@@ -482,7 +479,7 @@ export default function App({ repository = collectionRepository }: { repository?
               isPlaying={isPlaying}
               onBack={() => setCurrentScreen(activeTab)}
               onPlayAlbum={albumDetailTheme.themeId === 'archive' ? handleTogglePlay : handleImmersiveAlbumPlay}
-              onSelectTrack={albumDetailTheme.themeId === 'archive' ? handleSelectTrack : handleImmersiveTrackPlay}
+              onSelectTrack={handleSelectTrack}
               onToggleFavorite={handleToggleFavorite}
               isFavorite={favorites.includes(selectedAlbum.id)}
               onToggleWishlist={handleToggleWishlist}
@@ -531,6 +528,8 @@ export default function App({ repository = collectionRepository }: { repository?
 
           {currentScreen === 'player' && currentPlayingAlbum && currentTrack && (
             <PlayerView
+              volume={volume}
+              onVolumeChange={value => { setVolume(value); void audioEngine.setVolume(value); }}
               themePreference={playerTheme}
               favorite={favorites.includes(currentPlayingAlbum.id)}
               onToggleFavorite={() => handleToggleFavorite(currentPlayingAlbum.id)}

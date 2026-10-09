@@ -38,6 +38,65 @@ function audioFixture(seconds = 10) {
   return buffer;
 }
 
+for (const theme of ['holo-card', 'cover-notes']) {
+  test(`${theme} album track opens the player even without a playable source`, async ({ page }) => {
+    await mockCatalogue(page);
+    if (theme === 'holo-card') {
+      const tracks = [track, ...['蓝色风暴','发如雪','黑色毛衣','四面楚歌','枫','浪漫手机'].map((title,index) => ({...track,id:`desktop-track-${index}`,title,number:index+2}))];
+      await page.route('**/api/releases/search?*', route => route.fulfill({json:{results:[{...identityMatch,album:{...identity,tracks}},physicalMatch],providers:[]}}));
+    }
+    await page.route('https://api.audius.co/**', route => route.fulfill({ json: { data: [] } }));
+    await page.route('https://itunes.apple.com/**', route => route.fulfill({ json: { results: [] } }));
+    await login(page);
+    await page.evaluate(value => localStorage.setItem('vinyl_album_detail_theme_v1:account:account-b', value), theme);
+    await page.reload();
+    await expect(page.locator('#bottom-navigation-bar')).toBeVisible();
+    await page.locator('#nav-tab-discover').click();
+    await page.getByRole('button', { name: '打开专辑：七里香', exact: true }).click();
+    if (theme === 'holo-card') {
+      await page.getByRole('button', { name: /曲目列表/ }).click();
+      await page.locator('#album-holo-track-drawer').getByRole('button', { name: /七里香/ }).click();
+    } else {
+      await page.frameLocator('.album-sketchbook-theme__frame').locator('#plateList button').filter({ hasText: '七里香' }).last().click();
+    }
+    await expect(page.locator('#player-view-container')).toBeVisible();
+    await expect(page.locator('#player-view-container').getByText('七里香', { exact: true }).first()).toBeVisible();
+    await expect(page.locator('#album-detail-view')).toHaveCount(0);
+    if (theme === 'holo-card') {
+      await expect(page.getByRole('group', { name: '选择唱片面' })).toHaveCount(0);
+      for (const [width, height] of [[1280,720], [1440,900], [1920,1080], [1024,600]]) {
+        await page.setViewportSize({ width, height });
+        await expect(page.locator('.player-desktop-details')).toBeVisible();
+        const disc = await page.locator('.crescent-stage__disc').boundingBox();
+        const crop = await page.locator('.crescent-stage__crop').boundingBox();
+        expect(disc!.x).toBeGreaterThanOrEqual(crop!.x - 1);
+        expect(disc!.y).toBeGreaterThanOrEqual(crop!.y - 1);
+        expect(disc!.x + disc!.width).toBeLessThanOrEqual(crop!.x + crop!.width + 1);
+        expect(disc!.y + disc!.height).toBeLessThanOrEqual(crop!.y + crop!.height + 1);
+        await expect(page.locator('#player-btn-shuffle')).toBeVisible();
+        await expect(page.getByRole('slider', { name: '音量', exact: true })).toBeVisible();
+      }
+      await page.setViewportSize({width:1440,height:900});
+      await page.screenshot({path:'test-results/player-desktop.png'});
+      await page.locator('.player-desktop-queue button').nth(1).click();
+      await expect(page.locator('.player-desktop-queue button').nth(1)).toHaveAttribute('aria-current','true');
+      await expect(page.locator('.player-desktop-details h1')).toHaveText('蓝色风暴');
+      await page.locator('#player-btn-next').click();
+      await expect(page.locator('.player-desktop-details h1')).toHaveText('发如雪');
+      const play = await page.locator('#player-btn-play-pause').boundingBox();
+      expect(play!.width).toBe(play!.height);
+      for (const width of [320,375,390,393,430]) {
+        await page.setViewportSize({width,height:844});
+        await expect(page.locator('.player-desktop-details')).toBeHidden();
+        await expect(page.locator('#player-btn-play-pause')).toBeInViewport();
+        expect(await page.locator('#player-view-container').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+      }
+      await page.screenshot({path:'test-results/player-mobile.png'});
+    }
+
+  });
+}
+
 test('missing release artwork and tracks hydrate without opening details', async ({ page }) => {
   await mockCatalogue(page);
   const missing = { ...physicalMatch, vinylRelease: { ...physicalMatch.vinylRelease, coverUrl: '' } };

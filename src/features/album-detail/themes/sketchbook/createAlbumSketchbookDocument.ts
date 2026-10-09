@@ -62,7 +62,7 @@ export function createAlbumSketchbookDocument({ album, favorite, wishlistEnabled
     })),
   ];
   const description = album.description?.trim()
-    || `《${album.title}》由 ${album.artist} 创作。这里保留专辑封面、曲目顺序与实体压片资料，点击下方曲目即可把对应封面翻到上方。`;
+    || `《${album.title}》由 ${album.artist} 创作。这里保留专辑封面、曲目顺序与实体压片资料，点击下方曲目即可进入播放器。`;
   const meta = [album.year, album.genre, album.edition].map(meaningful).filter(Boolean).join(' · ');
   const catalogue = [album.label, album.matrixCode].map(meaningful).filter(Boolean).join(' · ') || 'VINYL SHELF ARCHIVE';
   const recordFormat = meaningful(album.rpm) || 'LP';
@@ -189,7 +189,11 @@ export function createAlbumSketchbookDocument({ album, favorite, wishlistEnabled
   document = replaceRequired(document, /<header class="top">[\s\S]*?<\/header>/, header, 'header');
   document = replaceRequired(document, /<p class="hero-kicker">[\s\S]*?<\/p>/, `<p class="hero-kicker">${escapeMarkup(album.artist)} / ${escapeMarkup(meta)}</p>`, 'hero kicker');
   document = replaceRequired(document, /<section id="about" class="about">[\s\S]*?<\/section>/, about, 'about');
-  document = replaceRequired(document, '<p class="section-label">Plates</p>', '<p class="section-label">Track index · 点击曲目切换上方封面</p>', 'track index label');
+  document = replaceRequired(document, '<p class="section-label">Plates</p>', '<p class="section-label">Track index · 点击曲目进入播放器</p>', 'track index label');
+  document = replaceRequired(document,
+    "b.onclick=()=>{goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:'smooth',block:'center'});};",
+    "b.onclick=()=>{if(p.trackId){vinylMessage('play-track',{trackId:p.trackId});return;}goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:vinylScrollBehavior(),block:'center'});};",
+    'track index playback');
   document = replaceRequired(document, /<p class="foot" id="contact">[\s\S]*?<\/p>/, footer, 'footer');
   document = replaceRequired(document, /const PAGES=\[[\s\S]*?\];/, `const PAGES=${safeJson(pages)};`, 'pages');
   document = replaceRequired(document, 'PAGES.forEach(p=>p.url=DIR+p.file);', 'PAGES.forEach(p=>p.url=p.url||DIR+p.file);', 'page URLs');
@@ -201,7 +205,6 @@ export function createAlbumSketchbookDocument({ album, favorite, wishlistEnabled
   document = replaceRequired(document, 'animateTo(1,()=>{idx=turn.to;turn=null;paint();},170,26);', 'tweenTo(1,.34,()=>{idx=turn.to;turn=null;paint();});', 'reliable page commit');
   document = replaceRequired(document, 'animateTo(0,()=>{turn=null;paint();},150,24);', 'tweenTo(0,.24,()=>{turn=null;paint();});', 'reliable page cancel');
   document = replaceRequired(document, `document.getElementById('about').scrollIntoView({behavior:'smooth',block:'start'});`, `document.getElementById('about').scrollIntoView({behavior:vinylScrollBehavior(),block:'start'});`, 'mobile about scroll');
-  document = replaceRequired(document, `b.onclick=()=>{goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:'smooth',block:'center'});};`, `b.onclick=()=>{goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:vinylScrollBehavior(),block:'center'});};`, 'mobile track scroll');
   document = replaceRequired(document, `stage.addEventListener('pointerdown',e=>{
   if(e.button!==0)return;
   e.preventDefault();                     /* no text selection, no image drag */

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { ArtworkImage } from '../components/ArtworkImage';
-import { Album, Track, VinylSide } from '../types';
+import { Album, Track } from '../types';
 import { PlayerThemeRenderer } from '../features/player/themes/PlayerThemeRenderer';
 import { PlayerControls } from '../features/player/themes/shared/PlayerControls';
 import { PlayerProgress } from '../features/player/themes/shared/PlayerProgress';
@@ -25,6 +25,7 @@ import {
   Link2,
   RefreshCw,
   Upload,
+  Volume2,
 } from 'lucide-react';
 import { hapticsService } from '../platform/platformService';
 import type { TrackSource } from '../music';
@@ -54,6 +55,8 @@ interface PlayerViewProps {
   isPreviewLoading: boolean;
   onImportLocalSource: () => void;
   localImportPending: boolean;
+  volume: number;
+  onVolumeChange: (volume: number) => void;
 }
 
 export const PlayerView: React.FC<PlayerViewProps> = ({
@@ -75,6 +78,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   isPreviewLoading,
   onImportLocalSource,
   localImportPending,
+  volume, onVolumeChange,
 }) => {
   const [activePanel, setActivePanel] = useState<'none' | 'queue' | 'source'>('none');
   const [viewMode, setViewMode] = useState<'turntable' | 'lyrics'>('turntable');
@@ -98,7 +102,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
   // 获取当前面信息
   const currentVinylSide = sideState.getCurrentVinylSide();
-  const availableSides = sideState.getAvailableSides();
+
 
   useEffect(() => {
     const matchingDisc = playerAlbum.discs?.find(disc =>
@@ -121,23 +125,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     document.addEventListener('keydown', closeOnEscape);
     return () => document.removeEventListener('keydown', closeOnEscape);
   }, [activePanel]);
-
-  /**
-   * 处理翻面动画
-   */
-  const handleFlipSide = (disc: number, side: string) => {
-    if (sideState.currentSide === side && sideState.currentDisc === disc) return;
-    
-    setIsFlipping(true);
-    hapticsService.triggerHaptic('medium');
-    
-    setTimeout(() => {
-      sideState.switchToSide(disc, side);
-      const nextSide = playerAlbum.discs?.find(item => item.disc === disc)?.sides.find(item => item.side === side);
-      if (nextSide?.tracks[0]) onSelectTrack(nextSide.tracks[0]);
-      setIsFlipping(false);
-    }, 200); // 动画时长
-  };
 
   /**
    * 翻到下一面
@@ -186,34 +173,6 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     }
   };
 
-  /**
-   * 获取标签信息（支持图片或文字）
-   */
-  const getLabelContent = () => {
-    if (!currentVinylSide) return null;
-
-    if (currentVinylSide.labelImage) {
-      return (
-        <ArtworkImage
-          src={currentVinylSide.labelImage}
-          alt={`Side ${currentVinylSide.side}`}
-          className="w-full h-full object-cover rounded-full"
-        />
-      );
-    }
-
-    // 降级到文字标签
-    const bgColor = currentVinylSide.labelColor || '#d8c9a7';
-    return (
-      <div
-        className="w-full h-full rounded-full flex items-center justify-center text-white font-bold text-2xl"
-        style={{ backgroundColor: bgColor }}
-      >
-        {currentVinylSide.side}
-      </div>
-    );
-  };
-
   return (
     <div
       id="player-view-container"
@@ -231,26 +190,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           <ChevronDown className="w-5 h-5" />
         </button>
 
-        {availableSides.length > 1 && (
-          <div className="player-side-controls player-side-controls--header">
-            <div className="player-side-pill" role="group" aria-label="选择唱片面">
-              {availableSides.slice(0, 2).map((side, index) => (
-                <button
-                  key={side.side}
-                  type="button"
-                  onClick={() => handleFlipSide(sideState.currentDisc, side.side)}
-                  disabled={isFlipping}
-                  className={`player-side-pill__option ${sideState.currentSide === side.side ? 'is-active' : ''}`}
-                  title={`切换到 ${index === 0 ? 'A' : 'B'} 面`}
-                >
-                  {index === 0 ? 'A' : 'B'}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {themePreference.themeId === 'crescent' ? <span className="crescent-header-spacer" aria-hidden="true" /> : <div className="full-player__brand" aria-hidden="true">
+        {themePreference.themeId === 'crescent' ? <span className="crescent-header-spacer"><span className="player-desktop-brand">Vinyl Shelf</span></span> : <div className="full-player__brand" aria-hidden="true">
           <strong>ORBIT</strong>
           <span>轻触封面播放</span>
         </div>}
@@ -318,7 +258,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       <div className="full-player__turntable" hidden={viewMode !== 'turntable'}>
         {/* 唱片容器 - 支持滑动翻面 */}
         <div
-          className="flex-1 flex items-center justify-center touch-none"
+          className="player-stage-layout flex-1 flex items-center justify-center touch-none"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -358,6 +298,23 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             }
           />
         </div>
+
+        {themePreference.themeId === 'crescent' && <section className="player-desktop-details" aria-label="专辑与曲目">
+          <p className="player-desktop-details__album">{album.title}{album.year ? ` · ${album.year}` : ''}</p>
+          <h1 title={currentTrack.title}>{currentTrack.title}</h1>
+          <p className="player-desktop-details__artist">{album.artist}</p>
+          <header><h2>曲目列表</h2><span>{album.tracks.length} 首</span></header>
+          <ol className="player-desktop-queue">
+            {album.tracks.map((track, index) => <li key={track.id}>
+              <button type="button" aria-label={`播放歌曲：${track.title}`} aria-current={track.id === currentTrack.id ? 'true' : undefined} onClick={() => onSelectTrack(track)}>
+                <span className="player-desktop-queue__number">{String(index + 1).padStart(2, '0')}</span>
+                <span className="player-desktop-queue__title">{track.title}</span>
+                {track.id === currentTrack.id && <span className="player-desktop-queue__status">{isPlaying ? '播放中' : '已选择'}</span>}
+                <span className="player-desktop-queue__duration">{track.duration}</span>
+              </button>
+            </li>)}
+          </ol>
+        </section>}
 
         {themePreference.themeId !== 'crescent' && themePreference.themeId !== 'luminous-card' && (
           <PlayerTrackInfo album={album} currentTrack={currentTrack} favorite={favorite} onToggleFavorite={onToggleFavorite} />
@@ -407,6 +364,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
       {/* Bottom Controls Area (Restrained 80/15/5 ratio) */}
       <div className="full-player__controls">
         {themePreference.themeId === 'crescent' && <div className="crescent-controls__track" aria-label="当前播放">
+          <ArtworkImage className="player-desktop-thumbnail" src={album.coverUrl} alt="" />
           <div className="crescent-controls__track-title">
             <strong title={currentTrack.title}>{currentTrack.title}</strong>
           </div>
@@ -414,6 +372,10 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             <span title={`${album.artist} · ${album.title}`}>{album.artist}</span>
             <button type="button" id="player-favorite" aria-label={favorite ? '取消当前专辑的喜爱标记' : '将当前专辑标记为喜爱'} aria-pressed={favorite} onClick={onToggleFavorite}><Heart size={18} fill={favorite ? 'currentColor' : 'none'}/></button>
           </div>
+        </div>}
+        {themePreference.themeId === 'crescent' && <div className="player-desktop-volume">
+          <Volume2 size={20} aria-hidden="true" />
+          <input type="range" min="0" max="1" step="0.01" value={volume} onChange={event => onVolumeChange(Number(event.target.value))} aria-label="音量" />
         </div>}
         <PlayerControls artwork={themePreference.themeId === 'classic' || themePreference.themeId === 'crescent' || themePreference.themeId === 'luminous-card' ? undefined : album.coverUrl} isPlaying={isPlaying} loading={isPreviewLoading} shuffle={isShuffle} repeatMode={repeatMode} onShuffleChange={onShuffleChange} onRepeatChange={onRepeatChange} onTogglePlay={onTogglePlay} onPrevTrack={onPrevTrack} onNextTrack={onNextTrack} />
         <PlayerProgress progress={progressPercent} currentTime={currentTimeSec} duration={durationSec} onSeek={onSeek} />

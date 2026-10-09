@@ -152,6 +152,7 @@ export function createAlbumHoloDocument(source: string, configValue: AlbumHoloCo
       let line = "";
       for (const token of tokens) {
         const candidate = line ? line + joiner + token : token;
+        if (context.measureText(token).width > maxWidth) return null;
         if (line && context.measureText(candidate).width > maxWidth) {
           lines.push(line);
           line = token;
@@ -181,15 +182,21 @@ export function createAlbumHoloDocument(source: string, configValue: AlbumHoloCo
       context.fillStyle = fillStyle;
       const step = size * lineHeight;
       const firstY = y - ((lines.length - 1) * step) / 2;
-      lines.forEach((line, index) => context.fillText(line, canvas.width / 2, firstY + index * step));
+      // Center the visible glyphs, including CJK fallback fonts whose baseline
+      // metrics differ from Georgia/Arial. Canvas "middle" alone sits too low.
+      lines.forEach((line, index) => {
+        const metrics = context.measureText(line);
+        const inkOffset = (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
+        context.fillText(line, canvas.width / 2, firstY + index * step + inkOffset);
+      });
     };
 
     drawFitted({
       text: albumConfig.albumTitle || "VINYL SHELF",
-      y: 332,
+      y: 256,
       maxWidth: 1280,
       maxLines: 2,
-      maxSize: 82,
+      maxSize: 104,
       minSize: 44,
       lineHeight: 1.1,
       family: "Georgia, 'Noto Serif SC', serif",
@@ -197,10 +204,10 @@ export function createAlbumHoloDocument(source: string, configValue: AlbumHoloCo
     });
     drawFitted({
       text: albumConfig.artistName || "",
-      y: 2742,
+      y: 2650,
       maxWidth: 1160,
       maxLines: 1,
-      maxSize: 56,
+      maxSize: 76,
       minSize: 36,
       lineHeight: 1,
       family: "Arial, 'Noto Sans SC', sans-serif",

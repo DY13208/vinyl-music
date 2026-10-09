@@ -30,7 +30,7 @@ function Acceptance() {
     observer.observe(document.querySelector('#player-view-container')!, {subtree:true,childList:true,attributes:true,attributeFilter:['data-angle','data-phase']});
     return () => observer.disconnect();
   }, []);
-  return <><PlayerView album={album} currentTrack={album.tracks[track]} isPlaying={playing} progressPercent={progress}
+  return <><PlayerView volume={1} onVolumeChange={()=>{}} album={album} currentTrack={album.tracks[track]} isPlaying={playing} progressPercent={progress}
     themePreference={{themeId,setTheme,message:''}} favorite={favorite} onToggleFavorite={()=>setFavorite(value=>!value)} isShuffle={shuffle} onShuffleChange={setShuffle} repeatMode={repeatMode} onRepeatChange={setRepeatMode}
     playbackSource={null} playbackMessage="本地界面验证" isPreviewLoading={false} onImportLocalSource={()=>{}} localImportPending={false}
     currentTimeSec={album.tracks[track].durationSec * progress / 100} durationSec={album.tracks[track].durationSec}
